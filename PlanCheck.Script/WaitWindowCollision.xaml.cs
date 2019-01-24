@@ -14,9 +14,6 @@ using System.Windows.Shapes;
 
 namespace PlanCheck
 {
-    /// <summary>
-    /// Interaction logic for WaitWindow.xaml
-    /// </summary>
     public partial class WaitWindowCollision : Window
     {
         public WaitWindowCollision()
