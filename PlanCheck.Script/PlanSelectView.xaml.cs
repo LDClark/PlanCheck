@@ -19,9 +19,6 @@ using Path = System.IO.Path;
 
 namespace PlanCheck
 {
-    /// <summary>
-    /// Interaction logic for Window1.xaml
-    /// </summary>
     public partial class PlanSelectView : UserControl
     {
         private PlanSelectViewModel _psvm;
