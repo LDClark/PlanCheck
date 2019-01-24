@@ -1,0 +1,8 @@
+Structure IDs,Structure Codes,IDAliases,CodeAliases,DVH Objective,Evaluation Point,Variation,Priority,Met,Achieved
+Heart,7088,,,Mean[cGy],<=400,420,1,,
+Heart,7088,,,Max[cGy],<=2500,2625,1,,
+Lung_L,7310,Lung LT,,D15%[cGy],<=2000,2100,1,,
+Lung_R,7309,Lung RT,,D15%[cGy],<=2000,2100,1,,
+Lungs Combined,68877,Lungs|Lungs-PTV|Total Lung,,D60%[cGy],<=500,525,1,,
+Lungs Combined,68877,Lungs|Lungs-PTV|Total Lung,,D50%[cGy],<=1000,1050,1,,
+Lungs Combined,68877,Lungs|Lungs-PTV|Total Lung,,D15%[cGy],<=2000,2100,1,,
