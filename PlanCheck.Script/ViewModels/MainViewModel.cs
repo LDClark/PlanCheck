@@ -11,11 +11,6 @@ using VMS.TPS.Common.Model.API;
 
 namespace PlanCheck
 {
-    /// <summary>
-    /// Interaction logic for MainControl.xaml
-    /// </summary>
-    /// 
-
     public class MainViewModel : ViewModelBase
     {
         public Patient Patient { get; set; }
