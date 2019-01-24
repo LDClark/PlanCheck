@@ -81,8 +81,5 @@ namespace VMS.TPS
             scriptContext.PlanSumsInScope,
             mainWindow);
         }
-
-        // Fix UnauthorizedScriptingAPIAccessException
-        public void DoNothing(PlanSetup plan) { }
     }
 }
