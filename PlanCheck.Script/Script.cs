@@ -70,8 +70,8 @@ namespace VMS.TPS
             }
         }
 
-		public void Execute(ScriptContext scriptContext, Window mainWindow)
-		{
+	public void Execute(ScriptContext scriptContext, Window mainWindow)
+	{
             Run(scriptContext.CurrentUser,
             scriptContext.Patient,
             scriptContext.Image,
