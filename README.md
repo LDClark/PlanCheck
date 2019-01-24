@@ -5,3 +5,5 @@ A version 15.5 read-only plugin script that checks Plan DVH metrics including pl
 This project includes code from EclipsePluginRunner, SimplePdfReport, and DvhSummary from redcurry.
 
 This project includes helper/geometry class code from HelixToolkit.
+
+This project includes code from DVHMetric from Steve Thompson and Tomasz Morgas.
