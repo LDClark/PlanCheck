@@ -9,6 +9,7 @@ Checks for collisions between Body/Support/Gantry (gantry distances were from a 
 Hard-coded plan/structure/dose checks.
 
 
+
 This project includes code from EclipsePluginRunner, SimplePdfReport, and DvhSummary from redcurry.
 
 This project includes helper/geometry class code from HelixToolkit.
