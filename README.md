@@ -1,7 +1,7 @@
 # PlanCheck
 
 A version 15.5 read-only plugin script that checks:
-Plan DVH metrics including planSums and planSetups, with PDF reports.
+Plan DVH metrics including planSums and planSetups, with PDF reports and customizable templates.
 Collisions between Body/Support/Gantry (gantry distances were from a Trilogy), and gives approximate distance.  
 Hard-coded plan/structure/dose checks.
 
