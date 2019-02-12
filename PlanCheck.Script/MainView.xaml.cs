@@ -26,21 +26,42 @@ namespace PlanCheck
     public partial class MainView : UserControl
     {
         private MainViewModel _vm;
+       // public MainViewModel ViewModel
+       // {
+         //   get { return _vm; }
+         //   set
+         //   {
+         //       _vm = value;
+        //        DataContext = _vm;
+        //    }
+       // }
 
         public MainView(MainViewModel mainViewModel)
         {
             _vm = mainViewModel;
             InitializeComponent();
             DataContext = _vm;
-            pqmDataGrid.Columns[5].Header = _vm.ActivePlanningItem.PlanningItemIdWithCourse;
-            SliderBar.Minimum = -135;
-            SliderBar.Maximum = 135;
+            //pqmDataGrid.Columns[5].Header = _vm.ActivePlanningItem.PlanningItemIdWithCourse;
+            SliderBar.Minimum = -180;
+            SliderBar.Maximum = 180;
             SliderBar.TickFrequency = 1;
+            _vm.GetPQMSummaries(_vm.ActiveConstraintPath, _vm.ActivePlanningItem, _vm.Patient);
+            DirectoryInfo constraintDir = new DirectoryInfo(Path.Combine(AssemblyHelper.GetAssemblyDirectory(), "ConstraintTemplates"));
+            string firstFileName = constraintDir.GetFiles().FirstOrDefault().ToString();
+            string firstConstraintFilePath = Path.Combine(constraintDir.ToString(), firstFileName);
+            
+
+            //_vm.ActiveConstraintPath = new ConstraintViewModel(firstConstraintFilePath);
+            //ActiveConstraintPath = new ConstraintViewModel(constraintPath);
+            UpdatePqmDataGrid();
+            //NotifyPropertyChanged("Structure");
+            //pqmDataGrid.ItemsSource = 
         }
 
         public void UpdatePqmDataGrid()
         {
-            pqmDataGrid.Columns[5].Header = _vm.ActivePlanningItem.PlanningItemIdWithCourse;
+            //pqmDataGrid.Columns[5].Header = _vm.ActivePlanningItem.PlanningItemIdWithCourse;
+            
             pqmDataGrid.ItemsSource = null;
             pqmDataGrid.ItemsSource = _vm.PqmSummaries;
         }
@@ -48,15 +69,16 @@ namespace PlanCheck
         private void ConstraintComboBoxChanged(object sender, SelectionChangedEventArgs e)
         {
             var selection = (ConstraintViewModel)ConstraintComboBox.SelectedItem;
-            if (_vm.ActiveConstraintPath.ConstraintPath != selection.ConstraintPath)
-            {
+           // if (_vm.ActiveConstraintPath.ConstraintPath != selection.ConstraintPath)
+            //if (_vm.PqmSummaries != null)
+            //{
                 _vm.ActiveConstraintPath = (ConstraintViewModel)ConstraintComboBox.SelectedItem;
                 var calculator = new PQMSummaryCalculator();
                 _vm.GetPQMSummaries(_vm.ActiveConstraintPath, _vm.ActivePlanningItem, _vm.Patient);
                 UpdatePqmDataGrid();
                 planningItemSummariesDataGrid.ItemsSource = null;
                 planningItemSummariesDataGrid.ItemsSource = _vm.PlanningItemSummaries;
-            }
+            //}
         }
 
         private PlanningItemViewModel GetPlan(object sender)
@@ -66,9 +88,9 @@ namespace PlanCheck
             return new PlanningItemViewModel(planningItem.PlanningItemObject);
         }
 
-        private PlanningItemViewModel GetPlanFromRadioButton(object sender)
+        private PlanningItemViewModel GetPlanFromCheckBox(object sender)
         {
-            var selection = (RadioButton)sender;
+            var selection = (CheckBox)sender;
             var planningItem = (PlanningItemDetailsViewModel)selection.DataContext;
             return new PlanningItemViewModel(planningItem.PlanningItemObject);
         }
@@ -90,8 +112,9 @@ namespace PlanCheck
 
         private void StructureChanged(object sender, EventArgs e)
         {
-            var selection = GetStructure(sender);
+            //var selection = GetStructure(sender);
             UpdatePqmDataGrid();
+            //var q = pqmDataGrid.Items;
         }
 
         private void ButtonClicked(object sender, RoutedEventArgs e)
@@ -190,12 +213,19 @@ namespace PlanCheck
             return Path.GetTempFileName() + ".pdf";
         }
 
-        private void RadioButtonChecked(object sender, RoutedEventArgs e)
+        private void CheckBoxChecked(object sender, RoutedEventArgs e)
         {
-            _vm.ActivePlanningItem = GetPlanFromRadioButton(sender);
+            //_vm.ActivePlanningItem = GetPlanFromCheckBox(sender);
+            var comparisionPlan = GetPlanFromCheckBox(sender);
             //_vm.ActivePlanningItem = plan;
-            _vm.GetPQMSummaries(_vm.ActiveConstraintPath, _vm.ActivePlanningItem, _vm.Patient);
+            _vm.GetPQMSummaries(_vm.ActiveConstraintPath, comparisionPlan, _vm.Patient);
+            //DataGridTextColumn textColumn = new DataGridTextColumn();
+            //textColumn.Header = "Comparision Plan";
+            //textColumn.Binding = new Binding("PQM1");
+            //pqmDataGrid.Columns.Add(textColumn);
             //pqmDataGrid.Columns[5].Header = plan.PlanningItemIdWithCourse;
+            
+            //pqmDataGrid.ItemsSource
             UpdatePqmDataGrid();
             _vm.GetErrors(_vm.ActivePlanningItem);
             errorDataGrid.ItemsSource = null;
@@ -206,7 +236,7 @@ namespace PlanCheck
             planningItemSummariesDataGrid.ItemsSource = _vm.PlanningItemSummaries;
         }
 
-        private void RadioButtonUnchecked(object sender, RoutedEventArgs e)
+        private void CheckBoxUnchecked(object sender, RoutedEventArgs e)
         {
 
         }
@@ -222,5 +252,15 @@ namespace PlanCheck
             perspectiveCamera.Position = new Point3D(x, 0, z);
             ModelVisual.Content = _vm.ModelGroup;
         }
+
+        private void CheckBox_AccessKeyPressed(object sender, AccessKeyPressedEventArgs e)
+        {
+
+        }
+
+        //private void StructureChanged(object sender, ContextMenuEventArgs e)
+        //{
+
+        //}
     }
 }
