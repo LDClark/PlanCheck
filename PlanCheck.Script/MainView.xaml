@@ -1,4 +1,3 @@
-
 <UserControl x:Class="PlanCheck.MainView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -65,10 +64,10 @@
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <Grid>
-                                        <RadioButton 
-                                            x:Name="RadioButton"
-                                            Checked="RadioButtonChecked" 
-                                            Unchecked="RadioButtonUnchecked" 
+                                        <CheckBox
+                                            x:Name="CheckBox"
+                                            Checked="CheckBoxChecked"
+                                            Unchecked="CheckBoxUnchecked"
                                             HorizontalAlignment="Center" 
                                             VerticalAlignment="Center"
                                             
@@ -240,6 +239,7 @@
             </Grid>
             <DataGrid x:Name="pqmDataGrid"
                   EnableRowVirtualization="False"
+                  IsReadOnly="True"
                   Grid.Row="1" 
                   AutoGenerateColumns="False"
                   HorizontalAlignment="Stretch"
@@ -248,8 +248,8 @@
                   RowHeight="23"
                   ColumnWidth="*" >
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="TemplateId" Binding="{Binding TemplateId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="2*"/>
-                    <DataGridTemplateColumn Header="FoundStructure" SortMemberPath="FoundStructure.StructureName" Width="2*">
+                    <DataGridTextColumn Header="TemplateId" Binding="{Binding TemplateId}" Width="2*"/>
+                    <DataGridTemplateColumn Header="FoundStructure" SortMemberPath="Structure.StructureName" Width="2*">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <Grid>
@@ -289,6 +289,7 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
+                    
                     <DataGridTextColumn Header="StructVolume" Binding="{Binding StructVolume, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="*"/>
                     <DataGridTextColumn Header="DVHObjective" Binding="{Binding DVHObjective, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="*"/>
                     <DataGridTextColumn Header="Goal" Binding="{Binding Goal, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="*"/>
@@ -298,7 +299,7 @@
                                 <Grid>
                                     <ProgressBar  Foreground="{Binding Path=AchievedColor}"  Value="{Binding AchievedPercentageOfGoal, UpdateSourceTrigger=PropertyChanged}" BorderBrush="{x:Null}" Background="{x:Null}" />
                                     <TextBlock Text="{Binding Achieved, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                    <TextBlock Text="{Binding Met,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Bottom" HorizontalAlignment="Right" FontSize="12" FontWeight="Bold"/>
+                                    <TextBlock Text="{Binding Met, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Bottom" HorizontalAlignment="Right" FontSize="12" FontWeight="Bold"/>
                                 </Grid>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
