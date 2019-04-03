@@ -5,7 +5,7 @@ namespace PlanCheck.Calculators
 {
     class PQMCoveredDoseAtVolume
     {
-        public static string GetCoveredDoseAtVolume(StructureSet structureSet, PlanningItem planningItem, Structure evalStructure, MatchCollection testMatch, Group evalunit)
+        public static string GetCoveredDoseAtVolume(StructureSet structureSet, PlanningItemViewModel planningItem, Structure evalStructure, MatchCollection testMatch, Group evalunit)
         {
             System.Console.WriteLine("Covered Dose at Volume");
             return "Not supported";
