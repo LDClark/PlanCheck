@@ -42,21 +42,22 @@ namespace PlanCheck
             return m_objectives;
         }
 
-        public ObservableCollection<Structure> FindMatchingStructures(ConstraintViewModel constraintVM, StructureSet structureSet)
-        {
-            PQMSummaryViewModel[] m_objectives = GetObjectives(constraintVM);
-            var evalStructureList = new ObservableCollection<Structure>();
+      //  public ObservableCollection<Structure> FindMatchingStructures(ConstraintViewModel constraintVM, StructureSet structureSet)
+      //  {
+           // PQMSummaryViewModel[] m_objectives = GetObjectives(constraintVM);
+           // var evalStructureList = new ObservableCollection<Structure>();
             //int i = 0;
-            foreach (var objective in m_objectives)
-            {
-                Structure evalStructure = FindStructureFromAlias(structureSet, objective.TemplateId, objective.TemplateAliases, objective.TemplateCodes);
-                evalStructureList.Add(evalStructure);
+           // foreach (var objective in m_objectives)
+           // {
+            //    Structure evalStructure = FindStructureFromAlias(structureSet, objective.TemplateId, objective.TemplateAliases, objective.TemplateCodes);
+                //objective.Structure = evalStructure;
+            //    evalStructureList.Add(evalStructure);
                 //i++;
-            }
-            return evalStructureList;
-        }
+          //  }
+         //   return evalStructureList;
+       // }
 
-        public PQMSummaryViewModel CalculatePQM(PQMSummaryViewModel objective, PlanningItemViewModel planningItemVM, StructureSet structureSet, StructureViewModel evalStructure)
+        public PQMSummaryViewModel GetObjectiveProperties(PQMSummaryViewModel objective, PlanningItemViewModel planningItemVM, StructureSet structureSet, StructureViewModel evalStructure)
         {
             objective.ActivePlanningItem = planningItemVM;
             PlanningItem planningItem = planningItemVM.PlanningItemObject;
@@ -73,7 +74,8 @@ namespace PlanCheck
                 objective.Structure = evalStructure;
                 objective.StructureName = evalStructure.StructureName;
                 objective.StructVolume = evalStructure.VolumeValue;
-                objective.StructureNameWithCode = evalStructure.StructureNameWithCode;
+                //objective.StructureNameWithCode = evalStructure.StructureNameWithCode;
+                NotifyPropertyChanged("Structure");
                 objective.StructureList = StructureSetListViewModel.GetStructureList(structureSet);
                 return objective;
             }
@@ -226,8 +228,9 @@ namespace PlanCheck
                 expression = expression.Replace(resultString, newValue.ToString());
             }
         }
-        public string CalculateMetric(StructureSet structureSet, StructureViewModel evalStructureVM, PlanningItem planningItem, string DVHObjective)
+        public string CalculateMetric(StructureSet structureSet, StructureViewModel evalStructureVM, PlanningItemViewModel planningItem, string DVHObjective)
         {
+
             //start with a general regex that pulls out the metric type and the @ (evalunit) part.
             string pattern = @"^(?<type>[^\[\]]+)(\[(?<evalunit>[^\[\]]+)\])$";
             string minmaxmean_Pattern = @"^(M(in|ax|ean)|Volume)$";//check for Max or Min or Mean or Volume
@@ -277,6 +280,7 @@ namespace PlanCheck
                                     testMatch = Regex.Matches(type.Value, gi_pattern);
                                     if (testMatch.Count != 1)
                                     {
+                                        
                                         return string.Format("DVH Objective expression \"{0}\" is not a recognized expression type.", DVHObjective);
                                     }
                                     else
