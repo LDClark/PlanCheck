@@ -22,17 +22,6 @@ namespace PlanCheck
         public PlanningItemViewModel ActivePlanningItem { get; set; }
         public List<ErrorViewModel> ErrorGrid { get; set; }
         public ObservableCollection<PQMSummaryViewModel> PqmSummaries { get; set; }
-
-       // public ObservableCollection<StructureViewModel> _FoundStructureList;
-       // public ObservableCollection<StructureViewModel> FoundStructureList
-       // {
-        //    get { return _FoundStructureList; }
-        //    set
-         //   {
-         //       _FoundStructureList = value;
-        //        NotifyPropertyChanged("FoundStructureList");
-       //     }
-       // }
         PQMSummaryViewModel[] Objectives { get; set; }
         public ObservableCollection<PlanningItemViewModel> PlanningItemList { get; set; }
         public ObservableCollection<ConstraintViewModel> ConstraintComboBoxList { get; set; }
@@ -53,15 +42,12 @@ namespace PlanCheck
             Image = ActivePlanningItem.PlanningItemImage;
             StructureSet = ActivePlanningItem.PlanningItemStructureSet;
             DirectoryInfo constraintDir = new DirectoryInfo(Path.Combine(AssemblyHelper.GetAssemblyDirectory(), "ConstraintTemplates"));
-            //DirectoryInfo constraintDir = new DirectoryInfo(Path.Combine(AssemblyHelper.GetAssemblyDirectory(), "ConstraintTemplates"));
             string firstFileName = constraintDir.GetFiles().FirstOrDefault().ToString();
             string firstConstraintFilePath = Path.Combine(constraintDir.ToString(), firstFileName);
             ActiveConstraintPath = new ConstraintViewModel(firstConstraintFilePath);
             PlanningItemList = planningItemList;
             StructureList = StructureSetListViewModel.GetStructureList(StructureSet); ;
             ConstraintComboBoxList = ConstraintListViewModel.GetConstraintList(constraintDir.ToString());
-            //GetPQMSummaries(ActiveConstraintPath, ActivePlanningItem, Patient);
-            //PqmSummaries = new ObservableCollection<PQMSummaryViewModel>();
             ErrorGrid = GetErrors(ActivePlanningItem);
             Title = GetTitle(patient, scriptVersion);
             ModelGroup = new Model3DGroup();
@@ -71,7 +57,6 @@ namespace PlanCheck
             isoctr = new Point3D(0, 0, 0);  //just to initalize
             cameraPosition = new Point3D(0, 0, -3500);
             PlanningItemSummaries = GetPlanningItemSummary(ActivePlanningItem, PlanningItemList);
-            //NotifyPropertyChanged("Structure");
         }
 
         public string GetTitle(Patient patient, string scriptVersion)
@@ -147,11 +132,7 @@ namespace PlanCheck
         {
             StructureSet structureSet = planningItem.PlanningItemStructureSet;
             Structure evalStructure;
-            //ObservableCollection<PQMSummaryViewModel> pqmSummaries = new ObservableCollection<PQMSummaryViewModel>();
-            //ObservableCollection<StructureViewModel> foundStructureList = new ObservableCollection<StructureViewModel>();
             var calculator = new PQMSummaryCalculator();
-            //var numCol = PqmSummaries[0]
-            //Objectives = calculator.GetObjectives(constraintPath);
             if (planningItem.PlanningItemObject is PlanSum)
             {
                 var waitWindowPQM = new WaitWindowPQM();
@@ -169,14 +150,10 @@ namespace PlanCheck
                             pqm.AchievedColor_Comparison = pqmSummary.AchievedColor;
                             pqm.AchievedPercentageOfGoal_Comparison = pqmSummary.AchievedPercentageOfGoal;
                             pqm.Met_Comparison = pqmSummary.Met;
-                            //pqmSummaries.Add(pqmSummary);
-                            //foundStructureList.Add(new StructureViewModel(evalStructure));
                         }
                     }
-                    //FoundStructureList = foundStructureList;
                     waitWindowPQM.Close();
                 }
-                //PqmSummaries = pqmSummaries;
             }
             else //is plansetup
             {
@@ -201,13 +178,10 @@ namespace PlanCheck
                             }
                             var pqmSummary = calculator.GetObjectiveProperties(pqm, planningItem, structureSet, new StructureViewModel(evalStructure));
                             pqm.Achieved_Comparison = pqmSummary.Achieved;
-                            //foundStructureList.Add(new StructureViewModel(evalStructure));
                         }
                     }
-                    //FoundStructureList = foundStructureList;
                     waitWindowPQM.Close();
                 }
-                //PqmSummaries = pqmSummaries;
             }
             return PqmSummaries;
         }
