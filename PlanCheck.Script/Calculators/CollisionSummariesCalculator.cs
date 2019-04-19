@@ -3,6 +3,8 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Media.Media3D;
 using VMS.TPS.Common.Model.API;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace PlanCheck
 {
@@ -51,7 +53,7 @@ namespace PlanCheck
             if (isArc == true)
             {
                 int i = 0;
-                int arcAngleResolution = 20;  //number of degrees to skip
+                int arcAngleResolution = 0;  //number of degrees to skip
                 foreach (ControlPoint cp in beam.ControlPoints)
                 {
                     if (planSetup.TreatmentOrientation.ToString() == "HeadFirstProne")
@@ -59,18 +61,20 @@ namespace PlanCheck
                     else
                         gantryAngle = cp.GantryAngle <= 180.0f ? (Math.PI / 180.0f) * cp.GantryAngle : (Math.PI / 180.0f) * (cp.GantryAngle - 360.0f);
                     i++;
-                    if (cp.Index == 0)
-                    {
+                    if (cp.Index == beam.ControlPoints.First().Index)
                         AddCylinderToMesh(planSetup, meshBuilder, gantryAngle, tableAngle, iso);
-                    }
-                    if (cp.Index == beam.ControlPoints.Count())
+                    if (beam.GantryDirection.ToString() == "Clockwise")
                     {
-                        AddCylinderToMesh(planSetup, meshBuilder, gantryAngle, tableAngle, iso);
-                    }
-                    if (cp.Index == (beam.ControlPoints.First().Index + arcAngleResolution))
+                        if (cp.Index == (beam.ControlPoints.First().Index + arcAngleResolution))
+                            AddCylinderToMesh(planSetup, meshBuilder, gantryAngle, tableAngle, iso);
+                    }                       
+                    if (beam.GantryDirection.ToString() == "CounterClockwise")
                     {
-                        AddCylinderToMesh(planSetup, meshBuilder, gantryAngle, tableAngle, iso);
+                        if (cp.Index == (beam.ControlPoints.First().Index - arcAngleResolution))
+                            AddCylinderToMesh(planSetup, meshBuilder, gantryAngle, tableAngle, iso);
                     }
+                    if (cp.Index == beam.ControlPoints.Last().Index)
+                        AddCylinderToMesh(planSetup, meshBuilder, gantryAngle, tableAngle, iso);
                     if (i > arcAngleResolution)
                         arcAngleResolution = arcAngleResolution + 20;
                 }
