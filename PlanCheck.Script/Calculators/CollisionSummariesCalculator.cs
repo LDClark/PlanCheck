@@ -3,8 +3,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Media.Media3D;
 using VMS.TPS.Common.Model.API;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace PlanCheck
 {
@@ -41,7 +39,7 @@ namespace PlanCheck
             return cameraPosition;
         }
 
-        public MeshGeometry3D CalculateCollimatorMesh(PlanSetup planSetup, Beam beam, Point3D iso, bool isArc, bool isElectron, bool isSRSCone)
+        public MeshGeometry3D CalculateCollimatorMesh(PlanSetup planSetup, Beam beam, Point3D iso, bool isVMAT, bool isStatic, bool isElectron, bool isSRSArc)
         {
             var meshBuilder = new MeshBuilder(false, false);
 
@@ -50,8 +48,13 @@ namespace PlanCheck
             double tableAngle = beam.ControlPoints.First().PatientSupportAngle <= 180.0f ? (Math.PI / 180.0f) * beam.ControlPoints.First().PatientSupportAngle : (Math.PI / 180.0f) * (beam.ControlPoints.First().PatientSupportAngle - 360.0f);
             double gantryAngle;
 
-            if (isArc == true)
+            if (isVMAT == true)
             {
+                double distToCollFace = 415.0f;
+                double collimatorDiameter1 = 470.0f;
+                double collimatorDiameter2 = 750.0f;
+                double collimatorFaceThickness = 27.5f;
+                double collimatorTopThickness = 200.0f;
                 int i = 0;
                 int arcAngleResolution = 0;  //number of degrees to skip
                 foreach (ControlPoint cp in beam.ControlPoints)
@@ -61,114 +64,97 @@ namespace PlanCheck
                     else
                         gantryAngle = cp.GantryAngle <= 180.0f ? (Math.PI / 180.0f) * cp.GantryAngle : (Math.PI / 180.0f) * (cp.GantryAngle - 360.0f);
                     i++;
-                    if (cp.Index == beam.ControlPoints.First().Index)
-                        AddCylinderToMesh(planSetup, meshBuilder, gantryAngle, tableAngle, iso);
-                    if (beam.GantryDirection.ToString() == "Clockwise")
+                    if ((cp.Index == beam.ControlPoints.First().Index) ||
+                        (beam.GantryDirection.ToString() == "Clockwise" && cp.Index == (beam.ControlPoints.First().Index + arcAngleResolution)) ||
+                        (beam.GantryDirection.ToString() == "CounterClockwise" && cp.Index == (beam.ControlPoints.First().Index - arcAngleResolution)) ||
+                        (cp.Index == beam.ControlPoints.Last().Index))
                     {
-                        if (cp.Index == (beam.ControlPoints.First().Index + arcAngleResolution))
-                            AddCylinderToMesh(planSetup, meshBuilder, gantryAngle, tableAngle, iso);
-                    }                       
-                    if (beam.GantryDirection.ToString() == "CounterClockwise")
-                    {
-                        if (cp.Index == (beam.ControlPoints.First().Index - arcAngleResolution))
-                            AddCylinderToMesh(planSetup, meshBuilder, gantryAngle, tableAngle, iso);
+                        AddCylinderToMesh(planSetup, meshBuilder, gantryAngle, tableAngle, thetaDiv, distToCollFace, collimatorFaceThickness, iso, collimatorDiameter1);
+                        AddCylinderToMesh(planSetup, meshBuilder, gantryAngle, tableAngle, thetaDiv, distToCollFace, collimatorTopThickness, iso, collimatorDiameter2);
                     }
-                    if (cp.Index == beam.ControlPoints.Last().Index)
-                        AddCylinderToMesh(planSetup, meshBuilder, gantryAngle, tableAngle, iso);
+                        
                     if (i > arcAngleResolution)
                         arcAngleResolution = arcAngleResolution + 20;
                 }
             }
-            else
+            if (isStatic == true)
             {
+                double distToCollFace = 415.0f;
+                double collimatorDiameter1 = 470.0f;
+                double collimatorDiameter2 = 750.0f;
+                double collimatorFaceThickness = 27.5f;
+                double collimatorTopThickness = 200.0f;
+
                 if (planSetup.TreatmentOrientation.ToString() == "HeadFirstProne")
                     gantryAngle = beam.ControlPoints.First().GantryAngle <= 180.0f ? (Math.PI / 180.0f) * (beam.ControlPoints.First().GantryAngle - 180.0f) : (Math.PI / 180.0f) * (beam.ControlPoints.First().GantryAngle - 180.0f);
                 else
                     gantryAngle = beam.ControlPoints.First().GantryAngle <= 180.0f ? (Math.PI / 180.0f) * beam.ControlPoints.First().GantryAngle : (Math.PI / 180.0f) * (beam.ControlPoints.First().GantryAngle - 360.0f);
-
-                AddCylinderToMesh(planSetup, meshBuilder, gantryAngle, tableAngle, iso);
-
+                AddCylinderToMesh(planSetup, meshBuilder, gantryAngle, tableAngle, thetaDiv, distToCollFace, collimatorFaceThickness, iso, collimatorDiameter1);
+                AddCylinderToMesh(planSetup, meshBuilder, gantryAngle, tableAngle, thetaDiv, distToCollFace, collimatorTopThickness, iso, collimatorDiameter2);
             }
             if (isElectron == true) //todo
             {
-                double distToConeElectron = 5.0f;
+                double distToCollFace = 50.0f;
                 double fieldSize = Double.Parse(Regex.Match(beam.Applicator.Id, @"\d+").Value);
-                double coneDiameter = fieldSize + 3.0f;
-                double coneThickness = 3.0f;
-                Point3D coneCenter = new Point3D();
-                Point3D coneTop = new Point3D();
+                double collimaterDiameter = fieldSize + 30.0f;
+                double collimatorThickness = 30.0f;
 
                 if (planSetup.TreatmentOrientation.ToString() == "HeadFirstProne")
                     gantryAngle = beam.ControlPoints.First().GantryAngle <= 180.0f ? (Math.PI / 180.0f) * (beam.ControlPoints.First().GantryAngle - 180.0f) : (Math.PI / 180.0f) * (beam.ControlPoints.First().GantryAngle - 180.0f);
                 else
                     gantryAngle = beam.ControlPoints.First().GantryAngle <= 180.0f ? (Math.PI / 180.0f) * beam.ControlPoints.First().GantryAngle : (Math.PI / 180.0f) * (beam.ControlPoints.First().GantryAngle - 360.0f);
-
-
-                coneCenter.X = iso.X + (distToConeElectron) * Math.Cos(tableAngle) * Math.Sin(gantryAngle);
-                coneCenter.Y = iso.Y - (distToConeElectron) * Math.Cos(gantryAngle);
-                coneCenter.Z = iso.Z - (distToConeElectron) * Math.Sin(tableAngle) * Math.Sin(gantryAngle);
-
-                coneTop.X = iso.X + (distToConeElectron + coneThickness) * Math.Cos(tableAngle) * Math.Sin(gantryAngle);
-                coneTop.Y = iso.Y - (distToConeElectron + coneThickness) * Math.Cos(gantryAngle);
-                coneTop.Z = iso.Z - (distToConeElectron + coneThickness) * Math.Sin(tableAngle) * Math.Sin(gantryAngle);
-
-                meshBuilder.AddCylinder(coneCenter, coneTop, coneDiameter, thetaDiv);
+                AddCylinderToMesh(planSetup, meshBuilder, gantryAngle, tableAngle, thetaDiv, distToCollFace, collimatorThickness, iso, collimaterDiameter);
             }
-            if (isSRSCone == true) //todo
+            if (isSRSArc == true) //todo
             {
-                double distToConeSRS = 34.6f;
-                double coneDiameter = 5.0f;
-                double coneThickness = 10.0f;
-                Point3D coneCenter = new Point3D();
-                Point3D coneTop = new Point3D();
+                thetaDiv = 10;
+                double distToCollFace = 255.0f;
+                double collimatorDiameter = 70.0f;
+                double collimatorThickness = 100.0f;
+                double gantryAngleLast;
 
-                if (planSetup.TreatmentOrientation.ToString() == "HeadFirstProne")
-                    tableAngle = beam.ControlPoints.First().GantryAngle <= 180.0f ? (Math.PI / 180.0f) * (beam.ControlPoints.First().GantryAngle - 180.0f) : (Math.PI / 180.0f) * (beam.ControlPoints.First().GantryAngle - 180.0f);
+                if (planSetup.TreatmentOrientation.ToString() == "HeadFirstProne")              
+                    gantryAngleLast = beam.ControlPoints.Last().GantryAngle <= 180.0f ? (Math.PI / 180.0f) * (beam.ControlPoints.Last().GantryAngle - 180.0f) : (Math.PI / 180.0f) * (beam.ControlPoints.Last().GantryAngle - 180.0f);
                 else
-                    tableAngle = beam.ControlPoints.First().GantryAngle <= 180.0f ? (Math.PI / 180.0f) * beam.ControlPoints.First().GantryAngle : (Math.PI / 180.0f) * (beam.ControlPoints.First().GantryAngle - 360.0f);
+                    gantryAngleLast = beam.ControlPoints.Last().GantryAngle <= 180.0f ? (Math.PI / 180.0f) * beam.ControlPoints.Last().GantryAngle : (Math.PI / 180.0f) * (beam.ControlPoints.Last().GantryAngle - 360.0f);
 
-                coneCenter.X = iso.X + (distToConeSRS) * Math.Cos(tableAngle) * Math.Sin(tableAngle);
-                coneCenter.Y = iso.Y - (distToConeSRS) * Math.Cos(tableAngle);
-                coneCenter.Z = iso.Z - (distToConeSRS) * Math.Sin(tableAngle) * Math.Sin(tableAngle);
-
-                coneTop.X = iso.X + (distToConeSRS + coneThickness) * Math.Cos(tableAngle) * Math.Sin(tableAngle);
-                coneTop.Y = iso.Y - (distToConeSRS + coneThickness) * Math.Cos(tableAngle);
-                coneTop.Z = iso.Z - (distToConeSRS + coneThickness) * Math.Sin(tableAngle) * Math.Sin(tableAngle);
-
-                meshBuilder.AddCylinder(coneCenter, coneTop, coneDiameter, thetaDiv);
+                foreach (ControlPoint cp in beam.ControlPoints)
+                {
+                    if (planSetup.TreatmentOrientation.ToString() == "HeadFirstProne")
+                        gantryAngle = cp.GantryAngle <= 180.0f ? (Math.PI / 180.0f) * (cp.GantryAngle - 180.0f) : (Math.PI / 180.0f) * (cp.GantryAngle - 180.0f);
+                    else
+                        gantryAngle = cp.GantryAngle <= 180.0f ? (Math.PI / 180.0f) * cp.GantryAngle : (Math.PI / 180.0f) * (cp.GantryAngle - 360.0f);                  
+                    if ((cp.Index == beam.ControlPoints.First().Index) ||
+                        (cp.Index == beam.ControlPoints.Last().Index))
+                    {
+                        AddCylinderToMesh(planSetup, meshBuilder, gantryAngle, tableAngle, thetaDiv, distToCollFace, collimatorThickness, iso, collimatorDiameter);
+                    }
+                    if (beam.GantryDirection.ToString() == "Clockwise" && cp.Index == beam.ControlPoints.First().Index)
+                        for (double x = gantryAngle; x < gantryAngleLast; x = x + thetaDiv * (Math.PI / 180))
+                            AddCylinderToMesh(planSetup, meshBuilder, x, tableAngle, thetaDiv, distToCollFace, collimatorThickness, iso, collimatorDiameter);
+                        
+                    if (beam.GantryDirection.ToString() == "CounterClockwise" && cp.Index == beam.ControlPoints.First().Index)
+                        for (double x = gantryAngle; x > gantryAngleLast; x = x - thetaDiv * (Math.PI / 180))
+                            AddCylinderToMesh(planSetup, meshBuilder, x, tableAngle, thetaDiv, distToCollFace, collimatorThickness, iso, collimatorDiameter);
+                }
             }
-
             return meshBuilder.ToMesh(true);
         }
 
-        public MeshBuilder AddCylinderToMesh(PlanSetup planSetup, MeshBuilder meshBuilder, double gantryAngle, double tableAngle, Point3D iso)
+        public MeshBuilder AddCylinderToMesh(PlanSetup planSetup, MeshBuilder meshBuilder, double gantryAngle, double tableAngle, int thetaDiv, double distanceFromIso, double cylinderThickness, Point3D iso, double diameter)
         {
-            int thetaDiv = 20;
-            Point3D collimatorPlate = new Point3D();
-            Point3D collimatorCenter = new Point3D();
-            Point3D collimatorTop = new Point3D();
+            Point3D circleCenter1 = new Point3D();
+            Point3D circleCenter2 = new Point3D();
 
-            double distToCollFace = 415.0f;
-            double collimatorDiameter1 = 470.0f;
-            double collimatorDiameter2 = 750.0f;
-            double collimatorFaceThickness = 27.5f;
-            double collimatorTopThickness = 200.0f;
+            circleCenter1.X = iso.X + distanceFromIso * Math.Cos(tableAngle) * Math.Sin(gantryAngle);
+            circleCenter1.Y = iso.Y - distanceFromIso * Math.Cos(gantryAngle);
+            circleCenter1.Z = iso.Z - distanceFromIso * Math.Sin(tableAngle) * Math.Sin(gantryAngle);
 
-            collimatorPlate.X = iso.X + distToCollFace * Math.Cos(tableAngle) * Math.Sin(gantryAngle);
-            collimatorPlate.Y = iso.Y - distToCollFace * Math.Cos(gantryAngle);
-            collimatorPlate.Z = iso.Z - distToCollFace * Math.Sin(tableAngle) * Math.Sin(gantryAngle);
+            circleCenter2.X = iso.X + (distanceFromIso + cylinderThickness) * Math.Cos(tableAngle) * Math.Sin(gantryAngle);
+            circleCenter2.Y = iso.Y - (distanceFromIso + cylinderThickness) * Math.Cos(gantryAngle);
+            circleCenter2.Z = iso.Z - (distanceFromIso + cylinderThickness) * Math.Sin(tableAngle) * Math.Sin(gantryAngle);
 
-            collimatorCenter.X = iso.X + (distToCollFace + collimatorFaceThickness) * Math.Cos(tableAngle) * Math.Sin(gantryAngle);
-            collimatorCenter.Y = iso.Y - (distToCollFace + collimatorFaceThickness) * Math.Cos(gantryAngle);
-            collimatorCenter.Z = iso.Z - (distToCollFace + collimatorFaceThickness) * Math.Sin(tableAngle) * Math.Sin(gantryAngle);
-
-            collimatorTop.X = iso.X + (distToCollFace + collimatorTopThickness) * Math.Cos(tableAngle) * Math.Sin(gantryAngle);
-            collimatorTop.Y = iso.Y - (distToCollFace + collimatorTopThickness) * Math.Cos(gantryAngle);
-            collimatorTop.Z = iso.Z - (distToCollFace + collimatorTopThickness) * Math.Sin(tableAngle) * Math.Sin(gantryAngle);
-
-            meshBuilder.AddCylinder(collimatorPlate, collimatorCenter, collimatorDiameter1, thetaDiv);
-            meshBuilder.AddCylinder(collimatorCenter, collimatorTop, collimatorDiameter2, thetaDiv);
-
+            meshBuilder.AddCylinder(circleCenter1, circleCenter2, diameter, thetaDiv);
             return meshBuilder;
         }
 
