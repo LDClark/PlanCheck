@@ -10,3 +10,5 @@ This project includes code from EclipsePluginRunner, SimplePdfReport, and DvhSum
 This project includes helper/geometry class code from HelixToolkit.
 
 This project includes code from DVHMetric from Steve Thompson and Tomasz Morgas.
+
+https://github.com/LDClark/PlanCheck/blob/master/TestCase.png
