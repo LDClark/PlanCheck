@@ -92,11 +92,11 @@ namespace PlanCheck
                 AddCylinderToMesh(planSetup, meshBuilder, gantryAngle, tableAngle, thetaDiv, distToCollFace, collimatorFaceThickness, iso, collimatorDiameter1);
                 AddCylinderToMesh(planSetup, meshBuilder, gantryAngle, tableAngle, thetaDiv, distToCollFace, collimatorTopThickness, iso, collimatorDiameter2);
             }
-            if (isElectron == true) //todo
+            if (isElectron == true)
             {
                 double distToCollFace = 50.0f;
                 double fieldSize = Double.Parse(Regex.Match(beam.Applicator.Id, @"\d+").Value);
-                double collimaterDiameter = fieldSize + 30.0f;
+                double collimaterDiameter = fieldSize * 10.0f + 30.0f; //convert to mm and add 30 mm safety margin
                 double collimatorThickness = 30.0f;
 
                 if (planSetup.TreatmentOrientation.ToString() == "HeadFirstProne")
@@ -105,7 +105,7 @@ namespace PlanCheck
                     gantryAngle = beam.ControlPoints.First().GantryAngle <= 180.0f ? (Math.PI / 180.0f) * beam.ControlPoints.First().GantryAngle : (Math.PI / 180.0f) * (beam.ControlPoints.First().GantryAngle - 360.0f);
                 AddCylinderToMesh(planSetup, meshBuilder, gantryAngle, tableAngle, thetaDiv, distToCollFace, collimatorThickness, iso, collimaterDiameter);
             }
-            if (isSRSArc == true) //todo
+            if (isSRSArc == true)
             {
                 thetaDiv = 10;
                 double distToCollFace = 255.0f;
