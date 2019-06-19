@@ -22,6 +22,17 @@ namespace PlanCheck
         public PlanningItemViewModel ActivePlanningItem { get; set; }
         public List<ErrorViewModel> ErrorGrid { get; set; }
         public ObservableCollection<PQMSummaryViewModel> PqmSummaries { get; set; }
+
+       // public ObservableCollection<StructureViewModel> _FoundStructureList;
+       // public ObservableCollection<StructureViewModel> FoundStructureList
+       // {
+        //    get { return _FoundStructureList; }
+        //    set
+         //   {
+         //       _FoundStructureList = value;
+        //        NotifyPropertyChanged("FoundStructureList");
+       //     }
+       // }
         PQMSummaryViewModel[] Objectives { get; set; }
         public ObservableCollection<PlanningItemViewModel> PlanningItemList { get; set; }
         public ObservableCollection<ConstraintViewModel> ConstraintComboBoxList { get; set; }
@@ -48,6 +59,8 @@ namespace PlanCheck
             PlanningItemList = planningItemList;
             StructureList = StructureSetListViewModel.GetStructureList(StructureSet); ;
             ConstraintComboBoxList = ConstraintListViewModel.GetConstraintList(constraintDir.ToString());
+            //GetPQMSummaries(ActiveConstraintPath, ActivePlanningItem, Patient);
+            //PqmSummaries = new ObservableCollection<PQMSummaryViewModel>();
             ErrorGrid = GetErrors(ActivePlanningItem);
             Title = GetTitle(patient, scriptVersion);
             ModelGroup = new Model3DGroup();
@@ -57,6 +70,7 @@ namespace PlanCheck
             isoctr = new Point3D(0, 0, 0);  //just to initalize
             cameraPosition = new Point3D(0, 0, -3500);
             PlanningItemSummaries = GetPlanningItemSummary(ActivePlanningItem, PlanningItemList);
+            //NotifyPropertyChanged("Structure");
         }
 
         public string GetTitle(Patient patient, string scriptVersion)
@@ -106,17 +120,22 @@ namespace PlanCheck
                     foreach (PQMSummaryViewModel objective in Objectives)
                     {
                         evalStructure = calculator.FindStructureFromAlias(structureSet, objective.TemplateId, objective.TemplateAliases, objective.TemplateCodes);
-                        if (evalStructure != null)
+                        if (evalStructure != null)                      
                         {
-                            if (evalStructure.Id.Contains("PTV") == true)
+                            if (evalStructure.StructureCodeInfos.FirstOrDefault().Code != null)
                             {
-                                foreach (Structure s in structureSet.Structures)
+                                if (evalStructure.StructureCodeInfos.FirstOrDefault().Code.Contains("PTV") == true)
                                 {
-                                    if (s.Id == planSetup.TargetVolumeID)
-                                        evalStructure = s;
+                                    foreach (Structure s in structureSet.Structures)
+                                    {
+                                        if (s.Id == planSetup.TargetVolumeID)
+                                        {
+                                            evalStructure = s;
+                                        }
+
+                                    }
                                 }
                             }
-                            
                             var evalStructureVM = new StructureViewModel(evalStructure);
                             var obj = calculator.GetObjectiveProperties(objective, planningItem, structureSet, evalStructureVM);
                             PqmSummaries.Add(obj);
@@ -132,7 +151,11 @@ namespace PlanCheck
         {
             StructureSet structureSet = planningItem.PlanningItemStructureSet;
             Structure evalStructure;
+            //ObservableCollection<PQMSummaryViewModel> pqmSummaries = new ObservableCollection<PQMSummaryViewModel>();
+            //ObservableCollection<StructureViewModel> foundStructureList = new ObservableCollection<StructureViewModel>();
             var calculator = new PQMSummaryCalculator();
+            //var numCol = PqmSummaries[0]
+            //Objectives = calculator.GetObjectives(constraintPath);
             if (planningItem.PlanningItemObject is PlanSum)
             {
                 var waitWindowPQM = new WaitWindowPQM();
@@ -150,10 +173,14 @@ namespace PlanCheck
                             pqm.AchievedColor_Comparison = pqmSummary.AchievedColor;
                             pqm.AchievedPercentageOfGoal_Comparison = pqmSummary.AchievedPercentageOfGoal;
                             pqm.Met_Comparison = pqmSummary.Met;
+                            //pqmSummaries.Add(pqmSummary);
+                            //foundStructureList.Add(new StructureViewModel(evalStructure));
                         }
                     }
+                    //FoundStructureList = foundStructureList;
                     waitWindowPQM.Close();
                 }
+                //PqmSummaries = pqmSummaries;
             }
             else //is plansetup
             {
@@ -178,10 +205,13 @@ namespace PlanCheck
                             }
                             var pqmSummary = calculator.GetObjectiveProperties(pqm, planningItem, structureSet, new StructureViewModel(evalStructure));
                             pqm.Achieved_Comparison = pqmSummary.Achieved;
+                            //foundStructureList.Add(new StructureViewModel(evalStructure));
                         }
                     }
+                    //FoundStructureList = foundStructureList;
                     waitWindowPQM.Close();
                 }
+                //PqmSummaries = pqmSummaries;
             }
             return PqmSummaries;
         }
@@ -252,9 +282,10 @@ namespace PlanCheck
                     {
                         upDir = new Vector3D(0, 1, 0);
                     }
-                    bool isArc = false;
+                    bool isVMAT = false;
+                    bool isStatic = false;
                     bool isElectron = false;
-                    bool isSRSCone = false;
+                    bool isSRSArc = false;
                     collimatorMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.Green));
                     if (beam.IsSetupField == true)
                     {
@@ -265,11 +296,16 @@ namespace PlanCheck
                     if (beam.EnergyModeDisplayName.Contains("E"))
                         isElectron = true;
                     if (beam.EnergyModeDisplayName.Contains("SRS"))
-                        isSRSCone = true;
-                    if (beam.Technique.Id.Contains("ARC"))
+                        isSRSArc = true;
+                    if (beam.MLCPlanType.ToString() == "VMAT")
                     {
-                        isArc = true;
+                        isVMAT = true;
                         collimatorMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.GreenYellow));
+                    }
+                    if (beam.Technique.ToString().Contains("STATIC"))
+                    {
+                        isStatic = true;
+                        collimatorMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.DarkGreen));
                     }
 
                     foreach (Structure structure in planSetup.StructureSet.Structures)
@@ -280,7 +316,7 @@ namespace PlanCheck
                             couchMesh = couchStruct.MeshGeometry;
                         }
                     }
-                    MeshGeometry3D collimatorMesh = calculator.CalculateCollimatorMesh(planSetup, beam, isoctr, isArc, isElectron, isSRSCone);
+                    MeshGeometry3D collimatorMesh = calculator.CalculateCollimatorMesh(planSetup, beam, isoctr, isVMAT, isStatic, isElectron, isSRSArc);
                     string shortestDistanceBody = "2000000";
                     string shortestDistanceTable = "2000000";
                     string status = "Clear";
