@@ -121,8 +121,8 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="YamlDotNet, Version=3.9.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\YamlDotNet.3.9.0\lib\net35\YamlDotNet.dll</HintPath>
+    <Reference Include="YamlDotNet, Version=6.0.0.0, Culture=neutral, PublicKeyToken=ec19458f3c15af5e, processorArchitecture=MSIL">
+      <HintPath>..\packages\YamlDotNet.6.1.2\lib\net45\YamlDotNet.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -158,11 +158,6 @@
     <Compile Include="Helpers\INotifyUserMessaged.cs" />
     <Compile Include="Helpers\UserMessagedEventArgs.cs" />
     <Compile Include="Helpers\UserMessager.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
     <Compile Include="ViewModels\CollisionCheckViewModel.cs" />
     <Compile Include="ViewModels\PlanSelectViewModel.cs" />
     <Compile Include="ViewModels\PlanSelectDetailViewModel.cs" />
@@ -233,7 +228,9 @@
     <None Include="ConstraintTemplates\Hypofractionated %285 Fractions%29.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\PlanApproved.png" />
@@ -243,13 +240,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\PlanRejected.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PlanCheck.Reporting.MigraDoc\PlanCheck.Reporting.MigraDoc.csproj">
