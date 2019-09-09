@@ -40,7 +40,7 @@ namespace PlanCheck
                 {
                     var calculator = new PQMSummaryCalculator();
                     StructVolume = _Structure.VolumeValue;
-                    Achieved = calculator.CalculateMetric(ActivePlanningItem.PlanningItemStructureSet, _Structure, ActivePlanningItem.PlanningItemObject, DVHObjective);
+                    Achieved = calculator.CalculateMetric(ActivePlanningItem.PlanningItemStructureSet, _Structure, ActivePlanningItem, DVHObjective);
                     Met = calculator.EvaluateMetric(Achieved, Goal, Variation);
                     NotifyPropertyChanged("Structure");
                     var tuple = Calculators.PQMColors.GetAchievedColor(Structure.Structure, Goal, DVHObjective, Achieved);
