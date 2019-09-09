@@ -169,10 +169,10 @@ namespace PlanCheck
                         if (evalStructure != null)
                         {
                             var pqmSummary = calculator.GetObjectiveProperties(pqm, planningItem, structureSet, new StructureViewModel(evalStructure));
-                            pqm.Achieved_Comparison = pqmSummary.Achieved;
-                            pqm.AchievedColor_Comparison = pqmSummary.AchievedColor;
-                            pqm.AchievedPercentageOfGoal_Comparison = pqmSummary.AchievedPercentageOfGoal;
-                            pqm.Met_Comparison = pqmSummary.Met;
+                            //pqm.Achieved_Comparison = pqmSummary.Achieved;
+                            //pqm.AchievedColor_Comparison = pqmSummary.AchievedColor;
+                            //pqm.AchievedPercentageOfGoal_Comparison = pqmSummary.AchievedPercentageOfGoal;
+                            //pqm.Met_Comparison = pqmSummary.Met;
                             //pqmSummaries.Add(pqmSummary);
                             //foundStructureList.Add(new StructureViewModel(evalStructure));
                         }
@@ -204,7 +204,7 @@ namespace PlanCheck
                                 }
                             }
                             var pqmSummary = calculator.GetObjectiveProperties(pqm, planningItem, structureSet, new StructureViewModel(evalStructure));
-                            pqm.Achieved_Comparison = pqmSummary.Achieved;
+                            //pqm.Achieved_Comparison = pqmSummary.Achieved;
                             //foundStructureList.Add(new StructureViewModel(evalStructure));
                         }
                     }
