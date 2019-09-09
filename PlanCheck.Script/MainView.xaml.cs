@@ -58,9 +58,10 @@ namespace PlanCheck
                 _vm.ActiveConstraintPath = (ConstraintViewModel)ConstraintComboBox.SelectedItem;
                 var calculator = new PQMSummaryCalculator();
                 _vm.GetPQMSummaries(_vm.ActiveConstraintPath, _vm.ActivePlanningItem, _vm.Patient);
-                UpdatePqmDataGrid();
+                
                 planningItemSummariesDataGrid.ItemsSource = null;
                 planningItemSummariesDataGrid.ItemsSource = _vm.PlanningItemSummaries;
+                UpdatePqmDataGrid();
             }
         }
 
@@ -71,12 +72,12 @@ namespace PlanCheck
             return new PlanningItemViewModel(planningItem.PlanningItemObject);
         }
 
-        private PlanningItemViewModel GetPlanFromCheckBox(object sender)
-        {
-            var selection = (CheckBox)sender;
-            var planningItem = (PlanningItemDetailsViewModel)selection.DataContext;
-            return new PlanningItemViewModel(planningItem.PlanningItemObject);
-        }
+        //private PlanningItemViewModel GetPlanFromButton(object sender)
+       // {
+       //     var selection = (CheckBox)sender;
+       //     var planningItem = (PlanningItemDetailsViewModel)selection.DataContext;
+       //     return new PlanningItemViewModel(planningItem.PlanningItemObject);
+      //  }
 
         private string GetConstraint(object sender)
         {
@@ -98,7 +99,7 @@ namespace PlanCheck
             UpdatePqmDataGrid();
         }
 
-        private void ButtonClicked(object sender, RoutedEventArgs e)
+        private void CCButtonClicked(object sender, RoutedEventArgs e)
         {
             var plan = GetPlan(sender);
             var tuple = _vm.GetCollisionSummary(plan);
@@ -194,12 +195,12 @@ namespace PlanCheck
             return Path.GetTempFileName() + ".pdf";
         }
 
-        private void CheckBoxChecked(object sender, RoutedEventArgs e)
+        private void PQMButtonClicked(object sender, RoutedEventArgs e)
         {
             
-            _vm.ActivePlanningItem = GetPlanFromCheckBox(sender);
+            _vm.ActivePlanningItem = GetPlan(sender);
             _vm.GetPQMSummaries(_vm.ActiveConstraintPath, _vm.ActivePlanningItem, _vm.Patient);
-            UpdatePqmDataGrid();
+            
             _vm.GetErrors(_vm.ActivePlanningItem);
             errorDataGrid.ItemsSource = null;
             errorDataGrid.ItemsSource = _vm.ErrorGrid;
@@ -210,11 +211,7 @@ namespace PlanCheck
             _vm.PlanningItemSummaries = _vm.GetPlanningItemSummary(_vm.ActivePlanningItem, _vm.PlanningItemList);
             planningItemSummariesDataGrid.ItemsSource = null;
             planningItemSummariesDataGrid.ItemsSource = _vm.PlanningItemSummaries;
-        }
-
-        private void CheckBoxUnchecked(object sender, RoutedEventArgs e)
-        {
-
+            UpdatePqmDataGrid();
         }
 
         private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -227,11 +224,6 @@ namespace PlanCheck
             perspectiveCamera.LookDirection = new Vector3D(-x, 0, -z);
             perspectiveCamera.Position = new Point3D(x, 0, z);
             ModelVisual.Content = _vm.ModelGroup;
-        }
-
-        private void CheckBox_AccessKeyPressed(object sender, AccessKeyPressedEventArgs e)
-        {
-
         }
     }
 }
