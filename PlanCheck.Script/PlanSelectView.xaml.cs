@@ -44,7 +44,7 @@ namespace PlanCheck
         {
             var selectedItem = (PlanSelectDetailViewModel)planningItemSummariesDataGrid.SelectedItem;
             _psvm.ActivePlanningItem = selectedItem.ActivePlanningItem;
-            var mainViewModel = new MainViewModel(_psvm.User, _psvm.Patient, _psvm.ScriptVersion, _psvm.ActiveConstraintPath.ConstraintPath, _psvm.PlanningItemList, _psvm.ActivePlanningItem);
+            var mainViewModel = new MainViewModel(_psvm.User, _psvm.Patient, _psvm.ScriptVersion, _psvm.PlanningItemList, _psvm.ActivePlanningItem);
 
             _psvm.MainWindow.Title = mainViewModel.Title;
             var mainView = new MainView(mainViewModel);
