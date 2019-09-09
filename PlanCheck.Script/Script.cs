@@ -63,7 +63,7 @@ namespace VMS.TPS
                 string firstConstraintFilePath = Path.Combine(constraintDir.ToString(), firstFileName);
                 var activeConstraintPath = new ConstraintViewModel(firstConstraintFilePath);
                 var planningItemList = PlanningItemListViewModel.GetPlanningItemList(planSetupsInScope, planSumsInScope);
-                var mainViewModel = new MainViewModel(user, patient, scriptVersion, activeConstraintPath.ConstraintPath, planningItemList, new PlanningItemViewModel(selectedPlanningItem));
+                var mainViewModel = new MainViewModel(user, patient, scriptVersion, planningItemList, new PlanningItemViewModel(selectedPlanningItem));
                 mainWindow.Title = mainViewModel.Title;
                 var mainView = new MainView(mainViewModel);
                 mainWindow.Content = mainView;
