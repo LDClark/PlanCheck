@@ -66,7 +66,7 @@ namespace PlanCheck
                     i++;
                     if ((cp.Index == beam.ControlPoints.First().Index) ||
                         (beam.GantryDirection.ToString() == "Clockwise" && cp.Index == (beam.ControlPoints.First().Index + arcAngleResolution)) ||
-                        (beam.GantryDirection.ToString() == "CounterClockwise" && cp.Index == (beam.ControlPoints.First().Index - arcAngleResolution)) ||
+                        (beam.GantryDirection.ToString() == "CounterClockwise" && cp.Index == (beam.ControlPoints.First().Index + arcAngleResolution)) ||
                         (cp.Index == beam.ControlPoints.Last().Index))
                     {
                         AddCylinderToMesh(planSetup, meshBuilder, gantryAngle, tableAngle, thetaDiv, distToCollFace, collimatorFaceThickness, iso, collimatorDiameter1);
