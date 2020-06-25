@@ -14,20 +14,13 @@ using System.Diagnostics;
 using System.Linq;
 using System.IO;
 using PlanCheck.Helpers;
+using EsapiEssentials.Plugin;
 
 namespace VMS.TPS
 {
-    public class Script
+    public class Script : ScriptBase
     {
-        public void Run(
-        User user,
-        Patient patient,
-        Image image,
-        StructureSet structureSet,
-        PlanSetup planSetup,
-        IEnumerable<PlanSetup> planSetupsInScope,
-        IEnumerable<PlanSum> planSumsInScope,
-        Window mainWindow)
+        public override void Run(PluginScriptContext context)
         {
             System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
             FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
@@ -35,51 +28,36 @@ namespace VMS.TPS
             string temp = System.Environment.GetEnvironmentVariable("TEMP");
             string eclipseVersion = System.Reflection.Assembly.GetAssembly
                 (typeof(VMS.TPS.Common.Model.API.Application)).GetName().Version.ToString();
-            if (planSumsInScope == null && planSetup == null)
+            if (context.PlanSumsInScope == null && context.PlanSetup == null)
             {
-                mainWindow.Title = "No plans open";
-                mainWindow.Content = "Please open a plan or plansum";
+                MessageBox.Show("Please open a plan or plansum");
             }
-            if (planSumsInScope.Count() > 1 && planSetup == null)  //plansums and/or plan(s) are in the scope window
+            if (context.PlanSumsInScope.Count() > 1 && context.PlanSetup == null)  //plansums and/or plan(s) are in the scope window
             {
-                var planSelectViewModel = new PlanSelectViewModel(user, patient, scriptVersion, planSetup, planSetupsInScope, planSumsInScope, mainWindow);
+                var planSelectViewModel = new PlanSelectViewModel(context.CurrentUser, context.Patient, scriptVersion, context.PlanSetup, context.PlansInScope, context.PlanSumsInScope);
                 var planSelectView = new PlanSelectView(planSelectViewModel);
-                mainWindow.Title = "Select a plan and constraint template";
-                mainWindow.Content = planSelectView;
             }
             else 
             {
                 PlanningItem selectedPlanningItem;
-                if (planSumsInScope.Count() == 1 && planSetup == null)  //only one plansum in scope window
+                if (context.PlanSumsInScope.Count() == 1 && context.PlanSetup == null)  //only one plansum in scope window
                 {
-                    selectedPlanningItem = planSumsInScope.FirstOrDefault();
+                    selectedPlanningItem = context.PlanSumsInScope.FirstOrDefault();
                 }
                 else //only plansetups are in scope window
                 {
-                    selectedPlanningItem = planSetup;
+                    selectedPlanningItem = context.PlanSetup;
                 }
                 DirectoryInfo constraintDir = new DirectoryInfo(Path.Combine(AssemblyHelper.GetAssemblyDirectory(), "ConstraintTemplates"));
                 string firstFileName = constraintDir.GetFiles().FirstOrDefault().ToString();
                 string firstConstraintFilePath = Path.Combine(constraintDir.ToString(), firstFileName);
                 var activeConstraintPath = new ConstraintViewModel(firstConstraintFilePath);
-                var planningItemList = PlanningItemListViewModel.GetPlanningItemList(planSetupsInScope, planSumsInScope);
-                var mainViewModel = new MainViewModel(user, patient, scriptVersion, planningItemList, new PlanningItemViewModel(selectedPlanningItem));
-                mainWindow.Title = mainViewModel.Title;
-                var mainView = new MainView(mainViewModel);
-                mainWindow.Content = mainView;
+                var planningItemList = PlanningItemListViewModel.GetPlanningItemList(context.PlansInScope, context.PlanSumsInScope);
+                var mainViewModel = new MainViewModel(context.CurrentUser, context.Patient, scriptVersion, planningItemList, new PlanningItemViewModel(selectedPlanningItem));
+                Window window = new MainWindow(mainViewModel);
+                window.DataContext = mainViewModel;
+                window.ShowDialog();
             }
-        }
-
-	public void Execute(ScriptContext scriptContext, Window mainWindow)
-	{
-            Run(scriptContext.CurrentUser,
-            scriptContext.Patient,
-            scriptContext.Image,
-            scriptContext.StructureSet,
-            scriptContext.PlanSetup,
-            scriptContext.PlansInScope,
-            scriptContext.PlanSumsInScope,
-            mainWindow);
         }
     }
 }

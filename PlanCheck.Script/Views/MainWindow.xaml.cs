@@ -23,11 +23,11 @@ namespace PlanCheck
     /// <summary>
     /// Interaction logic for MainView.xaml
     /// </summary>
-    public partial class MainView : UserControl
+    public partial class MainWindow : Window
     {
         private MainViewModel _vm;
 
-        public MainView(MainViewModel mainViewModel)
+        public MainWindow(MainViewModel mainViewModel)
         {
             _vm = mainViewModel;
             InitializeComponent();

@@ -18,19 +18,17 @@ namespace PlanCheck
         public string ScriptVersion { get; set; }
         public User User { get; set; }
         public Patient Patient { get; set; }
-        public Window MainWindow { get; set; }
         public ObservableCollection<PlanningItemViewModel> PlanningItemList { get; set; }
         public ObservableCollection<PlanSelectDetailViewModel> PlanningItemSummaries { get; set; }
         public ObservableCollection<ConstraintViewModel> ConstraintComboBoxList { get; set; }
         public ConstraintViewModel ActiveConstraintPath { get; set; }
         public PlanningItemViewModel ActivePlanningItem { get; set; }
 
-        public PlanSelectViewModel(User user, Patient patient, string scriptVersion, PlanSetup planSetup, IEnumerable<PlanSetup> planSetupsInScope, IEnumerable<PlanSum> planSumsInScope, Window mainWindow)
+        public PlanSelectViewModel(User user, Patient patient, string scriptVersion, PlanSetup planSetup, IEnumerable<PlanSetup> planSetupsInScope, IEnumerable<PlanSum> planSumsInScope)
         {
             User = user;
             Patient = patient;
             ScriptVersion = scriptVersion;
-            MainWindow = mainWindow;
             PlanningItemList = PlanningItemListViewModel.GetPlanningItemList(planSetupsInScope, planSumsInScope);
             var psc = new PlanSelectCalculator();
             PlanningItemSummaries = psc.Calculate(PlanningItemList);
