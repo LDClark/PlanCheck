@@ -297,7 +297,7 @@ namespace PlanCheck
                         isElectron = true;
                     if (beam.EnergyModeDisplayName.Contains("SRS"))
                         isSRSArc = true;
-                    if (beam.MLCPlanType.ToString() == "VMAT")
+                    if (beam.MLCPlanType.ToString() == "VMAT" || beam.Technique.Id.Contains("ARC"))
                     {
                         isVMAT = true;
                         collimatorMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.GreenYellow));
