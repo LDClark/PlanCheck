@@ -7,11 +7,10 @@ namespace PlanCheck.Calculators
     class PQMDoseAtVolume
     {
         public static string GetDoseAtVolume(StructureSet structureSet, PlanningItemViewModel planningItem, Structure evalStructure, MatchCollection testMatch, Group evalunit)
-        {
-            //check for sufficient dose and sampling coverage
-            DVHData dvh = planningItem.PlanningItemObject.GetDVHCumulativeData(evalStructure, DoseValuePresentation.Absolute, VolumePresentation.Relative, 0.1);
-            if (dvh != null)
+        {      
+            try
             {
+                DVHData dvh = planningItem.PlanningItemObject.GetDVHCumulativeData(evalStructure, DoseValuePresentation.Absolute, VolumePresentation.Relative, 0.1);
                 if ((dvh.SamplingCoverage < 0.9) || (dvh.Coverage < 0.9))
                     return "Unable to calculate - insufficient dose or sampling coverage";
                 Group eval = testMatch[0].Groups["evalpt"];
@@ -35,9 +34,9 @@ namespace PlanCheck.Calculators
 
                 return dvAchieved.ToString();
             }
-            else
+            catch (System.NullReferenceException)
             {
-                return "Unable to calculate - structure is empty";
+                return "Unable to calculate - DVH is not valid";
             }
         }
     }

@@ -5,7 +5,7 @@ namespace PlanCheck
 {
     public class PlanningItemDetailsViewModel : ViewModelBase
     {
-        public bool PQM { get; set; }
+        public bool IsBold { get; set; }
         public bool CC { get; set; }
         public string PlanningItemIdWithCourse { get; set; }
         public PlanningItem PlanningItemObject { get; set; }

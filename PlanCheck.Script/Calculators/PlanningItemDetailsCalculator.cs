@@ -11,7 +11,7 @@ namespace PlanCheck
         {
             var PlanningItemSummaries = new ObservableCollection<PlanningItemDetailsViewModel>();
             var PlanSummary = new ObservableCollection<PlanningItemDetailsViewModel>();
-            bool planIsChecked = false;
+            bool planIsBold = false;
             bool isCCEnabled = false;
             foreach (PlanningItemViewModel planningItem in planningItemComboBoxList)
             {
@@ -74,11 +74,11 @@ namespace PlanCheck
                     isCCEnabled = false;
                     if (planSum == activePlanningItem.PlanningItemObject)
                     {
-                        planIsChecked = true;
+                        planIsBold = true;
                     }
                     else
                     {
-                        planIsChecked = false;
+                        planIsBold = false;
                     }
 
                     foreach (PlanSetup planSetup in planSum.PlanSetups.OrderBy(x => x.CreationDateTime))
@@ -93,7 +93,7 @@ namespace PlanCheck
                     }
                     var PlanSumSummary = new PlanningItemDetailsViewModel
                     {
-                        PQM = planIsChecked,
+                        IsBold = planIsBold,
                         CC = isCCEnabled,
                         PlanningItemIdWithCourse = planSum.Course + "/" + planSum.Id,
                         ApprovalStatus = "PlanSum",
@@ -115,12 +115,12 @@ namespace PlanCheck
                     PlanSetup planSetup = (PlanSetup)planningItem.PlanningItemObject;
                     if (planSetup == activePlanningItem.PlanningItemObject)
                     {
-                        planIsChecked = true;
+                        planIsBold = true;
                         isCCEnabled = true;
                     }
                     else
                     {
-                        planIsChecked = false;
+                        planIsBold = false;
                         isCCEnabled = false;
                     }
                     var approvalStatus = "";
@@ -138,7 +138,7 @@ namespace PlanCheck
                         planTarget = "No target selected";
                     var PlanningItemSummary = new PlanningItemDetailsViewModel
                     {
-                        PQM = planIsChecked,
+                        IsBold = planIsBold,
                         CC = isCCEnabled,
                         PlanningItemIdWithCourse = planSetup.Course + "/" + planSetup.Id,
                         ApprovalStatus = approvalStatus,

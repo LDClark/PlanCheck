@@ -46,12 +46,12 @@
                     <DataGrid.RowStyle>
                         <Style TargetType="DataGridRow">
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding Path=PQM}" Value="True">
+                                <DataTrigger Binding="{Binding Path=IsBold}" Value="True">
                                     <Setter Property="FontWeight" Value="Bold"></Setter>
                                     <Setter Property="HorizontalAlignment" Value="Center"></Setter>
                                     <Setter Property="VerticalAlignment" Value="Center"></Setter>
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding Path=PQM}" Value="False">
+                                <DataTrigger Binding="{Binding Path=IsBold}" Value="False">
                                     <Setter Property="FontWeight" Value="Normal"></Setter>
                                     <Setter Property="HorizontalAlignment" Value="Center"></Setter>
                                     <Setter Property="VerticalAlignment" Value="Center"></Setter>
@@ -67,7 +67,7 @@
                                         <Button 
                                             Content="Run"
                                             Click="PQMButtonClicked"
-                                            IsEnabled="{Binding CC, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                            
                                             />
 
                                     </Grid>
