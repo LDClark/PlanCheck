@@ -1,4 +1,4 @@
-using System.Windows;
+﻿using System.Windows;
 using EsapiEssentials.PluginRunner;
 using VMS.TPS;
 using VMS.TPS.Common.Model.API;
