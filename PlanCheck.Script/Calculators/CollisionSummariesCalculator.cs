@@ -77,7 +77,7 @@ namespace PlanCheck
         {
             DiffuseMaterial collimatorMaterialStatic = new DiffuseMaterial(new SolidColorBrush(Colors.Green));
             DiffuseMaterial collimatorMaterialVMAT = new DiffuseMaterial(new SolidColorBrush(Colors.GreenYellow));
-            if (status != "Clear")
+            if (status == "Collision")
             {
                 collimatorMaterialStatic = new DiffuseMaterial(new SolidColorBrush(Colors.Red));
                 collimatorMaterialVMAT = new DiffuseMaterial(new SolidColorBrush(Colors.Red));

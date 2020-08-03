@@ -25,7 +25,7 @@ namespace PlanCheck
                     errorGrid = GetPlanSetupErrors(planSetup);
                 }
             }
-            return errorGrid;
+            return new ObservableCollection<ErrorViewModel>(errorGrid.OrderBy(x => x.Status));
         }
 
         public void AddNewRow(string description, string status, int severity, ObservableCollection<ErrorViewModel> errorGrid)

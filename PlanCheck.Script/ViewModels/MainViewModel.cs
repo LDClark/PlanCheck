@@ -282,6 +282,8 @@ namespace PlanCheck
             CameraPosition = new Point3D(x, 0, z);
         }
 
+
+
         public async void GetCollisionSummary()
         {
             var planId = SelectedPlan?.PlanId;
