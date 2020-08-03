@@ -75,15 +75,14 @@ namespace PlanCheck
                 return errorGrid;
             });
 
-        public Task<Tuple<CollisionCheckViewModel, Model3DGroup>> GetBeamCollisionsAsync(string courseId, string planId, string beamId) =>
+        public Task<CollisionCheckViewModel> GetBeamCollisionsAsync(string courseId, string planId, string beamId) =>
             RunAsync(context =>
             {
                 var planningItem = Extensions.GetPlanningItem(context.Patient, courseId, planId);
                 var calculator = new CollisionSummariesCalculator();
                 var plan = (PlanSetup)planningItem;
                 var beam = plan.Beams.FirstOrDefault(x => x.Id == beamId);
-                var tuple = calculator.CalculateBeamCollision(plan, beam);
-                return tuple;
+                return calculator.CalculateBeamCollision(plan, beam);
             });
 
         public Task<Model3DGroup> AddCouchBodyAsync(string courseId, string planId) =>

@@ -163,16 +163,12 @@ namespace PlanCheck
 
         private async void Start()
         {
-
-
-            Plans = await _esapiService.GetPlansAsync();
-
             DirectoryInfo constraintDir = new DirectoryInfo(Path.Combine(AssemblyHelper.GetAssemblyDirectory(), "ConstraintTemplates"));
             string firstFileName = constraintDir.GetFiles().FirstOrDefault().ToString();
-            var filenames = constraintDir.GetFiles();
             string firstConstraintFilePath = Path.Combine(constraintDir.ToString(), firstFileName);
             Constraints = ConstraintListViewModel.GetConstraintList(constraintDir.ToString());
             SelectedConstraint = new ConstraintViewModel(firstConstraintFilePath);
+            Plans = await _esapiService.GetPlansAsync();
         }
 
         public async void AnalyzePlan()
@@ -207,7 +203,6 @@ namespace PlanCheck
                     PQMs = new ObservableCollection<PQMViewModel>();
                     foreach (var structure in structures)
                     {
-
                         string result = "";
                         string resultCompare1 = "";
                         string resultCompare2 = "";
@@ -297,9 +292,8 @@ namespace PlanCheck
                     CollisionSummaries = new ObservableCollection<CollisionCheckViewModel>();
                     foreach (var beamId in beamIds)
                     {
-
                         var collisionSummary = await _esapiService.GetBeamCollisionsAsync(courseId, planId, beamId);
-                        CollisionSummaries.Add(collisionSummary.Item1);
+                        CollisionSummaries.Add(collisionSummary);
                         progress.Increment();
                     }
                 });
@@ -343,10 +337,6 @@ namespace PlanCheck
                             i++;
                         }
                     });
-
-
-
-
             }
 
         }

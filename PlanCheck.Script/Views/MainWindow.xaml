@@ -169,6 +169,18 @@
                         VerticalAlignment="Stretch"
                         ColumnWidth="*"
                     >
+                        <DataGrid.RowStyle>
+                            <Style TargetType="DataGridRow">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Status}" Value="Collision">
+                                        <Setter Property="Background" Value="#FFFFCFB9"></Setter>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Status}" Value="Clear">
+                                        <Setter Property="Background" Value="#FFA1DEAC"></Setter>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.RowStyle>
                     </DataGrid>
                 </Grid>
             </Grid>
@@ -194,8 +206,6 @@
                     x:Name="ConstraintComboBox" 
                     ItemsSource="{Binding Source={StaticResource Constraints}}"
                     SelectedItem="{Binding SelectedConstraint, NotifyOnSourceUpdated=True, Mode=TwoWay}"
-                    SelectedValuePath ="SelectedConstraint"
-                    IsSynchronizedWithCurrentItem="False"
                     >
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="SourceUpdated">

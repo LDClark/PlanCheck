@@ -17,17 +17,13 @@ namespace PlanCheck
         public DiffuseMaterial lightblueMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.LightBlue));
         public DiffuseMaterial magentaMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.Magenta));
 
-        public Tuple<CollisionCheckViewModel, Model3DGroup> CalculateBeamCollision(PlanSetup planSetup, Beam beam)
+        public CollisionCheckViewModel CalculateBeamCollision(PlanSetup planSetup, Beam beam)
         {
             var calculator = new CollisionSummariesCalculator();
-            //var collimatorModelGroup = new Model3DGroup();
-            //var isoModelGroup = new Model3DGroup();
             var modelGroup = new Model3DGroup();
-            var upDir = new Vector3D(0, -1, 0);
-            var lookDir = new Vector3D(0, 0, 1);
-            //var isoctr = new Point3D(0, 0, 0);  //just to initalize
+           // var upDir = new Vector3D(0, -1, 0);
+            //var lookDir = new Vector3D(0, 0, 1);
             var isoctr = GetIsocenter(beam);
-            //var cameraPosition = GetCameraPosition(beam);
             bool isVMAT = false;
             bool isStatic = false;
             bool isElectron = false;
@@ -65,20 +61,16 @@ namespace PlanCheck
                 isStatic = true;
                 collimatorMaterial = collimatorMaterialStatic;
             }
-            if (planSetup.TreatmentOrientation.ToString() == "HeadFirstProne")
-            {
-                upDir = new Vector3D(0, 1, 0);
+           // if (planSetup.TreatmentOrientation.ToString() == "HeadFirstProne")
+           // {
+          //      upDir = new Vector3D(0, 1, 0);
 
-            }
+        //    }
             MeshGeometry3D collimatorMesh = CalculateCollimatorMesh(beam, isoctr, isVMAT, isStatic, isElectron, isSRSArc);
-            //collimatorModelGroup.Children.Add(new GeometryModel3D { Geometry = collimatorMesh, Material = collimatorMaterial, BackMaterial = darkblueMaterial });
-            //isoModelGroup.Children.Add(new GeometryModel3D { Geometry = iso3DMesh, Material = redMaterial, BackMaterial = redMaterial });
-
             collisionSummary = calculator.GetFieldCollisionSummary(beam, couch, body);
-
             modelGroup.Children.Add(new GeometryModel3D { Geometry = iso3DMesh, Material = redMaterial, BackMaterial = redMaterial });
             modelGroup.Children.Add(new GeometryModel3D { Geometry = collimatorMesh, Material = collimatorMaterial, BackMaterial = darkblueMaterial });
-            return Tuple.Create(collisionSummary, modelGroup);
+            return collisionSummary;
         }
 
         public static Model3DGroup AddFieldMesh(PlanSetup planSetup, Beam beam, string status)
