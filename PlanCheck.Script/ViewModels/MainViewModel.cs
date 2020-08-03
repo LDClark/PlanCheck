@@ -1,3 +1,5 @@
+using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Command;
 using PlanCheck.Helpers;
 using System;
 using System.Collections.Generic;
@@ -5,6 +7,7 @@ using System.Collections.ObjectModel;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
 using VMS.TPS.Common.Model.API;
@@ -14,329 +17,338 @@ namespace PlanCheck
 
     public class MainViewModel : ViewModelBase
     {
-        public Patient Patient { get; set; }
-        public Image Image { get; set; }
-        public StructureSet StructureSet { get; set; }
-        public string Title { get; set; }
-        public ConstraintViewModel ActiveConstraintPath { get; set; }
-        public PlanningItemViewModel ActivePlanningItem { get; set; }
-        public List<ErrorViewModel> ErrorGrid { get; set; }
-        public ObservableCollection<PQMSummaryViewModel> PqmSummaries { get; set; }
-        PQMSummaryViewModel[] Objectives { get; set; }
-        public ObservableCollection<PlanningItemViewModel> PlanningItemList { get; set; }
-        public ObservableCollection<ConstraintViewModel> ConstraintComboBoxList { get; set; }
-        public ObservableCollection<PlanningItemDetailsViewModel> PlanningItemSummaries { get; set; }
-        public List<CollisionCheckViewModel> CollisionSummaries { get; set; }
-        public ObservableCollection<StructureViewModel> StructureList { get; set; }
-        public double SliderValue { get; set; }
-        public Model3DGroup ModelGroup { get; set; }
-        public Point3D isoctr { get; set; }
-        public Point3D cameraPosition { get; set; }
-        public Vector3D upDir { get; set; }
-        public Vector3D lookDir { get; set; }
+        private readonly IEsapiService _esapiService;
+        private readonly IDialogService _dialogService;
 
-        public MainViewModel(User user, Patient patient, string scriptVersion, ObservableCollection<PlanningItemViewModel> planningItemList, PlanningItemViewModel planningItem)
+        public MainViewModel(IEsapiService esapiService, IDialogService dialogService)
         {
-            ActivePlanningItem = planningItem;
-            Patient = patient;
-            Image = ActivePlanningItem.PlanningItemImage;
-            StructureSet = ActivePlanningItem.PlanningItemStructureSet;
+            _esapiService = esapiService;
+            _dialogService = dialogService;
+        }
+
+        private Plan[] _plans;
+        public Plan[] Plans
+        {
+            get => _plans;
+            set => Set(ref _plans, value);
+        }
+
+        private Plan _selectedPlan;
+        public Plan SelectedPlan
+        {
+            get => _selectedPlan;
+            set => Set(ref _selectedPlan, value);
+        }
+
+        private Plan _selectedPlanCompare1;
+        public Plan SelectedPlanCompare1
+        {
+            get => _selectedPlanCompare1;
+            set => Set(ref _selectedPlanCompare1, value);
+        }
+
+        private Plan _selectedPlanCompare2;
+        public Plan SelectedPlanCompare2
+        {
+            get => _selectedPlanCompare2;
+            set => Set(ref _selectedPlanCompare2, value);
+        }
+
+        private Plan _selectedPlanCompare3;
+        public Plan SelectedPlanCompare3
+        {
+            get => _selectedPlanCompare3;
+            set => Set(ref _selectedPlanCompare3, value);
+        }
+
+        private ObservableCollection<PQMViewModel> _pqms;
+        public ObservableCollection<PQMViewModel> PQMs
+        {
+            get => _pqms;
+            set => Set(ref _pqms, value);
+        }
+
+        private ObservableCollection<ErrorViewModel> _errorGrid;
+        public ObservableCollection<ErrorViewModel> ErrorGrid
+        {
+            get => _errorGrid;
+            set => Set(ref _errorGrid, value);
+        }
+
+        private ObservableCollection<ConstraintViewModel> _constraints;
+        public ObservableCollection<ConstraintViewModel> Constraints
+        {
+            get => _constraints;
+            set => Set(ref _constraints, value);
+        }
+
+        private ConstraintViewModel _selectedConstraint;
+        public ConstraintViewModel SelectedConstraint
+        {
+            get => _selectedConstraint;
+            set => Set(ref _selectedConstraint, value);
+        }
+
+        private ObservableCollection<CollisionCheckViewModel> _collisionSummaries;
+        public ObservableCollection<CollisionCheckViewModel> CollisionSummaries
+        {
+            get => _collisionSummaries;
+            set => Set(ref _collisionSummaries, value);
+        }
+
+        private Model3DGroup _collimatorModel;
+        public Model3DGroup CollimatorModel
+        {
+            get => _collimatorModel;
+            set => Set(ref _collimatorModel, value);
+        }
+
+        private Model3DGroup _couchBodyModel;
+        public Model3DGroup CouchBodyModel
+        {
+            get => _couchBodyModel;
+            set => Set(ref _couchBodyModel, value);
+        }
+
+        private Point3D _isoctr;
+        public Point3D Isoctr
+        {
+            get => _isoctr;
+            set => Set(ref _isoctr, value);
+        }
+
+        private Point3D _cameraPosition;
+        public Point3D CameraPosition
+        {
+            get => _cameraPosition;
+            set => Set(ref _cameraPosition, value);
+        }
+
+        private Vector3D _upDir;
+        public Vector3D UpDir
+        {
+            get => _upDir;
+            set => Set(ref _upDir, value);
+        }
+
+        private Vector3D _lookDir;
+        public Vector3D LookDir
+        {
+            get => _lookDir;
+            set => Set(ref _lookDir, value);
+        }
+
+        private double _sliderValue;
+        public double SliderValue
+        {
+            get => _sliderValue;
+            set
+            {
+                _sliderValue = value;
+                RaisePropertyChanged("SliderValue");
+                GetCameraPosition();
+            }
+        }
+
+        private bool _CCIsEnabled;
+        public bool CCIsEnabled
+        {
+            get => _CCIsEnabled;
+            set => Set(ref _CCIsEnabled, value);
+        }
+
+        public ICommand StartCommand => new RelayCommand(Start);
+        public ICommand AnalyzePlanCommand => new RelayCommand(AnalyzePlan);
+        public ICommand AnalyzeCollisionCommand => new RelayCommand(GetCollisionSummary);
+
+        private async void Start()
+        {
+
+
+            Plans = await _esapiService.GetPlansAsync();
+
             DirectoryInfo constraintDir = new DirectoryInfo(Path.Combine(AssemblyHelper.GetAssemblyDirectory(), "ConstraintTemplates"));
             string firstFileName = constraintDir.GetFiles().FirstOrDefault().ToString();
+            var filenames = constraintDir.GetFiles();
             string firstConstraintFilePath = Path.Combine(constraintDir.ToString(), firstFileName);
-            ActiveConstraintPath = new ConstraintViewModel(firstConstraintFilePath);
-            PlanningItemList = planningItemList;
-            StructureList = StructureSetListViewModel.GetStructureList(StructureSet); ;
-            ConstraintComboBoxList = ConstraintListViewModel.GetConstraintList(constraintDir.ToString());
-            ErrorGrid = GetErrors(ActivePlanningItem);
-            Title = GetTitle(patient, scriptVersion);
-            ModelGroup = new Model3DGroup();
-            SliderValue = 0;
-            upDir = new Vector3D(0, -1, 0);
-            lookDir = new Vector3D(0, 0, 1);
-            isoctr = new Point3D(0, 0, 0);  //just to initalize
-            cameraPosition = new Point3D(0, 0, -3500);
-            PlanningItemSummaries = GetPlanningItemSummary(ActivePlanningItem, PlanningItemList);
+            Constraints = ConstraintListViewModel.GetConstraintList(constraintDir.ToString());
+            SelectedConstraint = new ConstraintViewModel(firstConstraintFilePath);
         }
 
-        public string GetTitle(Patient patient, string scriptVersion)
+        public async void AnalyzePlan()
         {
-            Title = patient.Name + " - " + "PlanCheck v." + scriptVersion;
-            return Title;
-        }
+            var courseId = SelectedPlan?.CourseId;
+            var planId = SelectedPlan?.PlanId;
 
-        public void GetPQMSummaries(ConstraintViewModel constraintPath, PlanningItemViewModel planningItem, Patient patient)
-        {
-            PqmSummaries = new ObservableCollection<PQMSummaryViewModel>();
-            StructureSet structureSet = planningItem.PlanningItemStructureSet;
-            Structure evalStructure;
-            ObservableCollection<PQMSummaryViewModel> pqmSummaries = new ObservableCollection<PQMSummaryViewModel>();
-            ObservableCollection<StructureViewModel> foundStructureList = new ObservableCollection<StructureViewModel>();
-            var calculator = new PQMSummaryCalculator();
-            Objectives = calculator.GetObjectives(constraintPath);
-            if (planningItem.PlanningItemObject is PlanSum)
+            var type = SelectedPlan?.PlanType;
+            if (type == "VMS.TPS.Common.Model.API.PlanSum")
+                CCIsEnabled = false;
+            if (type == "VMS.TPS.Common.Model.API.ExternalPlanSetup")
+                CCIsEnabled = true;
+
+            if (courseId == null || planId == null)
+                return;
+
+            var structures = await _esapiService.GetStructuresAsync(courseId, planId);
+
+            CollimatorModel = null;
+            CouchBodyModel = null;
+
+            // make sure the workbook template exists
+            if (!System.IO.File.Exists(SelectedConstraint.ConstraintPath))
             {
-                var waitWindowPQM = new WaitWindowPQM();
-                PlanSum plansum = (PlanSum)planningItem.PlanningItemObject;
-                if (plansum.IsDoseValid() == true)
-                {
-                    waitWindowPQM.Show();
-                    foreach (PQMSummaryViewModel objective in Objectives)
-                    {
-                        evalStructure = calculator.FindStructureFromAlias(structureSet, objective.TemplateId, objective.TemplateAliases, objective.TemplateCodes);
-                        if (evalStructure != null)
-                        {
-                            var evalStructureVM = new StructureViewModel(evalStructure);
-                            var obj = calculator.GetObjectiveProperties(objective, planningItem, structureSet, evalStructureVM);
-                            PqmSummaries.Add(obj);
-                            NotifyPropertyChanged("Structure");
-                        }
-                    }
-                    waitWindowPQM.Close();
-                }
+                System.Windows.MessageBox.Show(string.Format("The template file '{0}' chosen does not exist.", SelectedConstraint.ConstraintPath));
             }
-            if (planningItem.PlanningItemObject is PlanSetup) //is plansetup
-            {
-                var waitWindowPQM = new WaitWindowPQM();
+            PQMViewModel[] pqms = Objectives.GetObjectives(SelectedConstraint);
 
-                PlanSetup planSetup = (PlanSetup)planningItem.PlanningItemObject;
-                if (planSetup.IsDoseValid() == true)
+            _dialogService.ShowProgressDialog("Calculating dose metrics", structures.Count(),
+                async progress =>
                 {
-                    waitWindowPQM.Show();
-                    foreach (PQMSummaryViewModel objective in Objectives)
+                    PQMs = new ObservableCollection<PQMViewModel>();
+                    foreach (var structure in structures)
                     {
-                        evalStructure = calculator.FindStructureFromAlias(structureSet, objective.TemplateId, objective.TemplateAliases, objective.TemplateCodes);
-                        if (evalStructure != null)                      
+
+                        string result = "";
+                        string resultCompare1 = "";
+                        string resultCompare2 = "";
+                        string resultCompare3 = "";
+                        string goal = "";
+                        string met = "";
+                        string variation = "";
+                        try
                         {
-                            if (evalStructure.StructureCodeInfos.FirstOrDefault().Code != null)
+                            foreach (var pqm in pqms)
                             {
-                                if (evalStructure.StructureCodeInfos.FirstOrDefault().Code.Contains("PTV") == true)
+                                if (pqm.TemplateId == structure.StructureName)
                                 {
-                                    foreach (Structure s in structureSet.Structures)
+                                    result = "";
+                                    resultCompare1 = "";
+                                    resultCompare2 = "";
+                                    resultCompare3 = "";
+                                    goal = pqm.Goal;
+                                    variation = pqm.Variation;
+                                    result = await _esapiService.CalculateMetricDoseAsync(courseId, planId, structure.StructureName, pqm.TemplateId, pqm.DVHObjective, pqm.Goal, pqm.Variation);
+                                    met = await _esapiService.EvaluateMetricDoseAsync(result, goal, variation);
+
+                                    var planCompare1 = SelectedPlanCompare1?.PlanId;
+                                    if (planCompare1 != null)
+                                        resultCompare1 = await _esapiService.CalculateMetricDoseAsync(courseId, planCompare1, structure.StructureName, pqm.TemplateId, pqm.DVHObjective, pqm.Goal, pqm.Variation);
+
+                                    var planCompare2 = SelectedPlanCompare2?.PlanId;
+                                    if (planCompare2 != null)
+                                        resultCompare2 = await _esapiService.CalculateMetricDoseAsync(courseId, planCompare2, structure.StructureName, pqm.TemplateId, pqm.DVHObjective, pqm.Goal, pqm.Variation);
+
+                                    var planCompare3 = SelectedPlanCompare3?.PlanId;
+                                    if (planCompare3 != null)
+                                        resultCompare3 = await _esapiService.CalculateMetricDoseAsync(courseId, planCompare3, structure.StructureName, pqm.TemplateId, pqm.DVHObjective, pqm.Goal, pqm.Variation);
+
+                                    PQMs.Add(new PQMViewModel
                                     {
-                                        if (s.Id == planSetup.TargetVolumeID)
-                                        {
-                                            evalStructure = s;
-                                        }
-
-                                    }
+                                        TemplateId = structure.StructureName,
+                                        StructureList = structures,
+                                        SelectedStructure = structure,
+                                        StructVolume = structure.VolumeValue,
+                                        DVHObjective = pqm.DVHObjective,
+                                        Goal = goal,
+                                        Met = met,
+                                        Achieved = result,
+                                        ResultCompare1 = resultCompare1,
+                                        ResultCompare2 = resultCompare2,
+                                        ResultCompare3 = resultCompare3,
+                                    });
                                 }
-                            }
-                            var evalStructureVM = new StructureViewModel(evalStructure);
-                            var obj = calculator.GetObjectiveProperties(objective, planningItem, structureSet, evalStructureVM);
-                            PqmSummaries.Add(obj);
-                            NotifyPropertyChanged("Structure");
-                        }
-                    }
-                    waitWindowPQM.Close();
-                }
-            }
-        }
-
-        public ObservableCollection<PQMSummaryViewModel> AddPQMSummary(ObservableCollection<PQMSummaryViewModel>  PqmSummaries, ConstraintViewModel constraintPath, PlanningItemViewModel planningItem, Patient patient)
-        {
-            StructureSet structureSet = planningItem.PlanningItemStructureSet;
-            Structure evalStructure;
-            var calculator = new PQMSummaryCalculator();
-            if (planningItem.PlanningItemObject is PlanSum)
-            {
-                var waitWindowPQM = new WaitWindowPQM();
-                PlanSum plansum = (PlanSum)planningItem.PlanningItemObject;
-                if (plansum.IsDoseValid() == true)
-                {
-                    waitWindowPQM.Show();
-                    foreach (PQMSummaryViewModel pqm in PqmSummaries)
-                    {
-                        evalStructure = calculator.FindStructureFromAlias(structureSet, pqm.TemplateId, pqm.TemplateAliases, pqm.TemplateCodes);
-                        if (evalStructure != null)
-                        {
-                            var pqmSummary = calculator.GetObjectiveProperties(pqm, planningItem, structureSet, new StructureViewModel(evalStructure));
-                        }
-                    }
-                    waitWindowPQM.Close();
-                }
-            }
-            else //is plansetup
-            {
-                var waitWindowPQM = new WaitWindowPQM();
-
-                PlanSetup planSetup = (PlanSetup)planningItem.PlanningItemObject;
-                if (planSetup.IsDoseValid() == true)
-                {
-                    waitWindowPQM.Show();
-                    foreach (PQMSummaryViewModel pqm in PqmSummaries)
-                    {
-                        evalStructure = calculator.FindStructureFromAlias(structureSet, pqm.TemplateId, pqm.TemplateAliases, pqm.TemplateCodes);
-                        if (evalStructure != null)
-                        {
-                            if (evalStructure.Id.Contains("PTV") == true)
-                            {
-                                foreach (Structure s in structureSet.Structures)
+                                else
                                 {
-                                    if (s.Id == planSetup.TargetVolumeID)
-                                        evalStructure = s;
                                 }
                             }
-                            var pqmSummary = calculator.GetObjectiveProperties(pqm, planningItem, structureSet, new StructureViewModel(evalStructure));
                         }
+                        catch
+                        {
+                            result = "";
+                        }
+                        progress.Increment();
                     }
-                    waitWindowPQM.Close();
-                }
-            }
-            return PqmSummaries;
+                });
+
+            ErrorGrid = await _esapiService.GetErrorsAsync(courseId, planId);
         }
 
-        public ObservableCollection<PlanningItemDetailsViewModel> GetPlanningItemSummary(PlanningItemViewModel activePlanningItem, ObservableCollection<PlanningItemViewModel> planningItemList)
+        public void GetCameraPosition()
         {
-            var calculator = new PlanningItemDetailsCalculator();
-            PlanningItemSummaries = calculator.Calculate(activePlanningItem, planningItemList, PqmSummaries, CollisionSummaries, ErrorGrid);
-            return PlanningItemSummaries;
+            var angle = SliderValue * Math.PI / 180;
+            double x = -2000 * Math.Sin(angle);
+            double z = -2000 * Math.Cos(angle);
+            LookDir = new Vector3D(-x, 0, -z);
+            CameraPosition = new Point3D(x, 0, z);
         }
 
-        public List<ErrorViewModel> GetErrors(PlanningItemViewModel planningItem)
+        public async void GetCollisionSummary()
         {
-            var calculator = new ErrorCalculator();
-            ErrorGrid = calculator.Calculate(planningItem.PlanningItemObject);
-            ErrorGrid = ErrorGrid.OrderBy(x => x.Status).ToList();
-            return ErrorGrid;
-        }
-
-        public Tuple<List<CollisionCheckViewModel>, Model3DGroup> GetCollisionSummary(PlanningItemViewModel planningItem)
-        {
-            var waitWindowCollision = new WaitWindowCollision();
-
-            waitWindowCollision.Show();
-
-            var calculator = new CollisionSummariesCalculator();
-            var collimatorModelGroup = new Model3DGroup();
-            var isoModelGroup = new Model3DGroup();
-            var modelGroup = new Model3DGroup();
-
-            upDir = new Vector3D(0, -1, 0);
-            lookDir = new Vector3D(0, 0, 1);
-            isoctr = new Point3D(0, 0, 0);  //just to initalize
-            cameraPosition = new Point3D(0, 0, -3500);
-            var CollisionSummaries = new List<CollisionCheckViewModel>();
-
-            // Create some materials
-            var redMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.Red));
-            var darkblueMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.DarkBlue));
-            var collimatorMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.Green));
-
-            Structure bodyStruct;
-            var iso3DMesh = calculator.CalculateIsoMesh(isoctr);
-            MeshGeometry3D bodyMesh = null;
-            MeshGeometry3D couchMesh = null;
-            if (planningItem.PlanningItemObject is PlanSetup)
+            var planId = SelectedPlan?.PlanId;
+            var courseId = SelectedPlan?.CourseId;
+            var type = SelectedPlan?.PlanType;
+            if (type == "VMS.TPS.Common.Model.API.ExternalPlanSetup")
             {
-                PlanSetup planSetup = (PlanSetup)planningItem.PlanningItemObject;
-                bodyStruct = planSetup.StructureSet.Structures.Where(x => x.Id.Contains("BODY")).First();
-                bodyMesh = bodyStruct.MeshGeometry;
-                foreach (Structure structure in planSetup.StructureSet.Structures)
-                {
-                    if (structure.StructureCodeInfos.FirstOrDefault().Code != null)
-                    {
-                        if (structure.StructureCodeInfos.FirstOrDefault().Code == "Support")
-                        {
-                            Structure couchStruct = structure;
-                            couchMesh = couchStruct.MeshGeometry;
-                        }
-                    }
-                }
-                foreach (Beam beam in planSetup.Beams)
-                {
-                    isoctr = calculator.GetIsocenter(beam);
-                    iso3DMesh = calculator.CalculateIsoMesh(calculator.GetIsocenter(beam));
-                    bool view = true;
-                    if (planSetup.TreatmentOrientation.ToString() == "HeadFirstProne")
-                    {
-                        upDir = new Vector3D(0, 1, 0);
-                    }
-                    bool isVMAT = false;
-                    bool isStatic = false;
-                    bool isElectron = false;
-                    bool isSRSArc = false;
-                    collimatorMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.Green));
-                    if (beam.IsSetupField == true)
-                    {
-                        continue;
-                    }
-                    if (beam.Name.Contains("Subfield 2") || beam.Name.Contains("Subfield 3"))
-                        continue;
-                    if (beam.EnergyModeDisplayName.Contains("E"))
-                        isElectron = true;
-                    if (beam.EnergyModeDisplayName.Contains("SRS"))
-                        isSRSArc = true;
-                    if (beam.MLCPlanType.ToString() == "VMAT" || beam.Technique.Id.Contains("ARC"))
-                    {
-                        isVMAT = true;
-                        collimatorMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.GreenYellow));
-                    }
-                    if (beam.Technique.ToString().Contains("STATIC"))
-                    {
-                        isStatic = true;
-                        collimatorMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.DarkGreen));
-                    }
+                var beamIds = await _esapiService.GetBeamIdsAsync(courseId, planId);
 
-                    foreach (Structure structure in planSetup.StructureSet.Structures)
+                _dialogService.ShowProgressDialog("Calculating collisions...", beamIds.Length,
+                async progress =>
+                {
+                    CollisionSummaries = new ObservableCollection<CollisionCheckViewModel>();
+                    foreach (var beamId in beamIds)
                     {
-                        if (structure.Id.Contains("CouchSurface") == true)
+
+                        var collisionSummary = await _esapiService.GetBeamCollisionsAsync(courseId, planId, beamId);
+                        CollisionSummaries.Add(collisionSummary.Item1);
+                        progress.Increment();
+                    }
+                });
+
+                _dialogService.ShowProgressDialog("Getting camera position...", 1,
+                async progress =>
+                {
+                    CameraPosition = await _esapiService.GetCameraPositionAsync(courseId, planId, beamIds.FirstOrDefault());
+                    progress.Increment();
+                });
+
+                _dialogService.ShowProgressDialog("Getting isocenter...", 1,
+                async progress =>
+                {
+                    Isoctr = await _esapiService.GetIsocenterAsync(courseId, planId, beamIds.FirstOrDefault());
+                    progress.Increment();
+                });
+
+                _dialogService.ShowProgressDialog("Adding body and couch...", 1,
+                async progress =>
+                {
+                    CouchBodyModel = new Model3DGroup();
+                    var couchBodyModel = await _esapiService.AddCouchBodyAsync(courseId, planId);
+                    CouchBodyModel.Children.Add(couchBodyModel);
+                    progress.Increment();
+                });
+
+                _dialogService.ShowProgressDialog("Adding models...", beamIds.Length,
+                    async progress =>
+                    {
+                        UpDir = new Vector3D(0, -1, 0);
+                        LookDir = new Vector3D(0, 0, 1);
+                        CollimatorModel = new Model3DGroup();
+                        int i = 0;
+                        foreach (var beamId in beamIds)
                         {
-                            Structure couchStruct = planSetup.StructureSet.Structures.Where(x => x.Id.Contains("CouchSurface")).First();
-                            couchMesh = couchStruct.MeshGeometry;
+                            var status = CollisionSummaries[i].Status;
+                            var fieldModel = await _esapiService.AddFieldMeshAsync(CollimatorModel, courseId, planId, beamId, status);
+                            CollimatorModel.Children.Add(fieldModel);
+                            progress.Increment();
+                            i++;
                         }
-                    }
-                    MeshGeometry3D collimatorMesh = calculator.CalculateCollimatorMesh(planSetup, beam, isoctr, isVMAT, isStatic, isElectron, isSRSArc);
-                    string shortestDistanceBody = "2000000";
-                    string shortestDistanceTable = "2000000";
-                    string status = "Clear";
-                    shortestDistanceBody = calculator.ShortestDistance(collimatorMesh, bodyMesh);
-                    if (couchMesh != null)
-                        shortestDistanceTable = calculator.ShortestDistance(collimatorMesh, couchMesh);
-                    else
-                    {
-                        shortestDistanceTable = " - ";
-                        status = " - ";
-                    }
-                    Console.WriteLine(beam.Id + " - gantry to body is " + shortestDistanceBody + " cm");
-                    Console.WriteLine(beam.Id + " - gantry to table is " + shortestDistanceTable + " cm");
-                    if (shortestDistanceTable != " - ")
-                    {
-                        if ((Convert.ToDouble(shortestDistanceBody) < 3.0) || (Convert.ToDouble(shortestDistanceTable) < 3.0))
-                        {
-                            collimatorMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.Red));
-                            status = "Collision";
-                        }
-                    }
-                    collimatorModelGroup.Children.Add(new GeometryModel3D { Geometry = collimatorMesh, Material = collimatorMaterial, BackMaterial = darkblueMaterial });
-                    isoModelGroup.Children.Add(new GeometryModel3D { Geometry = iso3DMesh, Material = redMaterial, BackMaterial = redMaterial });
-                    var collisionSummary = calculator.GetFieldCollisionSummary(beam, view, shortestDistanceBody, shortestDistanceTable, status);
-                    CollisionSummaries.Add(collisionSummary);
-                }
+                    });
+
+
+
+
             }
-            modelGroup = CreateModel(bodyMesh, couchMesh, isoModelGroup, collimatorModelGroup, collimatorMaterial);
-            waitWindowCollision.Close();
-            return Tuple.Create(CollisionSummaries, modelGroup);
-        }
 
-        private Model3DGroup CreateModel(MeshGeometry3D bodyMesh, MeshGeometry3D couchMesh, Model3DGroup isoModelGroup, Model3DGroup collimatorModelGroup, Material collimatorMaterial)
-        {
-            var modelGroup = new Model3DGroup();
-            AddModels(bodyMesh, couchMesh, isoModelGroup, collimatorModelGroup, modelGroup, collimatorMaterial);
-            return modelGroup;
-        }
-
-        private static void AddModels(MeshGeometry3D bodyMesh, MeshGeometry3D couchMesh, Model3DGroup isoModelGroup, Model3DGroup collimatorModelGroup, Model3DGroup modelGroup, Material collimatorMaterial)
-        {
-            // Create some materials
-            var lightblueMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.LightBlue));
-            var darkblueMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.DarkBlue));
-            var magentaMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.Magenta));
-
-            modelGroup.Children.Add(isoModelGroup);
-            modelGroup.Children.Add(collimatorModelGroup);
-            modelGroup.Children.Add(new GeometryModel3D { Geometry = bodyMesh, Material = lightblueMaterial, BackMaterial = darkblueMaterial });
-            modelGroup.Children.Add(new GeometryModel3D { Geometry = couchMesh, Material = magentaMaterial, BackMaterial = magentaMaterial });
         }
     }
 }

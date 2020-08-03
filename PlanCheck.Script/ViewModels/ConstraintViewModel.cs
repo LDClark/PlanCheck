@@ -2,7 +2,7 @@ using System.IO;
 
 namespace PlanCheck
 {
-	public class ConstraintViewModel : ViewModelBase
+	public class ConstraintViewModel
     {
         public string ConstraintName { get; set; }
         public string ConstraintPath { get; set; }

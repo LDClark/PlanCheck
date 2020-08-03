@@ -1,14 +1,9 @@
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Windows;
 using VMS.TPS.Common.Model.API;
 
 namespace PlanCheck
 {
-    public class PlanningItemViewModel : ViewModelBase
+    public class PlanningItemViewModel
     {
         public string PlanningItemId { get; set; }
         public string PlanningItemCourse { get; set; }

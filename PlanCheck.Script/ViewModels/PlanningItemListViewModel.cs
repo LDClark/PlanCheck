@@ -1,13 +1,10 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
 using VMS.TPS.Common.Model.API;
 
 namespace PlanCheck
 {
-    class PlanningItemListViewModel : ViewModelBase
+    class PlanningItemListViewModel
     {
         static public ObservableCollection<PlanningItemViewModel> GetPlanningItemList(IEnumerable<PlanSetup> planSetupsInScope, IEnumerable<PlanSum> planSumsInScope)
         {

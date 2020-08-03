@@ -9,7 +9,7 @@
     <OutputType>library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>PlanCheck</RootNamespace>
-    <AssemblyName>PlanCheck-1.0.0.0.esapi</AssemblyName>
+    <AssemblyName>PlanCheck-2.0.0.0.esapi</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
@@ -114,6 +114,16 @@
     <Compile Include="Calculators\PQMCoveredVolumeAtDose.cs" />
     <Compile Include="Calculators\PQMConformationNumber.cs" />
     <Compile Include="Calculators\PQMGradientIndex.cs" />
+    <Compile Include="DialogService\DialogService.cs" />
+    <Compile Include="DialogService\IDialogProgress.cs" />
+    <Compile Include="DialogService\IDialogService.cs" />
+    <Compile Include="DialogService\SimpleProgress.cs" />
+    <Compile Include="Calculators\MetricCalculator.cs" />
+    <Compile Include="Esapi\EsapiService.cs" />
+    <Compile Include="Esapi\Extensionscs.cs" />
+    <Compile Include="Esapi\IEsapiService.cs" />
+    <Compile Include="Esapi\Objectives.cs" />
+    <Compile Include="Esapi\Plan.cs" />
     <Compile Include="ExtensionMethods\Point3DExtensions.cs" />
     <Compile Include="ExtensionMethods\Vector3DExtensions.cs" />
     <Compile Include="Helpers\AssemblyHelper.cs" />
@@ -156,30 +166,22 @@
     </Compile>
     <Compile Include="Calculators\ErrorCalculator.cs" />
     <Compile Include="Script.cs" />
-    <Compile Include="Calculators\PQMSummaryCalculator.cs" />
     <Compile Include="ViewModels\PQMSummaryViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ViewModels\ViewModelBase.cs" />
-    <Compile Include="Views\WaitWindowCollision.xaml.cs">
-      <DependentUpon>WaitWindowCollision.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\WaitWindowPQM.xaml.cs">
-      <DependentUpon>WaitWindowPQM.xaml</DependentUpon>
+    <Compile Include="Views\ProgressDialog.xaml.cs">
+      <DependentUpon>ProgressDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\PlanSelectView.xaml.cs">
       <DependentUpon>PlanSelectView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\UnderscoreConverter.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="Views\MainWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\WaitWindowCollision.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\WaitWindowPQM.xaml">
+    <Page Include="Views\ProgressDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

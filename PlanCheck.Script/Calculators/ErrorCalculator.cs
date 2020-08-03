@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text.RegularExpressions;
 using VMS.TPS.Common.Model.API;
@@ -8,7 +9,26 @@ namespace PlanCheck
 {
     public class ErrorCalculator
     {
-        public void AddNewRow(string description, string status, int severity, List<ErrorViewModel> errorGrid)
+        public ObservableCollection<ErrorViewModel> Calculate(PlanningItem planningItem)
+        {
+            var errorGrid = new ObservableCollection<ErrorViewModel>();
+            if (planningItem is PlanSetup)
+            {
+                PlanSetup planSetup = (PlanSetup)planningItem;
+                errorGrid = GetPlanSetupErrors(planSetup);             
+            }
+            if (planningItem is PlanSum)
+            {
+                PlanSum planSum = (PlanSum)planningItem;
+                foreach (PlanSetup planSetup in planSum.PlanSetups)
+                {
+                    errorGrid = GetPlanSetupErrors(planSetup);
+                }
+            }
+            return errorGrid;
+        }
+
+        public void AddNewRow(string description, string status, int severity, ObservableCollection<ErrorViewModel> errorGrid)
         {
             var errorColumns = new ErrorViewModel
             {
@@ -18,35 +38,10 @@ namespace PlanCheck
             };
             errorGrid.Add(errorColumns);
         }
-        public List<ErrorViewModel> Calculate(PlanningItem planningItem)
-        {
-            var errorGrid = new List<ErrorViewModel>();
-            var planErrors = new List<ErrorViewModel>();
-            var planSumErrors = new List<ErrorViewModel>();
-            var planSumDoseErrors = new List<ErrorViewModel>();
-            if (planningItem is PlanSetup)
-            {
-                PlanSetup planSetup = (PlanSetup)planningItem;
-                planErrors = GetPlanSetupErrors(planSetup);
-                errorGrid.AddRange(planErrors);
-            }
-            if (planningItem is PlanSum)
-            {
-                PlanSum planSum = (PlanSum)planningItem;
-                foreach (PlanSetup planSetup in planSum.PlanSetups)
-                {
-                    planErrors = GetPlanSetupErrors(planSetup);
-                    errorGrid.AddRange(planErrors);
-                }
-                planSumDoseErrors = GetPlanSumRxErrors(planSum);
-                errorGrid.AddRange(planSumDoseErrors);
-            }
-            return errorGrid;
-        }
 
-        public List<ErrorViewModel> GetPlanSumRxErrors(PlanSum planSum)
+        public ObservableCollection<ErrorViewModel> GetPlanSumRxErrors(PlanSum planSum)
         {
-            var errorGrid = new List<ErrorViewModel>();
+            var errorGrid = new ObservableCollection<ErrorViewModel>();
             double totalRxDose = 0;
             string error;
             string errorStatus;
@@ -108,9 +103,9 @@ namespace PlanCheck
             return errorGrid;
         }
 
-        public List<ErrorViewModel> GetPlanSetupErrors(PlanSetup planSetup)
+        public ObservableCollection<ErrorViewModel> GetPlanSetupErrors(PlanSetup planSetup)
         {
-            var errorGrid = new List<ErrorViewModel>();
+            var errorGrid = new ObservableCollection<ErrorViewModel>();
             string error;
             string errorStatus;
             int errorSeverity;
@@ -136,10 +131,7 @@ namespace PlanCheck
                     doseNameList.Add(planSetup.Id.Split('_')[1]);
                 siteNameList.Add(planSetup.Id.Split('_')[0]);
                 doseValueList.Add(totalRxDose.ToString());
-                //Console.WriteLine("TotalRxDose is" + totalRxDose);
             }
-            //string planSiteFromPlanName = planSetup.Id.Split('_')[1];
-            //Console.WriteLine("Final TotalRxDose is" + totalRxDose);
             int i = 0;
             bool planSetupInPlanSum = false;
             foreach (PlanSum planSum in planSetup.Course.PlanSums)

@@ -2,7 +2,7 @@ using VMS.TPS.Common.Model.API;
 
 namespace PlanCheck
 {
-    public class PlanSelectDetailViewModel : ViewModelBase
+    public class PlanSelectDetailViewModel
     {
         public PlanningItemViewModel ActivePlanningItem { get; set; }
         public string PlanningItemIdWithCourse { get; set; }

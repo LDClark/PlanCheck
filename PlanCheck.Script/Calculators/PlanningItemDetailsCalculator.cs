@@ -7,7 +7,7 @@ namespace PlanCheck
 {
     public class PlanningItemDetailsCalculator
     {
-        public ObservableCollection<PlanningItemDetailsViewModel> Calculate(PlanningItemViewModel activePlanningItem, ObservableCollection<PlanningItemViewModel> planningItemComboBoxList, ObservableCollection<PQMSummaryViewModel> PqmSummaries, List<CollisionCheckViewModel> CollisionSummaries, List<ErrorViewModel> ErrorGrid)
+        public ObservableCollection<PlanningItemDetailsViewModel> Calculate(PlanningItemViewModel activePlanningItem, ObservableCollection<PlanningItemViewModel> planningItemComboBoxList, ObservableCollection<PQMViewModel> PqmSummaries, List<CollisionCheckViewModel> CollisionSummaries, List<ErrorViewModel> ErrorGrid)
         {
             var PlanningItemSummaries = new ObservableCollection<PlanningItemDetailsViewModel>();
             var PlanSummary = new ObservableCollection<PlanningItemDetailsViewModel>();

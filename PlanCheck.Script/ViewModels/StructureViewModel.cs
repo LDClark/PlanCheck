@@ -1,10 +1,11 @@
+using System.Collections.Generic;
 using System.Linq;
 using VMS.TPS.Common.Model.API;
 using VMS.TPS.Common.Model.Types;
 
 namespace PlanCheck
 {
-    public class StructureViewModel : ViewModelBase
+    public class StructureViewModel
     {
         public string StructureName { get; set; }
         public string StructureCode { get; set; }

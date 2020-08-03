@@ -7,12 +7,12 @@ namespace PlanCheck.Calculators
 {
     class PQMCoveredVolumeAtDose
     {
-        public static string GetCoveredVolumeAtDose(StructureSet structureSet, PlanningItemViewModel planningItem, Structure evalStructure, MatchCollection testMatch, Group evalunit)
+        public static string GetCoveredVolumeAtDose(StructureSet structureSet, PlanningItemViewModel planningItem, StructureViewModel evalStructure, MatchCollection testMatch, Group evalunit)
         {
             try
             {
                 //check for sufficient sampling and dose coverage
-                DVHData dvh = planningItem.PlanningItemObject.GetDVHCumulativeData(evalStructure, DoseValuePresentation.Absolute, VolumePresentation.Relative, 0.1);
+                DVHData dvh = planningItem.PlanningItemObject.GetDVHCumulativeData(evalStructure.Structure, DoseValuePresentation.Absolute, VolumePresentation.Relative, 0.1);
                 if ((dvh.SamplingCoverage < 0.9) || (dvh.Coverage < 0.9))
                 {
                     return "Unable to calculate - insufficient dose or sampling coverage";
@@ -26,8 +26,8 @@ namespace PlanCheck.Calculators
                 double volume = double.Parse(eval.Value);
                 VolumePresentation vpFinal = (evalunit.Value.CompareTo("%") == 0) ? VolumePresentation.Relative : VolumePresentation.AbsoluteCm3;
                 DoseValuePresentation dvpFinal = (evalunit.Value.CompareTo("%") == 0) ? DoseValuePresentation.Relative : DoseValuePresentation.Absolute;
-                double volumeAchieved = planningItem.PlanningItemObject.GetVolumeAtDose(evalStructure, dv, vpFinal);
-                double organVolume = evalStructure.Volume;
+                double volumeAchieved = planningItem.PlanningItemObject.GetVolumeAtDose(evalStructure.Structure, dv, vpFinal);
+                double organVolume = evalStructure.Structure.Volume;
                 double coveredVolume = organVolume - volumeAchieved;
                 return string.Format("{0:0.00} {1}", coveredVolume, evalunit.Value);   // todo: better formatting based on VolumePresentation
             }

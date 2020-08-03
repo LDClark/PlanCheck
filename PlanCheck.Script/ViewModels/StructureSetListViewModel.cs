@@ -4,7 +4,7 @@ using VMS.TPS.Common.Model.API;
 
 namespace PlanCheck
 {
-    class StructureSetListViewModel : ViewModelBase
+    class StructureSetListViewModel
     {
         static public ObservableCollection<StructureViewModel> GetStructureList(StructureSet structureSet)
         {

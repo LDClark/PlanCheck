@@ -3,7 +3,7 @@ using VMS.TPS.Common.Model.API;
 
 namespace PlanCheck
 {
-    public class PlanningItemDetailsViewModel : ViewModelBase
+    public class PlanningItemDetailsViewModel
     {
         public bool IsBold { get; set; }
         public bool CC { get; set; }

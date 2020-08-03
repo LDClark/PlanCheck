@@ -11,11 +11,11 @@ namespace PlanCheck.Calculators
 {
     class PQMConformationNumber
     {
-        public static string GetConformationNumber(StructureSet structureSet, PlanningItemViewModel planningItem, Structure evalStructure, MatchCollection testMatch, Group evalunit)
+        public static string GetConformationNumber(StructureSet structureSet, PlanningItemViewModel planningItem, StructureViewModel evalStructure, MatchCollection testMatch, Group evalunit)
         {
             try
             {
-                DVHData dvh = planningItem.PlanningItemObject.GetDVHCumulativeData(evalStructure, DoseValuePresentation.Absolute, VolumePresentation.Relative, 0.1);
+                DVHData dvh = planningItem.PlanningItemObject.GetDVHCumulativeData(evalStructure.Structure, DoseValuePresentation.Absolute, VolumePresentation.Relative, 0.1);
                 DoseValue prescribedDose;
                 double planDoseDouble = 0;
                 if ((dvh.SamplingCoverage < 0.9) || (dvh.Coverage < 0.9))
@@ -47,8 +47,8 @@ namespace PlanCheck.Calculators
                 DoseValuePresentation dvpFinal = (evalunit.Value.CompareTo("%") == 0) ? DoseValuePresentation.Relative : DoseValuePresentation.Absolute;
                 DoseValue dv = new DoseValue(double.Parse(eval.Value) / 100 * prescribedDose.Dose, DoseValue.DoseUnit.cGy);
                 double bodyWithPrescribedDoseVolume = planningItem.PlanningItemObject.GetVolumeAtDose(body, prescribedDose, vpFinal);
-                double targetWithPrescribedDoseVolume = planningItem.PlanningItemObject.GetVolumeAtDose(evalStructure, dv, vpFinal);
-                double targetVolume = evalStructure.Volume;
+                double targetWithPrescribedDoseVolume = planningItem.PlanningItemObject.GetVolumeAtDose(evalStructure.Structure, dv, vpFinal);
+                double targetVolume = evalStructure.Structure.Volume;
                 var cn = (targetWithPrescribedDoseVolume / targetVolume) * (targetWithPrescribedDoseVolume / bodyWithPrescribedDoseVolume);
                 return string.Format("{0:0.0}", cn);
             }

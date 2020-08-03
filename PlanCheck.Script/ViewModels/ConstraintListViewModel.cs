@@ -7,9 +7,9 @@ using System.Text;
 
 namespace PlanCheck
 {
-    class ConstraintListViewModel : ViewModelBase
+    class ConstraintListViewModel
     {
-        static public ObservableCollection<ConstraintViewModel> GetConstraintList(string constraintDir)
+        public static ObservableCollection<ConstraintViewModel> GetConstraintList(string constraintDir)
         {
             var ConstraintComboBoxList = new ObservableCollection<ConstraintViewModel>();
             foreach (string file in Directory.EnumerateFiles(constraintDir, "*.csv"))

@@ -1,6 +1,6 @@
 namespace PlanCheck
 {
-    public class ErrorViewModel : ViewModelBase
+    public class ErrorViewModel
     {
         public string Description { get; set; }
         public string Status { get; set; }

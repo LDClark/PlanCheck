@@ -6,11 +6,11 @@ namespace PlanCheck.Calculators
 {
     class PQMDoseAtVolume
     {
-        public static string GetDoseAtVolume(StructureSet structureSet, PlanningItemViewModel planningItem, Structure evalStructure, MatchCollection testMatch, Group evalunit)
+        public static string GetDoseAtVolume(StructureSet structureSet, PlanningItemViewModel planningItem, StructureViewModel evalStructure, MatchCollection testMatch, Group evalunit)
         {      
             try
             {
-                DVHData dvh = planningItem.PlanningItemObject.GetDVHCumulativeData(evalStructure, DoseValuePresentation.Absolute, VolumePresentation.Relative, 0.1);
+                DVHData dvh = planningItem.PlanningItemObject.GetDVHCumulativeData(evalStructure.Structure, DoseValuePresentation.Absolute, VolumePresentation.Relative, 0.1);
                 if ((dvh.SamplingCoverage < 0.9) || (dvh.Coverage < 0.9))
                     return "Unable to calculate - insufficient dose or sampling coverage";
                 Group eval = testMatch[0].Groups["evalpt"];
@@ -22,7 +22,7 @@ namespace PlanCheck.Calculators
                 double volume = double.Parse(eval.Value);
                 VolumePresentation vpFinal = (evalunit.Value.CompareTo("%") == 0) ? VolumePresentation.Relative : VolumePresentation.AbsoluteCm3;
                 DoseValuePresentation dvpFinal = (evalunit.Value.CompareTo("%") == 0) ? DoseValuePresentation.Relative : DoseValuePresentation.Absolute;
-                DoseValue dvAchieved = planningItem.PlanningItemObject.GetDoseAtVolume(evalStructure, volume, vp, dvpFinal);
+                DoseValue dvAchieved = planningItem.PlanningItemObject.GetDoseAtVolume(evalStructure.Structure, volume, vp, dvpFinal);
                 //checking dose output unit and adapting to template
                 if (dvAchieved.UnitAsString.CompareTo(evalunit.Value.ToString()) != 0)
                 {

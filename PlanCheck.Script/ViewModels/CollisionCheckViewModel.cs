@@ -2,7 +2,7 @@ using System.Windows.Media.Media3D;
 
 namespace PlanCheck
 {
-    public class CollisionCheckViewModel : ViewModelBase
+    public class CollisionCheckViewModel
     {
         public bool View { get; set; }
         public string FieldID { get; set; }
