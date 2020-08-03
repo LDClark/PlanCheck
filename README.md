@@ -11,4 +11,9 @@ This project includes helper/geometry class code from HelixToolkit.
 
 This project includes code from DVHMetric from Steve Thompson and Tomasz Morgas.
 
+To run:
+1. Right click solution > Restore NuGet Packages
+2. Set Configuration Manager to x64 for all projects
+2. Right click PlanCheck.Runner project > Set as StartUp Project
+
 ![alt text](https://github.com/LDClark/PlanCheck/blob/master/TestCase.png)
