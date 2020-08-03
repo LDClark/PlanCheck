@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PlanCheck.Reporting;
+using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows.Media.Media3D;
@@ -9,6 +10,7 @@ namespace PlanCheck
     public interface IEsapiService
     {
         Task<Plan[]> GetPlansAsync();
+        Task<ReportPatient> GetReportPatientAsync();
         Task<ObservableCollection<StructureViewModel>> GetStructuresAsync(string courseId, string planId);
         Task<string[]> GetBeamIdsAsync(string courseId, string planId);
         Task<Point3D> GetIsocenterAsync(string courseId, string planId, string beamId);

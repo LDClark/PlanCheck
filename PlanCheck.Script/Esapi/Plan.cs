@@ -1,4 +1,5 @@
-﻿using VMS.TPS.Common.Model.API;
+﻿using System;
+using VMS.TPS.Common.Model.API;
 
 namespace PlanCheck
 {
@@ -8,5 +9,9 @@ namespace PlanCheck
         public string PlanId { get; set; }
         public Beam[] Beams { get; set; }
         public string PlanType { get; set; }
+        public DateTime PlanCreation { get; set; }
+        public string PlanStructureSetId { get; set; }
+        public string PlanImageId { get; set; }
+        public DateTime PlanImageCreation { get; set; }
     }
 }

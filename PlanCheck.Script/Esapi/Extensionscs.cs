@@ -40,6 +40,26 @@ public static class Extensions
         throw new InvalidOperationException("Unknown PlanningItem type.");
     }
 
+    public static DateTime GetCreationDateTime(this PlanningItem plan)
+    {
+        switch (plan)
+        {
+            case PlanSetup planSetup: return (DateTime)planSetup.CreationDateTime;
+            case PlanSum planSum: return (DateTime)planSum.PlanSetups.LastOrDefault().CreationDateTime;
+        }
+        throw new InvalidOperationException("Unknown PlanningItem type.");
+    }
+
+    public static string GetPlanType(this PlanningItem plan)
+    {
+        switch (plan)
+        {
+            case PlanSetup planSetup: return "Plan";
+            case PlanSum planSum: return "PlanSum";
+        }
+        throw new InvalidOperationException("Unknown PlanningItem type.");
+    }
+
     private static Course GetCourse(Patient patient, string courseId) =>
         patient?.Courses?.FirstOrDefault(x => x.Id == courseId);
 

@@ -69,5 +69,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReportSex.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

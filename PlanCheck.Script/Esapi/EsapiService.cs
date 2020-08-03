@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Media.Media3D;
 using System;
+using PlanCheck.Reporting;
 
 namespace PlanCheck
 {
@@ -27,7 +28,11 @@ namespace PlanCheck
                {
                    PlanId = x.Id,
                    CourseId = x.GetCourse().Id,
-                   PlanType = x.GetType().ToString()
+                   PlanType = Extensions.GetPlanType(x),
+                   PlanCreation = Extensions.GetCreationDateTime(x),
+                   PlanStructureSetId = x.StructureSet.Id,
+                   PlanImageId = x.StructureSet.Image.Id,
+                   PlanImageCreation = (DateTime)x.StructureSet.Image.CreationDateTime
                })
                .ToArray());
 
@@ -100,16 +105,12 @@ namespace PlanCheck
                 {
 
                 }
-
-                
-                //var calculator = new CollisionSummariesCalculator();
                 return CollisionSummariesCalculator.AddCouchBodyMesh(body, couch);
             });
         public Task<Model3DGroup> AddFieldMeshAsync(Model3DGroup modelGroup, string courseId, string planId, string beamId, string status) =>
             RunAsync(context =>
             {
                 var planningItem = Extensions.GetPlanningItem(context.Patient, courseId, planId);
-                //var calculator = new CollisionSummariesCalculator();
                 var plan = (PlanSetup)planningItem;
                 var beam = plan.Beams.FirstOrDefault(x => x.Id == beamId);
                 return CollisionSummariesCalculator.AddFieldMesh(plan, beam, status);
@@ -142,14 +143,11 @@ namespace PlanCheck
             }
             var structureVM = new StructureViewModel(structure);
             string metric = "";
-            //var goal = "";
             string result = "";
-            //string variation = "";
+
                 if (templateId == structureId)
                 {
                     metric = dvhObjective;
-                    //goal = objective.Goal;
-                    //variation = objective.Variation;
                     result = _metricCalc.CalculateMetric(planVM.PlanningItemStructureSet, structureVM, planVM, metric);
                 }                 
                 else
@@ -166,5 +164,31 @@ namespace PlanCheck
 
         public Task<string> EvaluateMetricDoseAsync(string result, string goal, string variation) =>
             RunAsync(context => EvaluateMetricDose(result, goal, variation));
+
+        public Task<ReportPatient> GetReportPatientAsync() =>
+            RunAsync(context => new ReportPatient
+            {
+                Id = context.Patient.Id,
+                FirstName = context.Patient.FirstName,
+                LastName = context.Patient.LastName,
+                Sex = GetPatientSex(context.Patient.Sex),
+                Birthdate = (DateTime)context.Patient.DateOfBirth,
+                Doctor = new Doctor
+                {
+                    Name = context.Patient.PrimaryOncologistId
+                }
+            });
+
+        private Sex GetPatientSex(string sex)
+        {
+            switch (sex)
+            {
+                case "Male": return Sex.Male;
+                case "Female": return Sex.Female;
+                case "Other": return Sex.Other;
+                default: throw new ArgumentOutOfRangeException();
+            }
+
+        }
     }
 }

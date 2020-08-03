@@ -81,7 +81,6 @@
                                             <TextBlock
                                     Text="{Binding Name, StringFormat=Course: \{0\}, Converter={StaticResource UnderscoreConverter}}"
                                     FontWeight="Bold"
-                                    Foreground="DarkBlue"
                                     />
                                         </DataTemplate>
                                     </GroupStyle.HeaderTemplate>
@@ -220,7 +219,8 @@
                 </ComboBox>
                 <Button Grid.Column="2"
                         Content="Print PDF"
-                        VerticalAlignment="Center"/>
+                        VerticalAlignment="Center"
+                        Command="{Binding PrintCommand}"/>
             </Grid>
             <DataGrid x:Name="pqmDataGrid"
                       EnableRowVirtualization="False"
@@ -280,7 +280,10 @@
                     <DataGridTextColumn Header="StructVolume" Binding="{Binding StructVolume, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="2*"/>
                     <DataGridTextColumn Header="DVHObjective" Binding="{Binding DVHObjective, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="3*"/>
                     <DataGridTextColumn Header="Goal" Binding="{Binding Goal, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False" Width="*"/>
-                    <DataGridTemplateColumn Header="Achieved" SortMemberPath="AchievedPercentageOfGoal" Width="5*">
+                    <DataGridTemplateColumn SortMemberPath="AchievedPercentageOfGoal" Width="5*">
+                        <DataGridTemplateColumn.Header>
+                            <TextBlock Text="{Binding DataContext.SelectedPlan.PlanId, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}, Converter={StaticResource UnderscoreConverter}}"/>
+                        </DataGridTemplateColumn.Header>
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <Grid>

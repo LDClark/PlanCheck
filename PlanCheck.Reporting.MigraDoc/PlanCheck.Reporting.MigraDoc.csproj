@@ -93,10 +93,14 @@
     <EmbeddedResource Include="Resources\other-symbol.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\PlanSum.png" />
+    <EmbeddedResource Include="Resources\PlanSum.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Plan.png" />
+    <EmbeddedResource Include="Resources\Plan.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

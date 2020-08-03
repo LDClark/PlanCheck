@@ -1,10 +1,13 @@
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using PlanCheck.Helpers;
+using PlanCheck.Reporting;
+using PlanCheck.Reporting.MigraDoc;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows.Input;
@@ -160,6 +163,7 @@ namespace PlanCheck
         public ICommand StartCommand => new RelayCommand(Start);
         public ICommand AnalyzePlanCommand => new RelayCommand(AnalyzePlan);
         public ICommand AnalyzeCollisionCommand => new RelayCommand(GetCollisionSummary);
+        public ICommand PrintCommand => new RelayCommand(PrintPlan);
 
         private async void Start()
         {
@@ -177,9 +181,9 @@ namespace PlanCheck
             var planId = SelectedPlan?.PlanId;
 
             var type = SelectedPlan?.PlanType;
-            if (type == "VMS.TPS.Common.Model.API.PlanSum")
+            if (type == "PlanSum")
                 CCIsEnabled = false;
-            if (type == "VMS.TPS.Common.Model.API.ExternalPlanSetup")
+            if (type == "Plan")
                 CCIsEnabled = true;
 
             if (courseId == null || planId == null)
@@ -242,6 +246,7 @@ namespace PlanCheck
                                         TemplateId = structure.StructureName,
                                         StructureList = structures,
                                         SelectedStructure = structure,
+                                        StructureNameWithCode = structure.StructureNameWithCode,
                                         StructVolume = structure.VolumeValue,
                                         DVHObjective = pqm.DVHObjective,
                                         Goal = goal,
@@ -282,7 +287,7 @@ namespace PlanCheck
             var planId = SelectedPlan?.PlanId;
             var courseId = SelectedPlan?.CourseId;
             var type = SelectedPlan?.PlanType;
-            if (type == "VMS.TPS.Common.Model.API.ExternalPlanSetup")
+            if (type == "Plan")
             {
                 var beamIds = await _esapiService.GetBeamIdsAsync(courseId, planId);
 
@@ -339,6 +344,62 @@ namespace PlanCheck
                     });
             }
 
+        }
+
+        private async void PrintPlan()
+        {
+            var reportService = new ReportPdf();
+            var reportPQMs = new ReportPQMs();
+
+            int numPqms = PQMs.Count();
+            ReportPQM[] reportPQMList = new ReportPQM[numPqms];
+            var reportPQM = new ReportPQM();
+            int i = 0;
+            foreach (var pqm in PQMs)
+            {
+                reportPQMList[i] = new ReportPQM();
+                reportPQMList[i].Achieved = pqm.Achieved;
+                reportPQMList[i].DVHObjective = pqm.DVHObjective;
+                reportPQMList[i].Goal = pqm.Goal;
+                reportPQMList[i].StructureNameWithCode = pqm.StructureNameWithCode;
+                reportPQMList[i].StructVolume = pqm.StructVolume;
+                reportPQMList[i].TemplateId = pqm.TemplateId;
+                reportPQMList[i].Variation = pqm.Variation;
+                reportPQMList[i].Met = pqm.Met;
+                i++;
+            }
+            reportPQMs.PQMs = reportPQMList;
+
+            var reportData =  new ReportData
+            {
+                ReportPatient = await _esapiService.GetReportPatientAsync(),
+                ReportPlanningItem = new ReportPlanningItem
+                {
+                    Id = SelectedPlan.PlanId,
+                    Type = SelectedPlan.PlanType,
+                    Created = SelectedPlan.PlanCreation
+                },
+                ReportStructureSet = new ReportStructureSet
+                {
+                    Id = SelectedPlan.PlanStructureSetId,
+                    Image = new ReportImage
+                    {
+                        Id = SelectedPlan.PlanImageId,
+                        CreationTime = SelectedPlan.PlanImageCreation
+                    }
+                },
+                ReportPQMs = reportPQMs,
+            };
+
+            var path = GetTempPdfPath();
+            reportService.Export(path, reportData);
+
+            Process.Start(path);
+        }
+
+        private static string GetTempPdfPath()
+        {
+            return Path.GetTempFileName() + ".pdf";
         }
     }
 }
