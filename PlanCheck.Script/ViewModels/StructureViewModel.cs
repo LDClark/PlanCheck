@@ -10,7 +10,6 @@ namespace PlanCheck
         public string StructureName { get; set; }
         public string StructureCode { get; set; }
         public string StructureNameWithCode { get; set; }
-        public Structure Structure { get; set; }
         public string VolumeValue { get; set; }
         public string VolumeUnit {get;set;}
 
@@ -21,7 +20,6 @@ namespace PlanCheck
                 StructureName = structure.Id;
                 StructureCode = structure.StructureCodeInfos.FirstOrDefault().Code;
                 StructureNameWithCode = StructureName + " : " + StructureCode;
-                Structure = structure;
                 VolumeValue = structure.Volume.ToString("0.0");
                 VolumeUnit = VolumePresentation.AbsoluteCm3.ToString();
             }

@@ -25,6 +25,10 @@ namespace PlanCheck
                     errorGrid = GetPlanSetupErrors(planSetup);
                 }
             }
+            var structureSet = planningItem.StructureSet;
+            var structureSetErrors = GetStructureSetErrors(structureSet);
+            foreach (var structureSetError in structureSetErrors)  
+                errorGrid.Add(structureSetError);
             return new ObservableCollection<ErrorViewModel>(errorGrid.OrderBy(x => x.Status));
         }
 
@@ -37,6 +41,42 @@ namespace PlanCheck
                 Severity = severity
             };
             errorGrid.Add(errorColumns);
+        }
+
+        public ObservableCollection<ErrorViewModel> GetStructureSetErrors(StructureSet structureSet)
+        {
+            var errorGrid = new ObservableCollection<ErrorViewModel>();
+            foreach (var structure in structureSet.Structures)
+            {
+                try
+                {
+                    if (structure.StructureCodeInfos.FirstOrDefault().Code == "NormalTissue")
+                    {
+                        ;
+                        if (structure.GetAssignedHU(out double huValue))
+                        {
+                            var description = string.Format("Structure {0} has an assigned CT value of {1}.", structure.Id, huValue);
+                            var severity = 1;
+                            var status = "3 - OK";
+                            AddNewRow(description,status, severity, errorGrid);
+                        }
+                        else
+                        {
+
+                            var description = string.Format("Structure {0} does not have an assigned CT value.", structure.Id);
+                            var severity = 1;
+                            var status = "1 - Warning";
+                            AddNewRow(description, status, severity, errorGrid);
+                        }
+                    }
+                }
+                catch
+                {
+
+                }
+                
+            }
+            return errorGrid;
         }
 
         public ObservableCollection<ErrorViewModel> GetPlanSumRxErrors(PlanSum planSum)
@@ -75,7 +115,7 @@ namespace PlanCheck
                 else
                 {
                     error = string.Format("Plan name {0} does NOT match Rx dose of {1} cGy.", siteNameList[i]+ "_" + doseName, doseValueList[i]);
-                    errorStatus = "1 - Error";
+                    errorStatus = "1 - Warning";
                     errorSeverity = 1;
                     AddNewRow(error, errorStatus, errorSeverity, errorGrid);
                 }
@@ -95,7 +135,7 @@ namespace PlanCheck
                 else
                 {
                     error = string.Format("PlanSum name {0} does NOT match Rx dose of {1} cGy.", planSum.Id, totalRxDose);
-                    errorStatus = "1 - Error";
+                    errorStatus = "1 - Warning";
                     errorSeverity = 1;
                     AddNewRow(error, errorStatus, errorSeverity, errorGrid);
                 }
@@ -165,7 +205,7 @@ namespace PlanCheck
                     else
                     {
                         error = string.Format("Plan setup name {0} does NOT match Rx dose of {1} cGy.", siteNameList[i] + "_" + doseName, doseValueList[i]);
-                        errorStatus = "1 - Error";
+                        errorStatus = "1 - Warning";
                         errorSeverity = 1;
                         AddNewRow(error, errorStatus, errorSeverity, errorGrid);
                     }
@@ -177,7 +217,7 @@ namespace PlanCheck
             if ((planSetup.CreationDateTime.Value - planSetup.StructureSet.Image.CreationDateTime.Value).TotalDays > 21)
             {
                 error = string.Format("CT and structure data ({0}) is {1} days older than plan creation date ({2}) and outside of 21 days.", planSetup.StructureSet.Image.CreationDateTime.Value, (planSetup.CreationDateTime.Value - planSetup.StructureSet.Image.CreationDateTime.Value).TotalDays.ToString("0"), planSetup.CreationDateTime.Value);
-                errorStatus = "1 - Error";
+                errorStatus = "1 - Warning";
                 errorSeverity = 1;
                 AddNewRow(error, errorStatus, errorSeverity, errorGrid);
             }
@@ -193,31 +233,38 @@ namespace PlanCheck
             {
                 if (planSetup.TargetVolumeID != "")
                 {
-                    Structure target = planSetup.StructureSet.Structures.First(x => x.Id == planSetup.TargetVolumeID);
-                    error = target.IsPointInsideSegment(planSetup.Dose.DoseMax3DLocation) ?
-                    $"Dose max {planSetup.Dose.DoseMax3D} is inside {target.Id}." : $"Dose max {planSetup.Dose.DoseMax3D} not in target.";
-                    errorStatus = target.IsPointInsideSegment(planSetup.Dose.DoseMax3DLocation) ?
-                    "3 - OK" : "1 - Error";
-                    errorSeverity = 1;
-                    AddNewRow(error, errorStatus, errorSeverity, errorGrid);
+                    try
+                    {
+                        Structure target = planSetup.StructureSet.Structures.First(x => x.Id == planSetup.TargetVolumeID);
+                        error = target.IsPointInsideSegment(planSetup.Dose.DoseMax3DLocation) ?
+                        $"Dose maximum {planSetup.Dose.DoseMax3D} is inside {target.Id}." : $"Dose maximum {planSetup.Dose.DoseMax3D} not in target.";
+                        errorStatus = target.IsPointInsideSegment(planSetup.Dose.DoseMax3DLocation) ?
+                        "3 - OK" : "1 - Warning";
+                        errorSeverity = 1;
+                        AddNewRow(error, errorStatus, errorSeverity, errorGrid);
+                    }
+                    catch
+                    {
+
+                    }
                 }
                 if (planSetup.Dose.DoseMax3D.Dose >= 115)
                 {
-                    error = string.Format("Dose max is {0}.", planSetup.Dose.DoseMax3D.Dose.ToString("0.0") + " %");
-                    errorStatus = "1 - Error";
+                    error = string.Format("Dose maximum is {0}.", planSetup.Dose.DoseMax3D.Dose.ToString("0.0") + " %");
+                    errorStatus = "1 - Warning";
                     errorSeverity = 1;
                     AddNewRow(error, errorStatus, errorSeverity, errorGrid);
                 }
                 if (planSetup.Dose.DoseMax3D.Dose >= 110 && planSetup.Dose.DoseMax3D.Dose < 115)
                 {
-                    error = string.Format("Dose max {0} is less than 115 %.", planSetup.Dose.DoseMax3D.Dose.ToString("0.0") + " %");
+                    error = string.Format("Dose maximum is {0}.", planSetup.Dose.DoseMax3D.Dose.ToString("0.0") + " %");
                     errorStatus = "2 - Variation";
                     errorSeverity = 1;
                     AddNewRow(error, errorStatus, errorSeverity, errorGrid);
                 }
                 if (planSetup.Dose.DoseMax3D.Dose >= 100 && planSetup.Dose.DoseMax3D.Dose < 110)
                 {
-                    error = string.Format("Dose max {0} is less than 110 %.", planSetup.Dose.DoseMax3D.Dose.ToString("0.0") + " %");
+                    error = string.Format("Dose maximum {0}.", planSetup.Dose.DoseMax3D.Dose.ToString("0.0") + " %");
                     errorStatus = "3 - OK";
                     errorSeverity = 1;
                     AddNewRow(error, errorStatus, errorSeverity, errorGrid);
@@ -234,7 +281,7 @@ namespace PlanCheck
             else
             {
                 error = string.Format("Plan ID ({0}) does not match plan Name ({1}).", planSetup.Id, planSetup.Name);
-                errorStatus = "1 - Error";
+                errorStatus = "1 - Warning";
                 errorSeverity = 1;
                 AddNewRow(error, errorStatus, errorSeverity, errorGrid);
             }
@@ -249,10 +296,10 @@ namespace PlanCheck
                         double priority = opo.Priority;
 
 
-                        if (priority == 0 || priority >= 200)
+                        if (priority == 0 || priority > 200)
                         {
                             error = string.Format("Structure {0} has a priority of {1} and is not within the range of 0 to 200.", opo.StructureId, opo.Priority);
-                            errorStatus = "1 - Error";
+                            errorStatus = "1 - Warning";
                             errorSeverity = 1;
                             AddNewRow(error, errorStatus, errorSeverity, errorGrid);
                         }
@@ -285,7 +332,7 @@ namespace PlanCheck
                     else
                     {
                         error = string.Format("Structure {0} has assigned HU of {1} and is outside limit of {2} to {3}.", structure, assignedHU, upperLimitHU, lowerLimitHU);
-                        errorStatus = "1 - Error";
+                        errorStatus = "1 - Warning";
                         errorSeverity = 1;
                         AddNewRow(error, errorStatus, errorSeverity, errorGrid);
                     }
@@ -297,7 +344,7 @@ namespace PlanCheck
             if (planSetup.TargetVolumeID == "")
             {
                 error = string.Format("Plan {0} does not have a target volume assigned.", planSetup.Id);
-                errorStatus = "1 - Error";
+                errorStatus = "1 - Warning";
                 errorSeverity = 1;
                 AddNewRow(error, errorStatus, errorSeverity, errorGrid);
             }
@@ -314,7 +361,7 @@ namespace PlanCheck
                 if (couchFound == false)
                 {
                     error = string.Format("Plan {0} is IMRT but there is no couch inserted (okay if 6DoF headholder present).", planSetup.Id);
-                    errorStatus = "1 - Error";
+                    errorStatus = "1 - Warning";
                     errorSeverity = 1;
                     AddNewRow(error, errorStatus, errorSeverity, errorGrid);
                 }
@@ -332,7 +379,7 @@ namespace PlanCheck
                 if (couchFound == false)
                 {
                     error = string.Format("Plan {0} is VMAT but there is no couch inserted (okay if 6DoF headholder present).", planSetup.Id);
-                    errorStatus = "1 - Error";
+                    errorStatus = "1 - Warning";
                     errorSeverity = 1;
                     AddNewRow(error, errorStatus, errorSeverity, errorGrid);
                 }
@@ -385,7 +432,7 @@ namespace PlanCheck
                     if (CPsWithDoseRateMaxed > 1)
                     {
                         error = string.Format("Field {0} has {1} of {2} control points with max dose rate {3} MU/min.  Average dose rate is {4} MU/min.", b.Id, CPsWithDoseRateMaxed, b.ControlPoints.Count, b.DoseRate, doserateAvg.ToString("0.0"));
-                        errorStatus = "1 - Error";
+                        errorStatus = "2 - Variation";
                         errorSeverity = 1;
                         AddNewRow(error, errorStatus, errorSeverity, errorGrid);
                     }
@@ -399,7 +446,7 @@ namespace PlanCheck
                     if (CPsWithLargeSpeedChange > 1)
                     {
                         error = string.Format("Field {0} has {1} of {2} control points with gantry speed change > 0.1 deg/s.", b.Id, CPsWithLargeSpeedChange, b.ControlPoints.Count);
-                        errorStatus = "1 - Error";
+                        errorStatus = "2 - Variation";
                         errorSeverity = 1;
                         AddNewRow(error, errorStatus, errorSeverity, errorGrid);
                     }
@@ -578,7 +625,7 @@ namespace PlanCheck
                 if (b.ReferenceImage == null)
                 {
                     error = string.Format("Field {0} does not have a DRR.", b.Id);
-                    errorStatus = "1 - Error";
+                    errorStatus = "2 - Variation";
                     errorSeverity = 1;
                     AddNewRow(error, errorStatus, errorSeverity, errorGrid);
                 }
@@ -595,7 +642,7 @@ namespace PlanCheck
                     if (b.ControlPoints.First().PatientSupportAngle != 0)
                     {
                         error = string.Format("Setup field {0} is not at couch = 0.", b.Id);
-                        errorStatus = "1 - Error";
+                        errorStatus = "1 - Warning";
                         errorSeverity = 1;
                         AddNewRow(error, errorStatus, errorSeverity, errorGrid);
                     }
@@ -606,13 +653,13 @@ namespace PlanCheck
                         errorSeverity = 1;
                         AddNewRow(error, errorStatus, errorSeverity, errorGrid);
                     }
-                    if (b.IsSetupField && (b.ControlPoints.First().GantryAngle == 90.1))
+                    if (b.IsSetupField && (90 - (b.ControlPoints.First().GantryAngle) <= 0.1))
                         ltLatSetupFound = true;
-                    if (b.IsSetupField && (b.ControlPoints.First().GantryAngle == 0.0))
+                    if (b.IsSetupField && ((0 - (b.ControlPoints.First().GantryAngle) <= 0.1)))
                         apSetupFound = true;
-                    if (b.IsSetupField && (b.ControlPoints.First().GantryAngle == 180.0))
+                    if (b.IsSetupField && (180 - (b.ControlPoints.First().GantryAngle) <= 0.1))
                         paSetupFound = true;
-                    if (b.IsSetupField && (b.ControlPoints.First().GantryAngle == 270.0))
+                    if (b.IsSetupField && (270 - (b.ControlPoints.First().GantryAngle) <= 0.1))
                         rtLatSetupFound = true;
                     if (b.IsSetupField && (b.ControlPoints.First().GantryAngle == 0.0) && b.Id == "CBCT")
                         cbctSetupFound = true;
@@ -636,7 +683,7 @@ namespace PlanCheck
                                 else
                                 {
                                     error = string.Format("EDW field {0} is LESS than 20 MU and should not be deliverable.", b.Id);
-                                    errorStatus = "1 - Error";
+                                    errorStatus = "1 - Warning";
                                     errorSeverity = 1;
                                     AddNewRow(error, errorStatus, errorSeverity, errorGrid);
                                 }
@@ -656,7 +703,7 @@ namespace PlanCheck
                         else
                         {
                             error = string.Format("Field {0} is VMAT but the tolerance table is not IMRT.", b.Id);
-                            errorStatus = "1 - Error";
+                            errorStatus = "1 - Warning";
                             errorSeverity = 1;
                             AddNewRow(error, errorStatus, errorSeverity, errorGrid);
                         }
@@ -673,7 +720,7 @@ namespace PlanCheck
                         else
                         {
                             error = string.Format("Field {0} is IMRT but the tolerance table is not IMRT.", b.Id);
-                            error = "1 - Error";
+                            error = "1 - Warning";
                             errorSeverity = 1;
                             AddNewRow(error, errorStatus, errorSeverity, errorGrid);
                         }
@@ -690,7 +737,7 @@ namespace PlanCheck
                         else
                         {
                             error = string.Format("Field {0} is conformal/3D but the tolerance table is not T1.", b.Id);
-                            error = "1 - Error";
+                            error = "1 - Warning";
                             errorSeverity = 1;
                             AddNewRow(error, errorStatus, errorSeverity, errorGrid);
                         }
@@ -707,7 +754,7 @@ namespace PlanCheck
                         else
                         {
                             error = string.Format("Field {0} is an electron field but the tolerance table is not 'Electron'.", b.Id);
-                            errorStatus = "1 - Error";
+                            errorStatus = "1 - Warning";
                             errorSeverity = 1;
                             AddNewRow(error, errorStatus, errorSeverity, errorGrid);
                         }
@@ -716,7 +763,7 @@ namespace PlanCheck
                     if (b.Technique.ToString().Contains("STATIC") && b.Meterset.Value > 1000)
                     {
                         error = string.Format("Field {0} is Static, but the MUs are more than 1000.", b.Id);
-                        errorStatus = "1 - Error";
+                        errorStatus = "1 - Warning";
                         errorSeverity = 1;
                         AddNewRow(error, errorStatus, errorSeverity, errorGrid);
                     }
@@ -726,7 +773,7 @@ namespace PlanCheck
             if (rtLatSetupFound == false)
             {
                 error = "Setup field Rt Lat not found.";
-                errorStatus = "1 - Error";
+                errorStatus = "2 - Variation";
                 errorSeverity = 1;
                 AddNewRow(error, errorStatus, errorSeverity, errorGrid);
             }
@@ -740,7 +787,7 @@ namespace PlanCheck
             if (ltLatSetupFound == false)
             {
                 error = "Setup field Lt Lat not found.";
-                errorStatus = "1 - Error";
+                errorStatus = "2 - Variation";
                 errorSeverity = 1;
                 AddNewRow(error, errorStatus, errorSeverity, errorGrid);
             }
@@ -754,7 +801,7 @@ namespace PlanCheck
             if (apSetupFound == false)
             {
                 error = "Setup field AP not found.";
-                errorStatus = "1 - Error";
+                errorStatus = "2 - Variation";
                 errorSeverity = 1;
                 AddNewRow(error, errorStatus, errorSeverity, errorGrid);
             }
@@ -768,7 +815,7 @@ namespace PlanCheck
             if (paSetupFound == false)
             {
                 error = "Setup field PA not found.";
-                errorStatus = "1 - Error";
+                errorStatus = "2 - Variation";
                 errorSeverity = 1;
                 AddNewRow(error, errorStatus, errorSeverity, errorGrid);
             }
@@ -782,7 +829,7 @@ namespace PlanCheck
             if (cbctSetupFound == false)
             {
                 error = "Setup field CBCT not found.";
-                errorStatus = "1 - Error";
+                errorStatus = "2 - Variation";
                 errorSeverity = 1;
                 AddNewRow(error, errorStatus, errorSeverity, errorGrid);
             }
@@ -804,7 +851,7 @@ namespace PlanCheck
             else
             {
                 error = string.Format("Target Volume {0} does not match Primary Reference Point Id {1}.", planSetup.TargetVolumeID, planSetup.PrimaryReferencePoint.Id);
-                errorStatus = "1 - Error";
+                errorStatus = "1 - Warning";
                 errorSeverity = 1;
                 AddNewRow(error, errorStatus, errorSeverity, errorGrid);
             }
@@ -823,7 +870,7 @@ namespace PlanCheck
                 else
                 {
                     error = string.Format("Planned site {0} doesn't match Target Volume {1}.", planSiteFromPlanName, planSetup.TargetVolumeID);
-                    errorStatus = "1 - Error";
+                    errorStatus = "1 - Warning";
                     errorSeverity = 1;
                     AddNewRow(error, errorStatus, errorSeverity, errorGrid);
                 }
@@ -831,7 +878,7 @@ namespace PlanCheck
             else
             {
                 error = string.Format("Plan {0} does not have format 'Site_RxDose'.", planSetup.Id);
-                errorStatus = "1 - Error";
+                errorStatus = "1 - Warning";
                 errorSeverity = 1;
                 AddNewRow(error, errorStatus, errorSeverity, errorGrid);
             }
@@ -849,7 +896,7 @@ namespace PlanCheck
                     else
                     {
                         error = string.Format("Plan {0} has a right shift of {1} mm but the plan name is not labeled Right.", planSetup.Id, planSetup.Beams.First().IsocenterPosition.x.ToString("0.0"));
-                        errorStatus = "1 - Error";
+                        errorStatus = "1 - Warning";
                         errorSeverity = 1;
                         AddNewRow(error, errorStatus, errorSeverity, errorGrid);
                     }
@@ -866,7 +913,7 @@ namespace PlanCheck
                     else
                     {
                         error = string.Format("Plan {0} has a right shift of {1} mm but the plan name is not labeled Right.", planSetup.Id, planSetup.Beams.First().IsocenterPosition.x.ToString("0.0"));
-                        errorStatus = "1 - Error";
+                        errorStatus = "1 - Warning";
                         errorSeverity = 1;
                         AddNewRow(error, errorStatus, errorSeverity, errorGrid);
                     }
@@ -886,7 +933,7 @@ namespace PlanCheck
                     else
                     {
                         error = string.Format("Plan {0} has a left shift of {1} mm but the plan name is not labeled Left.", planSetup.Id, planSetup.Beams.First().IsocenterPosition.x.ToString("0.0"));
-                        errorStatus = "1 - Error";
+                        errorStatus = "1 - Warning";
                         errorSeverity = 1;
                         AddNewRow(error, errorStatus, errorSeverity, errorGrid);
                     }
@@ -902,7 +949,7 @@ namespace PlanCheck
                     else
                     {
                         error = string.Format("Plan {0} has a left shift of {1} mm but the plan name is not labeled Left.", planSetup.Id, planSetup.Beams.First().IsocenterPosition.x.ToString("0.0"));
-                        errorStatus = "1 - Error";
+                        errorStatus = "1 - Warning";
                         errorSeverity = 1;
                         AddNewRow(error, errorStatus, errorSeverity, errorGrid);
                     }
@@ -916,7 +963,7 @@ namespace PlanCheck
                     if (course.CompletedDateTime == null)
                     {
                         error = string.Format("{0} Course is still active.", course.Id);
-                        errorStatus = "1 - Error";
+                        errorStatus = "1 - Warning";
                         errorSeverity = 1;
                         AddNewRow(error, errorStatus, errorSeverity, errorGrid);
                     }

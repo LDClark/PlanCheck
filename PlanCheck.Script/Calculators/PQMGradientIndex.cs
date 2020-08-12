@@ -2,6 +2,7 @@ using System.Text.RegularExpressions;
 using System;
 using VMS.TPS.Common.Model.API;
 using VMS.TPS.Common.Model.Types;
+using System.Linq;
 
 namespace PlanCheck.Calculators
 {
@@ -11,8 +12,9 @@ namespace PlanCheck.Calculators
         {
             try
             {
+                var structure = structureSet.Structures.FirstOrDefault(x => x.Id == evalStructure.StructureName);
                 // we have Gradient Index pattern
-                DVHData dvh = planningItem.PlanningItemObject.GetDVHCumulativeData(evalStructure.Structure, DoseValuePresentation.Absolute, VolumePresentation.Relative, 0.1);
+                DVHData dvh = planningItem.PlanningItemObject.GetDVHCumulativeData(structure, DoseValuePresentation.Absolute, VolumePresentation.Relative, 0.1);
                 if ((dvh.SamplingCoverage < 0.9) || (dvh.Coverage < 0.9))
                 {
                     return "Unable to calculate - insufficient dose or sampling coverage";
@@ -42,8 +44,8 @@ namespace PlanCheck.Calculators
                 VolumePresentation vpFinal = VolumePresentation.AbsoluteCm3;
                 DoseValuePresentation dvpFinal = (evalunit.Value.CompareTo("%") == 0) ? DoseValuePresentation.Relative : DoseValuePresentation.Absolute;
                 DoseValue dv = new DoseValue(double.Parse(eval.Value) / 100 * prescribedDose.Dose, DoseValue.DoseUnit.cGy);
-                double bodyWithPrescribedDoseVolume = planningItem.PlanningItemObject.GetVolumeAtDose(evalStructure.Structure, prescribedDose, vpFinal);
-                double bodyWithEvalDoseVolume = planningItem.PlanningItemObject.GetVolumeAtDose(evalStructure.Structure, dv, vpFinal);
+                double bodyWithPrescribedDoseVolume = planningItem.PlanningItemObject.GetVolumeAtDose(structure, prescribedDose, vpFinal);
+                double bodyWithEvalDoseVolume = planningItem.PlanningItemObject.GetVolumeAtDose(structure, dv, vpFinal);
                 var gi = bodyWithEvalDoseVolume / bodyWithPrescribedDoseVolume;
                 return string.Format("{0:0.0}", gi);
             }

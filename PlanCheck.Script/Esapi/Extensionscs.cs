@@ -60,9 +60,19 @@ public static class Extensions
         throw new InvalidOperationException("Unknown PlanningItem type.");
     }
 
+    public static string GetFractionation(this PlanningItem plan)
+    {
+        switch (plan)
+        {
+            case PlanSetup planSetup: return "  -  " + planSetup.TotalDose.ValueAsString + " " + planSetup.TotalDose.UnitAsString + " x " + planSetup.NumberOfFractions;
+            case PlanSum planSum: return "";
+        }
+        throw new InvalidOperationException("Unknown PlanningItem type.");
+    }
+
     private static Course GetCourse(Patient patient, string courseId) =>
         patient?.Courses?.FirstOrDefault(x => x.Id == courseId);
 
-    public static Structure GetStructure(PlanningItem plan, string structureId) =>
-        plan?.StructureSet?.Structures?.FirstOrDefault(x => x.Id == structureId);
+    public static Structure GetStructure(PlanningItem plan, string structureCode) =>
+        plan?.StructureSet?.Structures?.FirstOrDefault(x => x.StructureCodeInfos.FirstOrDefault().Code == structureCode);
 }

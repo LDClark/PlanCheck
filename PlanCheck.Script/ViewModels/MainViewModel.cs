@@ -1,5 +1,6 @@
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using PlanCheck.Calculators;
 using PlanCheck.Helpers;
 using PlanCheck.Reporting;
 using PlanCheck.Reporting.MigraDoc;
@@ -10,6 +11,8 @@ using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
@@ -218,47 +221,53 @@ namespace PlanCheck
                         {
                             foreach (var pqm in pqms)
                             {
-                                if (pqm.TemplateId == structure.StructureName)
+                                foreach (var code in pqm.TemplateCodes)
                                 {
-                                    result = "";
-                                    resultCompare1 = "";
-                                    resultCompare2 = "";
-                                    resultCompare3 = "";
-                                    goal = pqm.Goal;
-                                    variation = pqm.Variation;
-                                    result = await _esapiService.CalculateMetricDoseAsync(courseId, planId, structure.StructureName, pqm.TemplateId, pqm.DVHObjective, pqm.Goal, pqm.Variation);
-                                    met = await _esapiService.EvaluateMetricDoseAsync(result, goal, variation);
-
-                                    var planCompare1 = SelectedPlanCompare1?.PlanId;
-                                    if (planCompare1 != null)
-                                        resultCompare1 = await _esapiService.CalculateMetricDoseAsync(courseId, planCompare1, structure.StructureName, pqm.TemplateId, pqm.DVHObjective, pqm.Goal, pqm.Variation);
-
-                                    var planCompare2 = SelectedPlanCompare2?.PlanId;
-                                    if (planCompare2 != null)
-                                        resultCompare2 = await _esapiService.CalculateMetricDoseAsync(courseId, planCompare2, structure.StructureName, pqm.TemplateId, pqm.DVHObjective, pqm.Goal, pqm.Variation);
-
-                                    var planCompare3 = SelectedPlanCompare3?.PlanId;
-                                    if (planCompare3 != null)
-                                        resultCompare3 = await _esapiService.CalculateMetricDoseAsync(courseId, planCompare3, structure.StructureName, pqm.TemplateId, pqm.DVHObjective, pqm.Goal, pqm.Variation);
-
-                                    PQMs.Add(new PQMViewModel
+                                    if (code == structure.StructureCode)
                                     {
-                                        TemplateId = structure.StructureName,
-                                        StructureList = structures,
-                                        SelectedStructure = structure,
-                                        StructureNameWithCode = structure.StructureNameWithCode,
-                                        StructVolume = structure.VolumeValue,
-                                        DVHObjective = pqm.DVHObjective,
-                                        Goal = goal,
-                                        Met = met,
-                                        Achieved = result,
-                                        ResultCompare1 = resultCompare1,
-                                        ResultCompare2 = resultCompare2,
-                                        ResultCompare3 = resultCompare3,
-                                    });
-                                }
-                                else
-                                {
+                                        if (code == "9680")
+                                            goal = "";
+                                        result = "";
+                                        resultCompare1 = "";
+                                        resultCompare2 = "";
+                                        resultCompare3 = "";
+                                        goal = pqm.Goal;
+                                        variation = pqm.Variation;
+                                        result = await _esapiService.CalculateMetricDoseAsync(courseId, planId, structure.StructureCode, code, pqm.DVHObjective, pqm.Goal, pqm.Variation);
+                                        met = await _esapiService.EvaluateMetricDoseAsync(result, goal, variation);
+                                        var ratio = Convert.ToDouble(Regex.Match(result, @"\d+").Value) / Convert.ToDouble(Regex.Match(goal, @"\d+").Value);
+                                        var color = PQMColors.GetNormalTissueSolidColorBrush(ratio);
+                                        var percentage = ratio * 100;
+                                        var planCompare1 = SelectedPlanCompare1?.PlanId;
+                                        if (planCompare1 != null)
+                                            resultCompare1 = await _esapiService.CalculateMetricDoseAsync(courseId, planCompare1, structure.StructureCode, code, pqm.DVHObjective, pqm.Goal, pqm.Variation);
+
+                                        var planCompare2 = SelectedPlanCompare2?.PlanId;
+                                        if (planCompare2 != null)
+                                            resultCompare2 = await _esapiService.CalculateMetricDoseAsync(courseId, planCompare2, structure.StructureCode, code, pqm.DVHObjective, pqm.Goal, pqm.Variation);
+
+                                        var planCompare3 = SelectedPlanCompare3?.PlanId;
+                                        if (planCompare3 != null)
+                                            resultCompare3 = await _esapiService.CalculateMetricDoseAsync(courseId, planCompare3, structure.StructureCode, code, pqm.DVHObjective, pqm.Goal, pqm.Variation);
+
+                                        PQMs.Add(new PQMViewModel
+                                        {
+                                            TemplateId = structure.StructureName,
+                                            StructureList = structures,
+                                            SelectedStructure = structure,
+                                            StructureNameWithCode = structure.StructureNameWithCode,
+                                            StructVolume = structure.VolumeValue,
+                                            AchievedPercentageOfGoal = percentage,
+                                            AchievedColor = color,
+                                            DVHObjective = pqm.DVHObjective,
+                                            Goal = goal,
+                                            Met = met,
+                                            Achieved = result,
+                                            ResultCompare1 = resultCompare1,
+                                            ResultCompare2 = resultCompare2,
+                                            ResultCompare3 = resultCompare3,
+                                        });
+                                    }
                                 }
                             }
                         }
@@ -270,7 +279,11 @@ namespace PlanCheck
                     }
                 });
 
-            ErrorGrid = await _esapiService.GetErrorsAsync(courseId, planId);
+            _dialogService.ShowProgressDialog("Finding errors...",
+                async progress =>
+                {
+                    ErrorGrid = await _esapiService.GetErrorsAsync(courseId, planId);
+                });
         }
 
         public void GetCameraPosition()
@@ -281,8 +294,6 @@ namespace PlanCheck
             LookDir = new Vector3D(-x, 0, -z);
             CameraPosition = new Point3D(x, 0, z);
         }
-
-
 
         public async void GetCollisionSummary()
         {

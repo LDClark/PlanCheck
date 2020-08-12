@@ -75,12 +75,18 @@ namespace PlanCheck
 
         public static Model3DGroup AddFieldMesh(PlanSetup planSetup, Beam beam, string status)
         {
+
             DiffuseMaterial collimatorMaterialStatic = new DiffuseMaterial(new SolidColorBrush(Colors.Green));
             DiffuseMaterial collimatorMaterialVMAT = new DiffuseMaterial(new SolidColorBrush(Colors.GreenYellow));
             if (status == "Collision")
             {
                 collimatorMaterialStatic = new DiffuseMaterial(new SolidColorBrush(Colors.Red));
                 collimatorMaterialVMAT = new DiffuseMaterial(new SolidColorBrush(Colors.Red));
+            }
+            if (status == "Warning")
+            {
+                collimatorMaterialStatic = new DiffuseMaterial(new SolidColorBrush(Colors.DarkOrange));
+                collimatorMaterialVMAT = new DiffuseMaterial(new SolidColorBrush(Colors.DarkOrange));
             }
             DiffuseMaterial redMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.Red));
 
@@ -186,6 +192,11 @@ namespace PlanCheck
                 {
                     collimatorMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.Red));
                     status = "Collision";
+                }
+                if ((Convert.ToDouble(shortestDistanceBody) < 4.0) || (Convert.ToDouble(shortestDistanceTable) < 4.0))
+                {
+                    collimatorMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.Red));
+                    status = "Warning";
                 }
             }
             var collisionSummary = new CollisionCheckViewModel

@@ -32,7 +32,8 @@ namespace PlanCheck
                    PlanCreation = Extensions.GetCreationDateTime(x),
                    PlanStructureSetId = x.StructureSet.Id,
                    PlanImageId = x.StructureSet.Image.Id,
-                   PlanImageCreation = (DateTime)x.StructureSet.Image.CreationDateTime
+                   PlanImageCreation = (DateTime)x.StructureSet.Image.CreationDateTime,
+                   PlanIdWithFractionation = x.Id + Extensions.GetFractionation(x) 
                })
                .ToArray());
 
@@ -123,14 +124,14 @@ namespace PlanCheck
                 return objectives.ToArray() ?? new PQMViewModel[0];
             });
 
-        public Task<string> CalculateMetricDoseAsync(string courseId, string planId, string structureId, string templateId, string dvhObjective, string goal, string variation) =>
-            RunAsync(context => CalculateMetricDose(context.Patient, courseId, planId, structureId, templateId, dvhObjective, goal, variation));
+        public Task<string> CalculateMetricDoseAsync(string courseId, string planId, string structureCode, string templateCode, string dvhObjective, string goal, string variation) =>
+            RunAsync(context => CalculateMetricDose(context.Patient, courseId, planId, structureCode, templateCode, dvhObjective, goal, variation));
 
-        public string CalculateMetricDose(Patient patient, string courseId, string planId, string structureId, string templateId, string dvhObjective, string goal, string variation)
+        public string CalculateMetricDose(Patient patient, string courseId, string planId, string structureCode, string templateCode, string dvhObjective, string goal, string variation)
         {
             var plan = Extensions.GetPlanningItem(patient, courseId, planId);
             var planVM = new PlanningItemViewModel(plan);
-            var structure = Extensions.GetStructure(plan, structureId);
+            var structure = Extensions.GetStructure(plan, structureCode);
 
             DirectoryInfo constraintDir = new DirectoryInfo(Path.Combine(AssemblyHelper.GetAssemblyDirectory(), "ConstraintTemplates"));
             string firstFileName = constraintDir.GetFiles().FirstOrDefault().ToString();
@@ -145,13 +146,13 @@ namespace PlanCheck
             string metric = "";
             string result = "";
 
-                if (templateId == structureId)
-                {
-                    metric = dvhObjective;
-                    result = _metricCalc.CalculateMetric(planVM.PlanningItemStructureSet, structureVM, planVM, metric);
-                }                 
-                else
-                    result = "";                
+            if (templateCode == structureCode)
+            {
+                metric = dvhObjective;
+                result = _metricCalc.CalculateMetric(planVM.PlanningItemStructureSet, structureVM, planVM, metric);
+            }                 
+            else
+                result = "";                
             return result;
         }
 

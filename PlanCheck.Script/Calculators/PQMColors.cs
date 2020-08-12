@@ -7,7 +7,7 @@ namespace PlanCheck.Calculators
 {
     public class PQMColors
     {
-        public static Tuple<SolidColorBrush, double> GetAchievedColor(Structure structure, string goal, string DVHObjective, string Achieved)
+        public static Tuple<SolidColorBrush, double> GetAchievedColor(StructureViewModel structure, string goal, string DVHObjective, string Achieved)
         {
             var achievedColor = new SolidColorBrush();
             double achievedDouble;
@@ -37,7 +37,7 @@ namespace PlanCheck.Calculators
             }
             if (goal.Contains(">") && DVHObjective.ToString().Contains("CV"))  //CV parallel tissue
             {
-                var structVol = structure.Volume;
+                var structVol = Convert.ToDouble(structure.VolumeValue);
                 achievedRatio = Convert.ToInt32((structVol - achievedDouble) / (structVol - goalDouble));
                 achievedColor = GetNormalTissueSolidColorBrush(achievedRatio);
             }
@@ -50,28 +50,25 @@ namespace PlanCheck.Calculators
             return Tuple.Create(achievedColor, achievedRatio);
         }
 
-        private static SolidColorBrush GetNormalTissueSolidColorBrush(double achievedRatio)
+        public static SolidColorBrush GetNormalTissueSolidColorBrush(double achievedRatio)
         {
             var achievedColor = new SolidColorBrush();
-            if (achievedRatio >= 100)
-            {
-                achievedRatio = 100;
-                achievedColor = (SolidColorBrush)(new BrushConverter().ConvertFrom("#FFE07979")); //red
-            }
-            if (achievedRatio >= 75 && achievedRatio < 100)
-                achievedColor = (SolidColorBrush)(new BrushConverter().ConvertFrom("#FFEEA862")); //orange;
-            if (achievedRatio >= 50 && achievedRatio < 75)
-                achievedColor = (SolidColorBrush)(new BrushConverter().ConvertFrom("#FFF0F3A4")); //yellow;
-            if (achievedRatio >= 25 && achievedRatio < 50)
-                achievedColor = (SolidColorBrush)(new BrushConverter().ConvertFrom("#FFA7F3A4")); //light green
-            if (achievedRatio >= 0 && achievedRatio < 25)
-                achievedColor = (SolidColorBrush)(new BrushConverter().ConvertFrom("#FFA7F3A4")); //light green
+            if (achievedRatio >= 1)
+                achievedColor = (SolidColorBrush)(new BrushConverter().ConvertFrom("#870707")); //red
+            if (achievedRatio >= 0.75 && achievedRatio < 1)
+                achievedColor = (SolidColorBrush)(new BrushConverter().ConvertFrom("#905e03")); //orange;
+            if (achievedRatio >= 0.50 && achievedRatio < 0.75)
+                achievedColor = (SolidColorBrush)(new BrushConverter().ConvertFrom("#787800")); //yellow;
+            if (achievedRatio >= 0.25 && achievedRatio < 0.50)
+                achievedColor = (SolidColorBrush)(new BrushConverter().ConvertFrom("#004500")); //light green
+            if (achievedRatio >= 0 && achievedRatio < 0.25)
+                achievedColor = (SolidColorBrush)(new BrushConverter().ConvertFrom("#004500")); //light green
             if (achievedRatio < 0)
-                achievedColor = (SolidColorBrush)(new BrushConverter().ConvertFrom("#FFA7F3A4")); //light green
+                achievedColor = (SolidColorBrush)(new BrushConverter().ConvertFrom("#004500")); //light green
             return achievedColor;
         }
 
-        private static SolidColorBrush GetTargetSolidColorBrush(double achievedRatio)
+        public static SolidColorBrush GetTargetSolidColorBrush(double achievedRatio)
         {
             var achievedColor = new SolidColorBrush();
             if (achievedRatio >= 100)

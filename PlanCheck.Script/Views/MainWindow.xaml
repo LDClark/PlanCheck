@@ -7,6 +7,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:l="clr-namespace:PlanCheck"
         mc:Ignorable="d"
+        Background="Black"
+        Foreground="LightGray"
         >
     <Window.Resources>
         <CollectionViewSource x:Key="Plans" Source="{Binding Plans}">
@@ -27,7 +29,6 @@
         </CollectionViewSource>
         <l:UnderscoreConverter x:Key="UnderscoreConverter" />
     </Window.Resources>
-
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
             <i:InvokeCommandAction Command="{Binding StartCommand}" />
@@ -62,7 +63,10 @@
                             ItemsSource="{Binding Source={StaticResource Plans}}"
                             SelectedItem="{Binding SelectedPlan, NotifyOnSourceUpdated=True}"
                             VerticalAlignment="Stretch"
-                            Margin="0,5,0,0"      
+                            Margin="0,5,0,0"    
+                            Background="#FF2B2B2B"
+                            Foreground="Gray"
+                            
                         >
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="SourceUpdated">
@@ -71,7 +75,7 @@
                             </i:Interaction.Triggers>
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding PlanId, Converter={StaticResource UnderscoreConverter}}" />
+                                    <TextBlock Text="{Binding PlanIdWithFractionation, Converter={StaticResource UnderscoreConverter}}"/>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                             <ListBox.GroupStyle>
@@ -79,9 +83,11 @@
                                     <GroupStyle.HeaderTemplate>
                                         <DataTemplate>
                                             <TextBlock
-                                    Text="{Binding Name, StringFormat=Course: \{0\}, Converter={StaticResource UnderscoreConverter}}"
-                                    FontWeight="Bold"
-                                    />
+                                            Text="{Binding Name, StringFormat=Course: \{0\}, Converter={StaticResource UnderscoreConverter}}"
+                                            FontWeight="Bold"
+                                            Foreground="Aqua"
+                                            />
+                                            
                                         </DataTemplate>
                                     </GroupStyle.HeaderTemplate>
                                     <GroupStyle.ContainerStyle>
@@ -97,6 +103,7 @@
                                                 </Setter.Value>
                                             </Setter>
                                         </Style>
+
                                     </GroupStyle.ContainerStyle>
                                 </GroupStyle>
                             </ListBox.GroupStyle>
@@ -119,6 +126,8 @@
                         Content="Run"
                         Command="{Binding AnalyzeCollisionCommand}"
                         IsEnabled="{Binding CCIsEnabled}"
+                        Background="#FF2B2B2B"
+                        Foreground="LightGray"
                         />
                 <Grid Grid.Row="1">
                     <Grid.ColumnDefinitions>
@@ -155,7 +164,10 @@
                             Value="{Binding SliderValue}"
                             TickFrequency="10"
                             IsSnapToTickEnabled="True"
-                            TickPlacement="BottomRight">
+                            TickPlacement="BottomRight"
+                            Background="#FF2B2B2B"
+                            Foreground="White"                           
+                            >
                     </Slider>
                 </Grid>
                 <Grid Grid.Row="3">
@@ -167,6 +179,9 @@
                         HorizontalAlignment="Stretch"
                         VerticalAlignment="Stretch"
                         ColumnWidth="*"
+                        Background="Black"
+                        Foreground="White"
+                        RowBackground="#FF2B2B2B"
                     >
                         <DataGrid.RowStyle>
                             <Style TargetType="DataGridRow">
@@ -180,6 +195,13 @@
                                 </Style.Triggers>
                             </Style>
                         </DataGrid.RowStyle>
+                        <DataGrid.Resources>
+                            <Style BasedOn="{StaticResource {x:Type DataGridColumnHeader}}" TargetType="{x:Type DataGridColumnHeader}">
+                                <Setter Property="Background" Value="#FF2B2B2B" />
+                                <Setter Property="Foreground" Value="White" />
+                                <Setter Property="BorderThickness" Value="2,2,2,2"/>
+                            </Style>
+                        </DataGrid.Resources>
                     </DataGrid>
                 </Grid>
             </Grid>
@@ -205,6 +227,9 @@
                     x:Name="ConstraintComboBox" 
                     ItemsSource="{Binding Source={StaticResource Constraints}}"
                     SelectedItem="{Binding SelectedConstraint, NotifyOnSourceUpdated=True, Mode=TwoWay}"
+                    Background="#FF2B2B2B"
+                    Foreground="LightGray"
+                    BorderBrush="Black"
                     >
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="SourceUpdated">
@@ -216,11 +241,19 @@
                             <TextBlock Text="{Binding ConstraintName, Mode=TwoWay}" />
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
+                    <ComboBox.Resources>
+                        <Style TargetType="ComboBoxItem">
+                            <Setter Property="Background" Value="#FF2B2B2B" />
+                            <Setter Property="Foreground" Value="LightGray" />
+                        </Style>
+                    </ComboBox.Resources>
                 </ComboBox>
                 <Button Grid.Column="2"
                         Content="Print PDF"
                         VerticalAlignment="Center"
-                        Command="{Binding PrintCommand}"/>
+                        Command="{Binding PrintCommand}"
+                        Background="#FF2B2B2B"
+                        Foreground="LightGray"/>
             </Grid>
             <DataGrid x:Name="pqmDataGrid"
                       EnableRowVirtualization="False"
@@ -232,6 +265,8 @@
                       ItemsSource="{Binding PQMs}"
                       RowHeight="23"
                       ColumnWidth="*"
+                      Background="Black"
+                      Foreground="LightGray"
                       >
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="TemplateId" Binding="{Binding TemplateId}" Width="4*"/>
@@ -243,7 +278,8 @@
                                               ItemsSource="{Binding StructureList, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                               FontSize="12"
                                               SelectedItem="{Binding SelectedStructure, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"                                            
-                                              Margin="-1">
+                                              Margin="-1"
+                                              Foreground="LightGray">
                                         <ComboBox.ItemTemplate>
                                             <DataTemplate>
                                                 <TextBlock Text="{Binding StructureNameWithCode}" />
@@ -253,24 +289,31 @@
                                             <Style TargetType="ComboBox">
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding Path=Met}" Value="Goal">
-                                                        <Setter Property="Background" Value="#FFA1DEAC"></Setter>
-                                                        <Setter Property="BorderBrush" Value="#FFA1DEAC"></Setter>
+                                                        <Setter Property="Background" Value="#FF096119"></Setter>
+                                                        <Setter Property="BorderBrush" Value="#FF096119"></Setter>
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding Path=Met}" Value="Variation">
-                                                        <Setter Property="Background" Value="#FFE0F388"></Setter>
-                                                        <Setter Property="BorderBrush" Value="#FFE0F388"></Setter>
+                                                        <Setter Property="Background" Value="#FF665D02"></Setter>
+                                                        <Setter Property="BorderBrush" Value="#FF665D02"></Setter>
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding Path=Met}" Value="Not met">
-                                                        <Setter Property="Background" Value="#FFFFCFB9"></Setter>
-                                                        <Setter Property="BorderBrush" Value="#FFFFCFB9"></Setter>
+                                                        <Setter Property="Background" Value="#FF6A2100"></Setter>
+                                                        <Setter Property="BorderBrush" Value="#FF6A2100"></Setter>
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding Path=Met}" Value="Not evaluated">
-                                                        <Setter Property="Background" Value="White"></Setter>
-                                                        <Setter Property="BorderBrush" Value="White"></Setter>
+                                                        <Setter Property="Background" Value="LightGray"></Setter>
+                                                        <Setter Property="BorderBrush" Value="LightGray"></Setter>
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
                                         </ComboBox.Style>
+                                        <ComboBox.Resources>
+                                            <Style TargetType="ComboBoxItem">
+                                                <Setter Property="Background" Value="#FF2B2B2B" />
+                                                <Setter Property="Foreground" Value="LightGray" />
+                                                <Setter Property="BorderBrush" Value="Black" />
+                                            </Style>
+                                        </ComboBox.Resources>
                                     </ComboBox>
                                 </Grid>
                             </DataTemplate>
@@ -287,7 +330,7 @@
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <Grid>
-                                    <ProgressBar  Foreground="{Binding Path=AchievedColor}"  Value="{Binding AchievedPercentageOfGoal, UpdateSourceTrigger=PropertyChanged}" BorderBrush="{x:Null}" Background="{x:Null}" />
+                                    <ProgressBar  Foreground="{Binding AchievedColor}"  Value="{Binding AchievedPercentageOfGoal, UpdateSourceTrigger=PropertyChanged}" BorderBrush="{x:Null}" Background="#FF2B2B2B" />
                                     <TextBlock Text="{Binding Achieved, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                     <TextBlock Text="{Binding Met, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Bottom" HorizontalAlignment="Right" FontSize="12" FontWeight="Bold"/>
                                 </Grid>
@@ -299,30 +342,41 @@
                     <Style TargetType="DataGridRow">
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding Path=Met}" Value="Goal">
-                                <Setter Property="Background" Value="#FFA1DEAC"></Setter>
+                                <Setter Property="Background" Value="#FF096119"></Setter>
                             </DataTrigger>
                             <DataTrigger Binding="{Binding Path=Met}" Value="Variation">
-                                <Setter Property="Background" Value="#FFE0F388"></Setter>
+                                <Setter Property="Background" Value="#FF665D02"></Setter>
                             </DataTrigger>
                             <DataTrigger Binding="{Binding Path=Met}" Value="Not met">
-                                <Setter Property="Background" Value="#FFFFCFB9"></Setter>
+                                <Setter Property="Background" Value="#FF6A2100"></Setter>
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
                 </DataGrid.RowStyle>
+                <DataGrid.Resources>
+                    <Style BasedOn="{StaticResource {x:Type DataGridColumnHeader}}" TargetType="{x:Type DataGridColumnHeader}">
+                        <Setter Property="Background" Value="#FF2B2B2B" />
+                        <Setter Property="Foreground" Value="LightGray" />
+                        <Setter Property="BorderBrush" Value="Black"/>
+                        <Setter Property="BorderThickness" Value="2,2,2,2"/>
+                    </Style>
+                </DataGrid.Resources>
             </DataGrid>
             <TextBlock 
                        Grid.Row ="2" 
                        Text="Plan Checks (PC)" />
             <DataGrid x:Name="errorDataGrid"
                       AutoGenerateColumns="False"
-
                       Grid.Row="3" 
                       HorizontalAlignment="Stretch"
                       VerticalAlignment="Stretch"
                       ItemsSource="{Binding ErrorGrid}"
                       IsReadOnly="True"
-                      ColumnWidth="*" >
+                      ColumnWidth="*" 
+                      Background="Black"
+                      Foreground="LightGray"  
+                      RowHeight="23"
+                      >
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Description" Binding="{Binding Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="800"/>
                     <DataGridTextColumn Header="Status" Binding="{Binding Status, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="*"/>
@@ -331,18 +385,25 @@
                 <DataGrid.RowStyle>
                     <Style TargetType="DataGridRow">
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding Status}" Value="1 - Error">
-                                <Setter Property="Background" Value="#FFFFCFB9"></Setter>
+                            <DataTrigger Binding="{Binding Status}" Value="1 - Warning">
+                                <Setter Property="Background" Value="#FF6A2100"></Setter>
                             </DataTrigger>
                             <DataTrigger Binding="{Binding Status}" Value="2 - Variation">
-                                <Setter Property="Background" Value="#FFE0F388"></Setter>
+                                <Setter Property="Background" Value="#FF665D02"></Setter>
                             </DataTrigger>
                             <DataTrigger Binding="{Binding Status}" Value="3 - OK">
-                                <Setter Property="Background" Value="#FFA1DEAC"></Setter>
+                                <Setter Property="Background" Value="#FF096119"></Setter>
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
                 </DataGrid.RowStyle>
+                <DataGrid.Resources>
+                    <Style BasedOn="{StaticResource {x:Type DataGridColumnHeader}}" TargetType="{x:Type DataGridColumnHeader}">
+                        <Setter Property="Background" Value="#FF2B2B2B" />
+                        <Setter Property="Foreground" Value="LightGray" />
+                        <Setter Property="BorderThickness" Value="2,2,2,2"/>
+                    </Style>
+                </DataGrid.Resources>
             </DataGrid>
         </Grid>
 

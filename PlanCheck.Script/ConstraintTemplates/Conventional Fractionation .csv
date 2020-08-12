@@ -1,7 +1,4 @@
 Structure IDs,Structure Codes,IDAliases,CodeAliases,DVH Objective,Evaluation Point,Variation,Priority,Met,Achieved
-Target,PTV_High|PTV_Intermediate|PTV_Low|CTV_High|CTV_Intermediate|CTV_Low,PTV|CTV,,V95%[%],>=95,90,1,,
-Target,PTV_High|PTV_Intermediate|PTV_Low|CTV_High|CTV_Intermediate|CTV_Low,PTV|CTV,,CN95%[%],<=1.2,1.5,1,,
-Body,BODY,Body,,GI50%[%],<=5,6,1,,
 Bladder,15900,,,D50%[cGy],<=6500,6825,1,,
 Bladder,15900,,,D35%[cGy],<=7000,7350,1,,
 Bladder,15900,,,D25%[cGy],<=7500,7875,1,,

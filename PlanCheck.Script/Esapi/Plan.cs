@@ -13,5 +13,6 @@ namespace PlanCheck
         public string PlanStructureSetId { get; set; }
         public string PlanImageId { get; set; }
         public DateTime PlanImageCreation { get; set; }
+        public string PlanIdWithFractionation { get; set; }
     }
 }
