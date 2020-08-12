@@ -29,6 +29,59 @@ public static class Extensions
         throw new InvalidOperationException("Unknown PlanningItem type.");
     }
 
+    public static string GetStructureSetId(this PlanningItem plan)
+    {
+        try
+        {
+            switch (plan)
+            {
+                case PlanSetup planSetup: return planSetup.StructureSet.Id;
+                case PlanSum planSum: return planSum.StructureSet.Id;
+            }
+
+            throw new InvalidOperationException("Unknown PlanningItem type.");
+        }
+        catch
+        {
+            return "";
+        }
+    }
+
+    public static string GetPlanImageId(this PlanningItem plan)
+    {
+        try
+        {
+            switch (plan)
+            {
+                case PlanSetup planSetup: return planSetup.StructureSet.Image.Id;
+                case PlanSum planSum: return planSum.StructureSet.Image.Id;
+            }
+
+            throw new InvalidOperationException("Unknown PlanningItem type.");
+        }
+        catch
+        {
+            return "";
+        }
+    }
+    public static DateTime GetPlanImageCreation(this PlanningItem plan)
+    {
+        try
+        {
+            switch (plan)
+            {
+                case PlanSetup planSetup: return (DateTime) planSetup.StructureSet.Image.CreationDateTime;
+                case PlanSum planSum: return (DateTime) planSum.StructureSet.Image.CreationDateTime;
+            }
+
+            throw new InvalidOperationException("Unknown PlanningItem type.");
+        }
+        catch
+        {
+            return DateTime.Now;
+        }
+    }
+
     public static PlanningItem GetPlanningItem(Patient patient, string courseId, string planId)
     {
         var course = GetCourse(patient, courseId);
@@ -64,7 +117,7 @@ public static class Extensions
     {
         switch (plan)
         {
-            case PlanSetup planSetup: return "  -  " + planSetup.TotalDose.ValueAsString + " " + planSetup.TotalDose.UnitAsString + " x " + planSetup.NumberOfFractions;
+            case PlanSetup planSetup: return "  -  " + planSetup.DosePerFraction.ValueAsString + " " + planSetup.DosePerFraction.UnitAsString + " x " + planSetup.NumberOfFractions + " to " + planSetup.TotalDose.ValueAsString + " " + planSetup.TotalDose.UnitAsString;
             case PlanSum planSum: return "";
         }
         throw new InvalidOperationException("Unknown PlanningItem type.");

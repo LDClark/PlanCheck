@@ -193,6 +193,8 @@ namespace PlanCheck
                 return;
 
             var structures = await _esapiService.GetStructuresAsync(courseId, planId);
+            if (structures == null)
+                return;
 
             CollimatorModel = null;
             CouchBodyModel = null;
@@ -204,7 +206,7 @@ namespace PlanCheck
             }
             PQMViewModel[] pqms = Objectives.GetObjectives(SelectedConstraint);
 
-            _dialogService.ShowProgressDialog("Calculating dose metrics", structures.Count(),
+            _dialogService.ShowProgressDialog("Calculating dose metrics...", structures.Count(),
                 async progress =>
                 {
                     PQMs = new ObservableCollection<PQMViewModel>();
@@ -225,8 +227,6 @@ namespace PlanCheck
                                 {
                                     if (code == structure.StructureCode)
                                     {
-                                        if (code == "9680")
-                                            goal = "";
                                         result = "";
                                         resultCompare1 = "";
                                         resultCompare2 = "";

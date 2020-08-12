@@ -245,6 +245,7 @@
                         <Style TargetType="ComboBoxItem">
                             <Setter Property="Background" Value="#FF2B2B2B" />
                             <Setter Property="Foreground" Value="LightGray" />
+                            <Setter Property="BorderBrush" Value="Black" />
                         </Style>
                     </ComboBox.Resources>
                 </ComboBox>

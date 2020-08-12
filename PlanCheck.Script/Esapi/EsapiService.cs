@@ -30,9 +30,9 @@ namespace PlanCheck
                    CourseId = x.GetCourse().Id,
                    PlanType = Extensions.GetPlanType(x),
                    PlanCreation = Extensions.GetCreationDateTime(x),
-                   PlanStructureSetId = x.StructureSet.Id,
-                   PlanImageId = x.StructureSet.Image.Id,
-                   PlanImageCreation = (DateTime)x.StructureSet.Image.CreationDateTime,
+                   PlanStructureSetId = Extensions.GetStructureSetId(x),
+                   PlanImageId = Extensions.GetPlanImageId(x),
+                   PlanImageCreation = Extensions.GetPlanImageCreation(x),
                    PlanIdWithFractionation = x.Id + Extensions.GetFractionation(x) 
                })
                .ToArray());

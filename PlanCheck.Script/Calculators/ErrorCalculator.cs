@@ -69,6 +69,14 @@ namespace PlanCheck
                             AddNewRow(description, status, severity, errorGrid);
                         }
                     }
+
+                    if (structure.GetNumberOfSeparateParts() > 1)
+                    {
+                        var description = string.Format("Structure {0} has {1} separate parts.", structure.Id, structure.GetNumberOfSeparateParts());
+                        var severity = 1;
+                        var status = "1 - Warning";
+                        AddNewRow(description, status, severity, errorGrid);
+                    }
                 }
                 catch
                 {
@@ -213,7 +221,6 @@ namespace PlanCheck
                 }
             }
 
-            Console.WriteLine(DateTime.Now + " now , plan" + planSetup.StructureSet.Image.CreationDateTime.Value);
             if ((planSetup.CreationDateTime.Value - planSetup.StructureSet.Image.CreationDateTime.Value).TotalDays > 21)
             {
                 error = string.Format("CT and structure data ({0}) is {1} days older than plan creation date ({2}) and outside of 21 days.", planSetup.StructureSet.Image.CreationDateTime.Value, (planSetup.CreationDateTime.Value - planSetup.StructureSet.Image.CreationDateTime.Value).TotalDays.ToString("0"), planSetup.CreationDateTime.Value);
