@@ -69,14 +69,6 @@ namespace PlanCheck
                             AddNewRow(description, status, severity, errorGrid);
                         }
                     }
-
-                    if (structure.GetNumberOfSeparateParts() > 1)
-                    {
-                        var description = string.Format("Structure {0} has {1} separate parts.", structure.Id, structure.GetNumberOfSeparateParts());
-                        var severity = 1;
-                        var status = "1 - Warning";
-                        AddNewRow(description, status, severity, errorGrid);
-                    }
                 }
                 catch
                 {
