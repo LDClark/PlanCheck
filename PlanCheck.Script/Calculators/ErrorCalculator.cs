@@ -69,6 +69,14 @@ namespace PlanCheck
                             AddNewRow(description, status, severity, errorGrid);
                         }
                     }
+
+                    //if (structure.GetNumberOfSeparateParts() > 1)
+                    //{
+                    //    var description = string.Format("Structure {0} has {1} separate parts.", structure.Id, structure.GetNumberOfSeparateParts());
+                    //    var severity = 1;
+                    //    var status = "1 - Warning";
+                    //    AddNewRow(description, status, severity, errorGrid);
+                    //}
                 }
                 catch
                 {
@@ -355,40 +363,47 @@ namespace PlanCheck
                 AddNewRow(error, errorStatus, errorSeverity, errorGrid);
             }
 
-            if (planSetup.Beams.FirstOrDefault().MLCPlanType.ToString() == "DoseDynamic")
+            try
             {
-                if (couchFound == false)
+                if (planSetup.Beams.FirstOrDefault().MLCPlanType.ToString() == "DoseDynamic")
                 {
-                    error = string.Format("Plan {0} is IMRT but there is no couch inserted (okay if 6DoF headholder present).", planSetup.Id);
-                    errorStatus = "1 - Warning";
-                    errorSeverity = 1;
-                    AddNewRow(error, errorStatus, errorSeverity, errorGrid);
+                    if (couchFound == false)
+                    {
+                        error = string.Format("Plan {0} is IMRT but there is no couch inserted (okay if 6DoF headholder present).", planSetup.Id);
+                        errorStatus = "1 - Warning";
+                        errorSeverity = 1;
+                        AddNewRow(error, errorStatus, errorSeverity, errorGrid);
+                    }
+                    else
+                    {
+                        error = string.Format("Plan {0} is IMRT and there is a couch inserted (except if 6DoF headholder present).", planSetup.Id);
+                        errorStatus = "3 - OK";
+                        errorSeverity = 1;
+                        AddNewRow(error, errorStatus, errorSeverity, errorGrid);
+                    }
                 }
-                else
+
+                if (planSetup.Beams.FirstOrDefault().MLCPlanType.ToString() == "VMAT")
                 {
-                    error = string.Format("Plan {0} is IMRT and there is a couch inserted (except if 6DoF headholder present).", planSetup.Id);
-                    errorStatus = "3 - OK";
-                    errorSeverity = 1;
-                    AddNewRow(error, errorStatus, errorSeverity, errorGrid);
+                    if (couchFound == false)
+                    {
+                        error = string.Format("Plan {0} is VMAT but there is no couch inserted (okay if 6DoF headholder present).", planSetup.Id);
+                        errorStatus = "1 - Warning";
+                        errorSeverity = 1;
+                        AddNewRow(error, errorStatus, errorSeverity, errorGrid);
+                    }
+                    else
+                    {
+                        error = string.Format("Plan {0} is VMAT and there is a couch inserted (except if 6DoF headholder present).", planSetup.Id);
+                        errorStatus = "3 - OK";
+                        errorSeverity = 1;
+                        AddNewRow(error, errorStatus, errorSeverity, errorGrid);
+                    }
                 }
             }
-
-            if (planSetup.Beams.FirstOrDefault().MLCPlanType.ToString() == "VMAT")
+            catch
             {
-                if (couchFound == false)
-                {
-                    error = string.Format("Plan {0} is VMAT but there is no couch inserted (okay if 6DoF headholder present).", planSetup.Id);
-                    errorStatus = "1 - Warning";
-                    errorSeverity = 1;
-                    AddNewRow(error, errorStatus, errorSeverity, errorGrid);
-                }
-                else
-                {
-                    error = string.Format("Plan {0} is VMAT and there is a couch inserted (except if 6DoF headholder present).", planSetup.Id);
-                    errorStatus = "3 - OK";
-                    errorSeverity = 1;
-                    AddNewRow(error, errorStatus, errorSeverity, errorGrid);
-                }
+
             }
 
             
@@ -881,78 +896,85 @@ namespace PlanCheck
                 errorSeverity = 1;
                 AddNewRow(error, errorStatus, errorSeverity, errorGrid);
             }
-            if (planSetup.Id.StartsWith("R ") || planSetup.Id.Contains("_R") || planSetup.Id.Contains("RUL") || planSetup.Id.Contains("RML") || planSetup.Id.Contains("RLL"))
+            try
             {
-                if (planSetup.TreatmentOrientation.ToString() == "HeadFirstSupine")
+                if (planSetup.Id.StartsWith("R ") || planSetup.Id.Contains("_R") || planSetup.Id.Contains("RUL") || planSetup.Id.Contains("RML") || planSetup.Id.Contains("RLL"))
                 {
-                    if (planSetup.Beams.First().IsocenterPosition.x < 0)
+                    if (planSetup.TreatmentOrientation.ToString() == "HeadFirstSupine")
                     {
-                        error = string.Format("Plan {0} has a right shift of {1} mm and the plan name is labeled Right.", planSetup.Id, planSetup.Beams.First().IsocenterPosition.x.ToString("0.0"));
-                        errorStatus = "3 - OK";
-                        errorSeverity = 1;
-                        AddNewRow(error, errorStatus, errorSeverity, errorGrid);
+                        if (planSetup.Beams.First().IsocenterPosition.x < 0)
+                        {
+                            error = string.Format("Plan {0} has a right shift of {1} mm and the plan name is labeled Right.", planSetup.Id, planSetup.Beams.First().IsocenterPosition.x.ToString("0.0"));
+                            errorStatus = "3 - OK";
+                            errorSeverity = 1;
+                            AddNewRow(error, errorStatus, errorSeverity, errorGrid);
+                        }
+                        else
+                        {
+                            error = string.Format("Plan {0} has a right shift of {1} mm but the plan name is not labeled Right.", planSetup.Id, planSetup.Beams.First().IsocenterPosition.x.ToString("0.0"));
+                            errorStatus = "1 - Warning";
+                            errorSeverity = 1;
+                            AddNewRow(error, errorStatus, errorSeverity, errorGrid);
+                        }
                     }
-                    else
+                    if (planSetup.TreatmentOrientation.ToString() == "HeadFirstProne" || planSetup.TreatmentOrientation.ToString() == "FeetFirstSupine")
                     {
-                        error = string.Format("Plan {0} has a right shift of {1} mm but the plan name is not labeled Right.", planSetup.Id, planSetup.Beams.First().IsocenterPosition.x.ToString("0.0"));
-                        errorStatus = "1 - Warning";
-                        errorSeverity = 1;
-                        AddNewRow(error, errorStatus, errorSeverity, errorGrid);
+                        if (planSetup.Beams.First().IsocenterPosition.x > 0)
+                        {
+                            error = string.Format("Plan {0} has a right shift of {1} mm and the plan name is labeled Right.", planSetup.Id, planSetup.Beams.First().IsocenterPosition.x.ToString("0.0"));
+                            errorStatus = "3 - OK";
+                            errorSeverity = 1;
+                            AddNewRow(error, errorStatus, errorSeverity, errorGrid);
+                        }
+                        else
+                        {
+                            error = string.Format("Plan {0} has a right shift of {1} mm but the plan name is not labeled Right.", planSetup.Id, planSetup.Beams.First().IsocenterPosition.x.ToString("0.0"));
+                            errorStatus = "1 - Warning";
+                            errorSeverity = 1;
+                            AddNewRow(error, errorStatus, errorSeverity, errorGrid);
+                        }
                     }
                 }
-                if (planSetup.TreatmentOrientation.ToString() == "HeadFirstProne" || planSetup.TreatmentOrientation.ToString() == "FeetFirstSupine")
+                if (planSetup.Id.StartsWith("L ") || planSetup.Id.Contains("_L") || planSetup.Id.Contains("LUL") || planSetup.Id.Contains("LML") || planSetup.Id.Contains("LLL"))
                 {
-                    if (planSetup.Beams.First().IsocenterPosition.x > 0)
+                    if (planSetup.TreatmentOrientation.ToString() == "HeadFirstSupine")
                     {
-                        error = string.Format("Plan {0} has a right shift of {1} mm and the plan name is labeled Right.", planSetup.Id, planSetup.Beams.First().IsocenterPosition.x.ToString("0.0"));
-                        errorStatus = "3 - OK";
-                        errorSeverity = 1;
-                        AddNewRow(error, errorStatus, errorSeverity, errorGrid);
+                        if (planSetup.Beams.First().IsocenterPosition.x > 0)
+                        {
+                            error = string.Format("Plan {0} has a left shift of {1} mm and the plan name is labeled Left.", planSetup.Id, planSetup.Beams.First().IsocenterPosition.x.ToString("0.0"));
+                            errorStatus = "3 - OK";
+                            errorSeverity = 1;
+                            AddNewRow(error, errorStatus, errorSeverity, errorGrid);
+                        }
+                        else
+                        {
+                            error = string.Format("Plan {0} has a left shift of {1} mm but the plan name is not labeled Left.", planSetup.Id, planSetup.Beams.First().IsocenterPosition.x.ToString("0.0"));
+                            errorStatus = "1 - Warning";
+                            errorSeverity = 1;
+                            AddNewRow(error, errorStatus, errorSeverity, errorGrid);
+                        }
                     }
-                    else
+                    if (planSetup.TreatmentOrientation.ToString() == "HeadFirstProne" || planSetup.TreatmentOrientation.ToString() == "FeetFirstSupine")
                     {
-                        error = string.Format("Plan {0} has a right shift of {1} mm but the plan name is not labeled Right.", planSetup.Id, planSetup.Beams.First().IsocenterPosition.x.ToString("0.0"));
-                        errorStatus = "1 - Warning";
-                        errorSeverity = 1;
-                        AddNewRow(error, errorStatus, errorSeverity, errorGrid);
+                        if (planSetup.Beams.First().IsocenterPosition.x < 0)
+                        {
+                            error = string.Format("Plan {0} has a left shift of {1} mm and the plan name is labeled Left.", planSetup.Id, planSetup.Beams.First().IsocenterPosition.x.ToString("0.0"));
+                            errorStatus = "3 - OK";
+                            AddNewRow(error, errorStatus, errorSeverity, errorGrid);
+                        }
+                        else
+                        {
+                            error = string.Format("Plan {0} has a left shift of {1} mm but the plan name is not labeled Left.", planSetup.Id, planSetup.Beams.First().IsocenterPosition.x.ToString("0.0"));
+                            errorStatus = "1 - Warning";
+                            errorSeverity = 1;
+                            AddNewRow(error, errorStatus, errorSeverity, errorGrid);
+                        }
                     }
                 }
             }
-            if (planSetup.Id.StartsWith("L ") || planSetup.Id.Contains("_L") || planSetup.Id.Contains("LUL") || planSetup.Id.Contains("LML") || planSetup.Id.Contains("LLL"))
+            catch
             {
-                if (planSetup.TreatmentOrientation.ToString() == "HeadFirstSupine")
-                {
-                    if (planSetup.Beams.First().IsocenterPosition.x > 0)
-                    {
-                        error = string.Format("Plan {0} has a left shift of {1} mm and the plan name is labeled Left.", planSetup.Id, planSetup.Beams.First().IsocenterPosition.x.ToString("0.0"));
-                        errorStatus = "3 - OK";
-                        errorSeverity = 1;
-                        AddNewRow(error, errorStatus, errorSeverity, errorGrid);
-                    }
-                    else
-                    {
-                        error = string.Format("Plan {0} has a left shift of {1} mm but the plan name is not labeled Left.", planSetup.Id, planSetup.Beams.First().IsocenterPosition.x.ToString("0.0"));
-                        errorStatus = "1 - Warning";
-                        errorSeverity = 1;
-                        AddNewRow(error, errorStatus, errorSeverity, errorGrid);
-                    }
-                }
-                if (planSetup.TreatmentOrientation.ToString() == "HeadFirstProne" || planSetup.TreatmentOrientation.ToString() == "FeetFirstSupine")
-                {
-                    if (planSetup.Beams.First().IsocenterPosition.x < 0)
-                    {
-                        error = string.Format("Plan {0} has a left shift of {1} mm and the plan name is labeled Left.", planSetup.Id, planSetup.Beams.First().IsocenterPosition.x.ToString("0.0"));
-                        errorStatus = "3 - OK";
-                        AddNewRow(error, errorStatus, errorSeverity, errorGrid);
-                    }
-                    else
-                    {
-                        error = string.Format("Plan {0} has a left shift of {1} mm but the plan name is not labeled Left.", planSetup.Id, planSetup.Beams.First().IsocenterPosition.x.ToString("0.0"));
-                        errorStatus = "1 - Warning";
-                        errorSeverity = 1;
-                        AddNewRow(error, errorStatus, errorSeverity, errorGrid);
-                    }
-                }
+
             }
 
             foreach (Course course in planSetup.Course.Patient.Courses)
