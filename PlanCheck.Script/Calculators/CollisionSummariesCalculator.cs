@@ -21,25 +21,28 @@ namespace PlanCheck
         {
             var calculator = new CollisionSummariesCalculator();
             var modelGroup = new Model3DGroup();
-           // var upDir = new Vector3D(0, -1, 0);
-            //var lookDir = new Vector3D(0, 0, 1);
             var isoctr = GetIsocenter(beam);
             bool isVMAT = false;
             bool isStatic = false;
             bool isElectron = false;
             bool isSRSArc = false;
+            
             var collisionSummary = new CollisionCheckViewModel();
             MeshGeometry3D bodyMesh;
-
             var iso3DMesh = CalculateIsoMesh(isoctr);
-            MeshGeometry3D couchMesh = null;
             var body = planSetup.StructureSet.Structures.Where(x => x.Id.Contains("BODY")).First();
-            Structure couch;
+            Structure couch = null;
+            MeshGeometry3D couchMesh = null;
             try
             {
-                couch = planSetup.StructureSet.Structures.Where(x => x.Id.Contains("CouchSurface")).First();
-                couchMesh = couch.MeshGeometry;
-
+                foreach (Structure structure in planSetup.StructureSet.Structures)
+                {
+                    if (structure.StructureCodeInfos.FirstOrDefault().Code == "Support")
+                    {
+                        couch = structure;
+                        couchMesh = couch.MeshGeometry;
+                    }
+                }
             }
             catch
             {
@@ -61,11 +64,7 @@ namespace PlanCheck
                 isStatic = true;
                 collimatorMaterial = collimatorMaterialStatic;
             }
-           // if (planSetup.TreatmentOrientation.ToString() == "HeadFirstProne")
-           // {
-          //      upDir = new Vector3D(0, 1, 0);
 
-        //    }
             MeshGeometry3D collimatorMesh = CalculateCollimatorMesh(beam, isoctr, isVMAT, isStatic, isElectron, isSRSArc);
             collisionSummary = calculator.GetFieldCollisionSummary(beam, couch, body);
             modelGroup.Children.Add(new GeometryModel3D { Geometry = iso3DMesh, Material = redMaterial, BackMaterial = redMaterial });
