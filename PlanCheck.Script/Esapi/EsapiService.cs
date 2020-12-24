@@ -100,11 +100,16 @@ namespace PlanCheck
                 Structure couch = null;
                 try
                 {
-                    couch = structureSet.Structures.Where(x => x.Id.Contains("CouchSurface")).First();
+                    foreach (Structure structure in structureSet.Structures)
+                    {
+                        if (structure.StructureCodeInfos.FirstOrDefault().Code == "Support")
+                        {
+                            couch = structure;
+                        }
+                    }
                 }
                 catch
                 {
-
                 }
                 return CollisionSummariesCalculator.AddCouchBodyMesh(body, couch);
             });
