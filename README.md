@@ -14,6 +14,10 @@ This project includes code from DVHMetric from Steve Thompson and Tomasz Morgas.
 To run:
 1. Right click solution > Restore NuGet Packages
 2. Set Configuration Manager to x64 for all projects
-2. Right click PlanCheck.Runner project > Set as StartUp Project
+3. Remove references to VMS.TPS.Common.Model.API and VMS.TPS.Common.Model.Types, and add the local dlls from the C: drive
+4. Make sure you are running the correct version of EsapiEssentials in PlanCheck and PlanCheck.Runner projects (15.5 uses 1.9, 15.6 uses 2.0)
+5. Right click PlanCheck.Runner project > Set as StartUp Project
+6. In Scripts Admin, add EsapiEssentials to approved scripts list
+
 
 ![alt text](https://github.com/LDClark/PlanCheck/blob/master/TestCase.png)
