@@ -7,7 +7,7 @@ namespace PlanCheck.Calculators
 {
     public class PQMColors
     {
-        public static Tuple<SolidColorBrush, double> GetAchievedColor(StructureViewModel structure, string goal, string DVHObjective, string Achieved)
+        public static Tuple<SolidColorBrush, double> GetAchievedRatio(StructureViewModel structure, string goal, string DVHObjective, string Achieved)
         {
             var achievedColor = new SolidColorBrush();
             double achievedDouble;
@@ -28,29 +28,18 @@ namespace PlanCheck.Calculators
                 achievedDouble = 0;
                 return Tuple.Create(achievedColor, achievedRatio);
             }          
-            achievedRatio = 0;
             double goalDouble = Convert.ToDouble(Regex.Match(goal.ToString(), @"(\d+(\.\d+)?)|(\.\d+)").Value);
+            achievedRatio = achievedDouble / goalDouble;
             if (goal.Contains("<"))  //D at V, V at D, serial tissue
-            {
-                achievedRatio = Convert.ToInt32(achievedDouble / goalDouble * 100);
-                achievedColor = GetNormalTissueSolidColorBrush(achievedRatio);
-            }
+                achievedColor = GetDoseVolumeSolidColorBrush(achievedRatio);
             if (goal.Contains(">") && DVHObjective.ToString().Contains("CV"))  //CV parallel tissue
-            {
-                var structVol = Convert.ToDouble(structure.VolumeValue);
-                achievedRatio = Convert.ToInt32((structVol - achievedDouble) / (structVol - goalDouble));
-                achievedColor = GetNormalTissueSolidColorBrush(achievedRatio);
-            }
-
+                achievedColor = GetCriticalVolumeSolidColorBrush(achievedRatio);
             else if (goal.ToString().Contains(">")) //Target
-            {
-                achievedRatio = Convert.ToInt32(achievedDouble / goalDouble * 100);
                 achievedColor = GetTargetSolidColorBrush(achievedRatio);
-            }
             return Tuple.Create(achievedColor, achievedRatio);
         }
 
-        public static SolidColorBrush GetNormalTissueSolidColorBrush(double achievedRatio)
+        public static SolidColorBrush GetDoseVolumeSolidColorBrush(double achievedRatio)
         {
             var achievedColor = new SolidColorBrush();
             if (achievedRatio >= 1)
@@ -65,6 +54,16 @@ namespace PlanCheck.Calculators
                 achievedColor = (SolidColorBrush)(new BrushConverter().ConvertFrom("#004500")); //light green
             if (achievedRatio < 0)
                 achievedColor = (SolidColorBrush)(new BrushConverter().ConvertFrom("#004500")); //light green
+            return achievedColor;
+        }
+
+        public static SolidColorBrush GetCriticalVolumeSolidColorBrush(double achievedRatio)
+        {
+            var achievedColor = new SolidColorBrush();
+            if (achievedRatio >= 1)
+                achievedColor = (SolidColorBrush)(new BrushConverter().ConvertFrom("#004500")); //light green
+            if (achievedRatio < 1)
+                achievedColor = (SolidColorBrush)(new BrushConverter().ConvertFrom("#870707")); //red;
             return achievedColor;
         }
 
