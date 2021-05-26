@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Threading.Tasks;
 using EsapiEssentials.Plugin;
 using VMS.TPS.Common.Model.API;
@@ -16,9 +16,12 @@ namespace PlanCheck
     {
         private readonly MetricCalculator _metricCalc;
 
+        private PlanningItem _selectedPlan;
+
         public EsapiService(PluginScriptContext context) : base(context)
         {
             _metricCalc = new MetricCalculator();
+            _selectedPlan = context.PlanSetup;
         }
 
         public Task<Plan[]> GetPlansAsync() =>
@@ -110,6 +113,7 @@ namespace PlanCheck
                 }
                 catch
                 {
+
                 }
                 return CollisionSummariesCalculator.AddCouchBodyMesh(body, couch);
             });
@@ -129,35 +133,21 @@ namespace PlanCheck
                 return objectives.ToArray() ?? new PQMViewModel[0];
             });
 
-        public Task<string> CalculateMetricDoseAsync(string courseId, string planId, string structureCode, string templateCode, string dvhObjective, string goal, string variation) =>
-            RunAsync(context => CalculateMetricDose(context.Patient, courseId, planId, structureCode, templateCode, dvhObjective, goal, variation));
+        public Task<string> CalculateMetricDoseAsync(string courseId, string planId, string structureId, string structureCode, string dvhObjective) =>
+            RunAsync(context => CalculateMetricDose(context.Patient, courseId, planId, structureId, structureCode, dvhObjective));
 
-        public string CalculateMetricDose(Patient patient, string courseId, string planId, string structureCode, string templateCode, string dvhObjective, string goal, string variation)
+        public string CalculateMetricDose(Patient patient, string courseId, string planId, string structureId, string structureCode, string dvhObjective)
         {
             var plan = Extensions.GetPlanningItem(patient, courseId, planId);
             var planVM = new PlanningItemViewModel(plan);
-            var structure = Extensions.GetStructure(plan, structureCode);
-
-            DirectoryInfo constraintDir = new DirectoryInfo(Path.Combine(AssemblyHelper.GetAssemblyDirectory(), "ConstraintTemplates"));
-            string firstFileName = constraintDir.GetFiles().FirstOrDefault().ToString();
-            string firstConstraintFilePath = Path.Combine(constraintDir.ToString(), firstFileName);
-
-            // make sure the workbook template exists
-            if (!System.IO.File.Exists(firstConstraintFilePath))
-            {
-                System.Windows.MessageBox.Show(string.Format("The template file '{0}' chosen does not exist.", firstConstraintFilePath));
-            }
-            var structureVM = new StructureViewModel(structure);
-            string metric = "";
-            string result = "";
-
-            if (templateCode == structureCode)
-            {
-                metric = dvhObjective;
-                result = _metricCalc.CalculateMetric(planVM.PlanningItemStructureSet, structureVM, planVM, metric);
-            }                 
+            Structure structure;
+            if (structureCode == null)
+                structure = Extensions.GetStructureFromId(plan, structureId);
             else
-                result = "";                
+                structure = Extensions.GetStructureFromCode(plan, structureCode);
+            var structureVM = new StructureViewModel(structure);
+            string metric = dvhObjective;
+            string result = _metricCalc.CalculateMetric(planVM.PlanningItemStructureSet, structureVM, planVM, metric);             
             return result;
         }
 
