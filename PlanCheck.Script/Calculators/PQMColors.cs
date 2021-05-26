@@ -19,12 +19,12 @@ namespace PlanCheck.Calculators
             }
             catch (FormatException)
             {
-                achievedColor = (SolidColorBrush)(new BrushConverter().ConvertFrom("#FFFFFF")); //white
+                achievedColor = (SolidColorBrush)(new BrushConverter().ConvertFrom("#FF2B2B2B")); //black
                 achievedDouble = 0;
             }
             if (structure == null)
             {
-                achievedColor = (SolidColorBrush)(new BrushConverter().ConvertFrom("#FFFFFF")); //white
+                achievedColor = (SolidColorBrush)(new BrushConverter().ConvertFrom("#FF2B2B2B")); //black
                 achievedDouble = 0;
                 return Tuple.Create(achievedColor, achievedRatio);
             }          
