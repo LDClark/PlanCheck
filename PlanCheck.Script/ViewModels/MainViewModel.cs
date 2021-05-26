@@ -171,10 +171,10 @@ namespace PlanCheck
         private async void Start()
         {
             DirectoryInfo constraintDir = new DirectoryInfo(Path.Combine(AssemblyHelper.GetAssemblyDirectory(), "ConstraintTemplates"));
-            string firstFileName = constraintDir.GetFiles().FirstOrDefault().ToString();
+            string firstFileName = constraintDir.GetFiles().FirstOrDefault().FullName;
             string firstConstraintFilePath = Path.Combine(constraintDir.ToString(), firstFileName);
             Constraints = ConstraintListViewModel.GetConstraintList(constraintDir.ToString());
-            SelectedConstraint = new ConstraintViewModel(firstConstraintFilePath);
+            SelectedConstraint = new ConstraintViewModel(firstConstraintFilePath);            
             Plans = await _esapiService.GetPlansAsync();
         }
 
@@ -191,8 +191,15 @@ namespace PlanCheck
 
             if (courseId == null || planId == null)
                 return;
+            var structures = new ObservableCollection<StructureViewModel>();
+            try
+            {
+                structures = await _esapiService.GetStructuresAsync(courseId, planId);
+            }
+            catch
+            {
 
-            var structures = await _esapiService.GetStructuresAsync(courseId, planId);
+            }    
             if (structures == null)
                 return;
 
@@ -212,70 +219,67 @@ namespace PlanCheck
                     PQMs = new ObservableCollection<PQMViewModel>();
                     foreach (var structure in structures)
                     {
-                        string result = "";
-                        string resultCompare1 = "";
-                        string resultCompare2 = "";
-                        string resultCompare3 = "";
-                        string goal = "";
-                        string met = "";
-                        string variation = "";
                         try
                         {
                             foreach (var pqm in pqms)
                             {
-                                foreach (var code in pqm.TemplateCodes)
+                                string templateSelected = "";
+                                if (structure.StructureName.ToUpper().CompareTo(pqm.TemplateId.ToUpper()) == 0) //id matches
                                 {
-                                    if (code == structure.StructureCode)
-                                    {
-                                        result = "";
-                                        resultCompare1 = "";
-                                        resultCompare2 = "";
-                                        resultCompare3 = "";
-                                        goal = pqm.Goal;
-                                        variation = pqm.Variation;
-                                        result = await _esapiService.CalculateMetricDoseAsync(courseId, planId, structure.StructureCode, code, pqm.DVHObjective, pqm.Goal, pqm.Variation);
-                                        met = await _esapiService.EvaluateMetricDoseAsync(result, goal, variation);
-                                        var ratio = Convert.ToDouble(Regex.Match(result, @"\d+").Value) / Convert.ToDouble(Regex.Match(goal, @"\d+").Value);
-                                        var color = PQMColors.GetNormalTissueSolidColorBrush(ratio);
-                                        var percentage = ratio * 100;
-                                        var planCompare1 = SelectedPlanCompare1?.PlanId;
-                                        if (planCompare1 != null)
-                                            resultCompare1 = await _esapiService.CalculateMetricDoseAsync(courseId, planCompare1, structure.StructureCode, code, pqm.DVHObjective, pqm.Goal, pqm.Variation);
-
-                                        var planCompare2 = SelectedPlanCompare2?.PlanId;
-                                        if (planCompare2 != null)
-                                            resultCompare2 = await _esapiService.CalculateMetricDoseAsync(courseId, planCompare2, structure.StructureCode, code, pqm.DVHObjective, pqm.Goal, pqm.Variation);
-
-                                        var planCompare3 = SelectedPlanCompare3?.PlanId;
-                                        if (planCompare3 != null)
-                                            resultCompare3 = await _esapiService.CalculateMetricDoseAsync(courseId, planCompare3, structure.StructureCode, code, pqm.DVHObjective, pqm.Goal, pqm.Variation);
-
-                                        PQMs.Add(new PQMViewModel
+                                    templateSelected = pqm.TemplateId;
+                                }
+                                else if (structure.StructureCode != null)
+                                {
+                                    foreach (var code in pqm.TemplateCodes)
+                                        if (code == structure.StructureCode) //code matches
                                         {
-                                            TemplateId = structure.StructureName,
-                                            StructureList = structures,
-                                            SelectedStructure = structure,
-                                            StructureNameWithCode = structure.StructureNameWithCode,
-                                            StructVolume = structure.VolumeValue,
-                                            AchievedPercentageOfGoal = percentage,
-                                            AchievedColor = color,
-                                            DVHObjective = pqm.DVHObjective,
-                                            Goal = goal,
-                                            Met = met,
-                                            Achieved = result,
-                                            ResultCompare1 = resultCompare1,
-                                            ResultCompare2 = resultCompare2,
-                                            ResultCompare3 = resultCompare3,
-                                        });
+                                            templateSelected = code;
+                                        }
+                                }
+                                else
+                                {
+                                    foreach (string id in pqm.TemplateAliases)
+                                    {
+                                        if (structure.StructureName.ToUpper().CompareTo(id.ToUpper()) == 0) //id matches alias
+                                        {
+                                            templateSelected = id;
+                                        }
                                     }
                                 }
+                                if (templateSelected != structure.StructureCode)
+                                {
+                                    if (structure.StructureName.ToUpper().CompareTo(templateSelected.ToUpper()) != 0) //template code or name not found
+                                        continue;
+                                }
+                                else
+                                    templateSelected = pqm.TemplateId + " : " + templateSelected; // if template code matches, fill in the PQM id
+
+                                string result = await _esapiService.CalculateMetricDoseAsync(courseId, planId, structure.StructureName, structure.StructureCode, pqm.DVHObjective);
+                                string met = await _esapiService.EvaluateMetricDoseAsync(result, pqm.Goal, pqm.Variation);
+                                var tuple = PQMColors.GetAchievedRatio(structure, pqm.Goal, pqm.DVHObjective, result);
+                                var ratio = tuple.Item2;
+                                var color = tuple.Item1;
+                                var percentage = ratio * 100;
+                                PQMs.Add(new PQMViewModel
+                                {
+                                    TemplateId = templateSelected,
+                                    StructureList = structures,
+                                    SelectedStructure = structure,
+                                    StructureNameWithCode = structure.StructureNameWithCode,
+                                    StructVolume = structure.VolumeValue,
+                                    AchievedPercentageOfGoal = percentage,
+                                    AchievedColor = color,
+                                    DVHObjective = pqm.DVHObjective,
+                                    Goal = pqm.Goal,
+                                    Met = met,
+                                    Achieved = result
+                                });
+                                progress.Increment();
                             }
                         }
                         catch
                         {
-                            result = "";
                         }
-                        progress.Increment();
                     }
                 });
 
