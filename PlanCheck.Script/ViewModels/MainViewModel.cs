@@ -205,6 +205,7 @@ namespace PlanCheck
 
             CollimatorModel = null;
             CouchBodyModel = null;
+            CollisionSummaries = null;
 
             // make sure the workbook template exists
             if (!System.IO.File.Exists(SelectedConstraint.ConstraintPath))
