@@ -8,8 +8,7 @@
         xmlns:l="clr-namespace:PlanCheck"
         mc:Ignorable="d"
         Background="Black"
-        Foreground="LightGray"
-        >
+        Foreground="LightGray">
     <Window.Resources>
         <CollectionViewSource x:Key="Plans" Source="{Binding Plans}">
             <CollectionViewSource.SortDescriptions>
@@ -46,18 +45,12 @@
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="0">
                 <Grid >
-
-
                     <DockPanel
-                        LastChildFill="True"
-
-                    >
+                        LastChildFill="True">
                         <TextBlock
                             DockPanel.Dock="Top"
                             Text="Plans:"
-                            Margin="0,5,0,0"
- 
-                        />
+                            Margin="0,5,0,0"/>
                         <ListBox
                             DockPanel.Dock="Top"
                             ItemsSource="{Binding Source={StaticResource Plans}}"
@@ -65,9 +58,7 @@
                             VerticalAlignment="Stretch"
                             Margin="0,5,0,0"    
                             Background="#FF2B2B2B"
-                            Foreground="Gray"
-                            
-                        >
+                            Foreground="Gray" >
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="SourceUpdated">
                                     <i:InvokeCommandAction Command="{Binding AnalyzePlanCommand}" />
@@ -85,9 +76,7 @@
                                             <TextBlock
                                             Text="{Binding Name, StringFormat=Course: \{0\}, Converter={StaticResource UnderscoreConverter}}"
                                             FontWeight="Bold"
-                                            Foreground="Aqua"
-                                            />
-                                            
+                                            Foreground="Aqua"/>
                                         </DataTemplate>
                                     </GroupStyle.HeaderTemplate>
                                     <GroupStyle.ContainerStyle>
@@ -103,7 +92,6 @@
                                                 </Setter.Value>
                                             </Setter>
                                         </Style>
-
                                     </GroupStyle.ContainerStyle>
                                 </GroupStyle>
                             </ListBox.GroupStyle>
@@ -119,7 +107,6 @@
                     <RowDefinition Height="2*" />
                 </Grid.RowDefinitions>
                 <TextBlock Grid.Row="0" 
-
                            Text="Collision Checks (CC)"/>
                 <Button HorizontalAlignment="Right"
                         Width="30"
@@ -127,8 +114,7 @@
                         Command="{Binding AnalyzeCollisionCommand}"
                         IsEnabled="{Binding CCIsEnabled}"
                         Background="#FF2B2B2B"
-                        Foreground="LightGray"
-                        />
+                        Foreground="LightGray"/>
                 <Grid Grid.Row="1">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="37*"/>
@@ -141,8 +127,7 @@
                                                Position="{Binding CameraPosition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                                                LookDirection="{Binding LookDir, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                                                UpDirection="{Binding UpDir, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                               FieldOfView="69"
-                                               />
+                                               FieldOfView="69"/>
                         </Viewport3D.Camera>
                         <Viewport3D.Children>
                             <ModelVisual3D Content="{Binding CouchBodyModel, UpdateSourceTrigger=PropertyChanged}"/>
@@ -166,8 +151,7 @@
                             IsSnapToTickEnabled="True"
                             TickPlacement="BottomRight"
                             Background="#FF2B2B2B"
-                            Foreground="White"                           
-                            >
+                            Foreground="White">
                     </Slider>
                 </Grid>
                 <Grid Grid.Row="3">
@@ -181,8 +165,7 @@
                         ColumnWidth="*"
                         Background="Black"
                         Foreground="White"
-                        RowBackground="#FF2B2B2B"
-                    >
+                        RowBackground="#FF2B2B2B">
                         <DataGrid.RowStyle>
                             <Style TargetType="DataGridRow">
                                 <Style.Triggers>
@@ -229,8 +212,7 @@
                     SelectedItem="{Binding SelectedConstraint, NotifyOnSourceUpdated=True, Mode=TwoWay}"
                     Background="#FF2B2B2B"
                     Foreground="LightGray"
-                    BorderBrush="Black"
-                    >
+                    BorderBrush="Black">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="SourceUpdated">
                             <i:InvokeCommandAction Command="{Binding AnalyzePlanCommand}" />
@@ -267,8 +249,7 @@
                       RowHeight="23"
                       ColumnWidth="*"
                       Background="Black"
-                      Foreground="LightGray"
-                      >
+                      Foreground="LightGray">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="TemplateId" Binding="{Binding TemplateId}" Width="4*"/>
                     <DataGridTemplateColumn Header="FoundStructure" SortMemberPath="Structure.StructureName" Width="5*">
@@ -320,7 +301,6 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-
                     <DataGridTextColumn Header="StructVolume" Binding="{Binding StructVolume, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="2*"/>
                     <DataGridTextColumn Header="DVHObjective" Binding="{Binding DVHObjective, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="3*"/>
                     <DataGridTextColumn Header="Goal" Binding="{Binding Goal, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False" Width="*"/>
@@ -376,8 +356,7 @@
                       ColumnWidth="*" 
                       Background="Black"
                       Foreground="LightGray"  
-                      RowHeight="23"
-                      >
+                      RowHeight="23">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Description" Binding="{Binding Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="800"/>
                     <DataGridTextColumn Header="Status" Binding="{Binding Status, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="*"/>
@@ -407,8 +386,5 @@
                 </DataGrid.Resources>
             </DataGrid>
         </Grid>
-
     </Grid>
-
-
 </Window>
