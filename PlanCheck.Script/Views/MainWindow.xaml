@@ -283,8 +283,8 @@
                                                         <Setter Property="BorderBrush" Value="#FF6A2100"></Setter>
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding Path=Met}" Value="Not evaluated">
-                                                        <Setter Property="Background" Value="LightGray"></Setter>
-                                                        <Setter Property="BorderBrush" Value="LightGray"></Setter>
+                                                        <Setter Property="Background" Value="#FF2B2B2B"></Setter>
+                                                        <Setter Property="BorderBrush" Value="#FF2B2B2B"></Setter>
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
