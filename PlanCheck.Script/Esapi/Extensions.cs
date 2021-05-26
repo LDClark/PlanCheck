@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using VMS.TPS.Common.Model.API;
@@ -126,6 +126,9 @@ public static class Extensions
     private static Course GetCourse(Patient patient, string courseId) =>
         patient?.Courses?.FirstOrDefault(x => x.Id == courseId);
 
-    public static Structure GetStructure(PlanningItem plan, string structureCode) =>
+    public static Structure GetStructureFromCode(PlanningItem plan, string structureCode) =>
         plan?.StructureSet?.Structures?.FirstOrDefault(x => x.StructureCodeInfos.FirstOrDefault().Code == structureCode);
+
+    public static Structure GetStructureFromId(PlanningItem plan, string structureId) =>
+    plan?.StructureSet?.Structures?.FirstOrDefault(x => x.Id == structureId);
 }
