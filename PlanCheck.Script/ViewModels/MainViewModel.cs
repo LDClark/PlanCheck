@@ -222,7 +222,7 @@ namespace PlanCheck
                     {
                         try
                         {
-                            foreach (var pqm in pqms)
+                            foreach (var pqm in pqms.Where(i => i != null))
                             {
                                 string templateSelected = "";
                                 if (structure.StructureName.ToUpper().CompareTo(pqm.TemplateId.ToUpper()) == 0) //id matches
@@ -361,7 +361,6 @@ namespace PlanCheck
                         }
                     });
             }
-
         }
 
         private async void PrintPlan()
