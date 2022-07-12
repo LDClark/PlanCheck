@@ -12,9 +12,9 @@ namespace PlanCheck.Calculators
         {
             try
             {
-                var structure = structureSet.Structures.FirstOrDefault(x => x.Id == evalStructure.StructureName);
+                var structure = structureSet.Structures.FirstOrDefault(x => x.Id == evalStructure.Id);
                 // we have Gradient Index pattern
-                DVHData dvh = planningItem.PlanningItemObject.GetDVHCumulativeData(structure, DoseValuePresentation.Absolute, VolumePresentation.Relative, 0.1);
+                DVHData dvh = planningItem.Object.GetDVHCumulativeData(structure, DoseValuePresentation.Absolute, VolumePresentation.Relative, 0.1);
                 if ((dvh.SamplingCoverage < 0.9) || (dvh.Coverage < 0.9))
                 {
                     return "Unable to calculate - insufficient dose or sampling coverage";
@@ -25,18 +25,18 @@ namespace PlanCheck.Calculators
                 double planDoseDouble = 0;
                 DoseValue.DoseUnit du = (unit.Value.CompareTo("%") == 0) ? DoseValue.DoseUnit.Percent :
                 (unit.Value.CompareTo("cGy") == 0) ? DoseValue.DoseUnit.cGy : DoseValue.DoseUnit.Unknown;
-                if (planningItem.PlanningItemObject is PlanSum)
+                if (planningItem.Object is PlanSum)
                 {
-                    PlanSum planSum = (PlanSum)planningItem.PlanningItemObject;
+                    PlanSum planSum = (PlanSum)planningItem.Object;
                     foreach (PlanSetup planSetup in planSum.PlanSetups)
                     {
                         planDoseDouble += planSetup.TotalDose.Dose;
                     }
 
                 }
-                if (planningItem.PlanningItemObject is PlanSetup)
+                if (planningItem.Object is PlanSetup)
                 {
-                    PlanSetup planSetup = (PlanSetup)planningItem.PlanningItemObject;
+                    PlanSetup planSetup = (PlanSetup)planningItem.Object;
                     planDoseDouble = planSetup.TotalDose.Dose;
                 }
                 prescribedDose = new DoseValue(planDoseDouble, DoseValue.DoseUnit.cGy);
@@ -44,8 +44,8 @@ namespace PlanCheck.Calculators
                 VolumePresentation vpFinal = VolumePresentation.AbsoluteCm3;
                 DoseValuePresentation dvpFinal = (evalunit.Value.CompareTo("%") == 0) ? DoseValuePresentation.Relative : DoseValuePresentation.Absolute;
                 DoseValue dv = new DoseValue(double.Parse(eval.Value) / 100 * prescribedDose.Dose, DoseValue.DoseUnit.cGy);
-                double bodyWithPrescribedDoseVolume = planningItem.PlanningItemObject.GetVolumeAtDose(structure, prescribedDose, vpFinal);
-                double bodyWithEvalDoseVolume = planningItem.PlanningItemObject.GetVolumeAtDose(structure, dv, vpFinal);
+                double bodyWithPrescribedDoseVolume = planningItem.Object.GetVolumeAtDose(structure, prescribedDose, vpFinal);
+                double bodyWithEvalDoseVolume = planningItem.Object.GetVolumeAtDose(structure, dv, vpFinal);
                 var gi = bodyWithEvalDoseVolume / bodyWithPrescribedDoseVolume;
                 return string.Format("{0:0.0}", gi);
             }

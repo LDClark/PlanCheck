@@ -7,21 +7,26 @@ namespace PlanCheck
 {
     public class StructureViewModel
     {
-        public string StructureName { get; set; }
-        public string StructureCode { get; set; }
-        public string StructureNameWithCode { get; set; }
+        public string Id { get; set; }
+        public string Name { get; set; }
+        public string Code { get; set; }
+        public string NameWithCode { get; set; }
         public string VolumeValue { get; set; }
         public string VolumeUnit {get;set;}
+        public double AssignedHU { get; set; }
 
         public StructureViewModel(Structure structure)
         {
             if (structure != null)
             {
-                StructureName = structure.Id;
-                StructureCode = structure.StructureCodeInfos.FirstOrDefault().Code;
-                StructureNameWithCode = StructureName + " : " + StructureCode;
+                Id = structure.Id;
+                Name = structure.Name;
+                Code = structure.StructureCodeInfos.FirstOrDefault().Code;
+                NameWithCode = Name + " : " + Code;
                 VolumeValue = structure.Volume.ToString("0.0");
                 VolumeUnit = VolumePresentation.AbsoluteCm3.ToString();
+                structure.GetAssignedHU(out double huValue);
+                AssignedHU = huValue;
             }
         }
     }

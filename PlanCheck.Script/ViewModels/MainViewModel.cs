@@ -81,8 +81,8 @@ namespace PlanCheck
             set => Set(ref _errorGrid, value);
         }
 
-        private ObservableCollection<ConstraintViewModel> _constraints;
-        public ObservableCollection<ConstraintViewModel> Constraints
+        private ConstraintListViewModel _constraints;
+        public ConstraintListViewModel Constraints
         {
             get => _constraints;
             set => Set(ref _constraints, value);
@@ -173,7 +173,7 @@ namespace PlanCheck
             DirectoryInfo constraintDir = new DirectoryInfo(Path.Combine(AssemblyHelper.GetAssemblyDirectory(), "ConstraintTemplates"));
             string firstFileName = constraintDir.GetFiles().FirstOrDefault().FullName;
             string firstConstraintFilePath = Path.Combine(constraintDir.ToString(), firstFileName);
-            Constraints = ConstraintListViewModel.GetConstraintList(constraintDir.ToString());
+            Constraints = new ConstraintListViewModel(constraintDir.ToString());
             SelectedConstraint = new ConstraintViewModel(firstConstraintFilePath);            
             Plans = await _esapiService.GetPlansAsync();
         }
@@ -225,14 +225,14 @@ namespace PlanCheck
                             foreach (var pqm in pqms.Where(i => i != null))
                             {
                                 string templateSelected = "";
-                                if (structure.StructureName.ToUpper().CompareTo(pqm.TemplateId.ToUpper()) == 0) //id matches
+                                if (structure.Id.ToUpper().CompareTo(pqm.TemplateId.ToUpper()) == 0) //id matches
                                 {
                                     templateSelected = pqm.TemplateId;
                                 }
-                                else if (structure.StructureCode != null)
+                                else if (structure.Code != null)
                                 {
                                     foreach (var code in pqm.TemplateCodes)
-                                        if (code == structure.StructureCode) //code matches
+                                        if (code == structure.Code) //code matches
                                         {
                                             templateSelected = code;
                                         }
@@ -241,21 +241,21 @@ namespace PlanCheck
                                 {
                                     foreach (string id in pqm.TemplateAliases)
                                     {
-                                        if (structure.StructureName.ToUpper().CompareTo(id.ToUpper()) == 0) //id matches alias
+                                        if (structure.Id.ToUpper().CompareTo(id.ToUpper()) == 0) //id matches alias
                                         {
                                             templateSelected = id;
                                         }
                                     }
                                 }
-                                if (templateSelected != structure.StructureCode)
+                                if (templateSelected != structure.Code)
                                 {
-                                    if (structure.StructureName.ToUpper().CompareTo(templateSelected.ToUpper()) != 0) //template code or name not found
+                                    if (structure.Id.ToUpper().CompareTo(templateSelected.ToUpper()) != 0) //template code or name not found
                                         continue;
                                 }
                                 else
                                     templateSelected = pqm.TemplateId + " : " + templateSelected; // if template code matches, fill in the PQM id
 
-                                string result = await _esapiService.CalculateMetricDoseAsync(courseId, planId, structure.StructureName, structure.StructureCode, pqm.DVHObjective);
+                                string result = await _esapiService.CalculateMetricDoseAsync(courseId, planId, structure.Id, structure.Code, pqm.DVHObjective);
                                 string met = await _esapiService.EvaluateMetricDoseAsync(result, pqm.Goal, pqm.Variation);
                                 var tuple = PQMColors.GetAchievedRatio(structure, pqm.Goal, pqm.DVHObjective, result);
                                 var ratio = tuple.Item2;
@@ -266,7 +266,7 @@ namespace PlanCheck
                                     TemplateId = templateSelected,
                                     StructureList = structures,
                                     SelectedStructure = structure,
-                                    StructureNameWithCode = structure.StructureNameWithCode,
+                                    StructureNameWithCode = structure.NameWithCode,
                                     StructVolume = structure.VolumeValue,
                                     AchievedPercentageOfGoal = percentage,
                                     AchievedColor = color,

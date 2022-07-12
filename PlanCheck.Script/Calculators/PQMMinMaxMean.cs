@@ -15,7 +15,7 @@ namespace PlanCheck.Calculators
         {
             try
             {
-                var structure = structureSet.Structures.FirstOrDefault(x => x.Id == evalStructure.StructureName);
+                var structure = structureSet.Structures.FirstOrDefault(x => x.Id == evalStructure.Id);
                 if (type.Value.CompareTo("Volume") == 0)
                 {
                     return string.Format("{0:0.00} {1}", evalStructure.VolumeValue, evalunit.Value);
@@ -25,18 +25,18 @@ namespace PlanCheck.Calculators
                     double planSumRxDose = 0;
                     DVHData dvh;
                     DoseValuePresentation dvp = (evalunit.Value.CompareTo("%") == 0) ? DoseValuePresentation.Relative : DoseValuePresentation.Absolute;
-                    if (dvp == DoseValuePresentation.Relative && planningItem.PlanningItemObject is PlanSum)
+                    if (dvp == DoseValuePresentation.Relative && planningItem.Object is PlanSum)
                     {
-                        PlanSum planSum = (PlanSum)planningItem.PlanningItemObject;
+                        PlanSum planSum = (PlanSum)planningItem.Object;
                         foreach (PlanSetup planSetup in planSum.PlanSetups)
                         {
                             double planSetupRxDose = planSetup.TotalDose.Dose;
                             planSumRxDose += planSetupRxDose;
                         }
-                        dvh = planningItem.PlanningItemObject.GetDVHCumulativeData(structure, DoseValuePresentation.Absolute, VolumePresentation.Relative, 0.1);
+                        dvh = planningItem.Object.GetDVHCumulativeData(structure, DoseValuePresentation.Absolute, VolumePresentation.Relative, 0.1);
                     }
                     else
-                        dvh = planningItem.PlanningItemObject.GetDVHCumulativeData(structure, dvp, VolumePresentation.Relative, 0.1);
+                        dvh = planningItem.Object.GetDVHCumulativeData(structure, dvp, VolumePresentation.Relative, 0.1);
                     if (type.Value.CompareTo("Max") == 0)
                     {
                         //checking dose output unit and adapting to template
@@ -48,7 +48,7 @@ namespace PlanCheck.Calculators
                         //Gy to Gy or % to %
                         else
                         {
-                            if (dvp == DoseValuePresentation.Relative && planningItem.PlanningItemObject is PlanSum)
+                            if (dvp == DoseValuePresentation.Relative && planningItem.Object is PlanSum)
                             {
                                 double maxDoseDouble = double.Parse(dvh.MaxDose.ValueAsString);
                                 //double 

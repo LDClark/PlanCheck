@@ -11,9 +11,6 @@
         Foreground="LightGray">
     <Window.Resources>
         <CollectionViewSource x:Key="Plans" Source="{Binding Plans}">
-            <CollectionViewSource.SortDescriptions>
-                <cm:SortDescription PropertyName="PlanId" />
-            </CollectionViewSource.SortDescriptions>
             <CollectionViewSource.GroupDescriptions>
                 <PropertyGroupDescription PropertyName="CourseId" />
             </CollectionViewSource.GroupDescriptions>
@@ -211,7 +208,6 @@
                     ItemsSource="{Binding Source={StaticResource Constraints}}"
                     SelectedItem="{Binding SelectedConstraint, NotifyOnSourceUpdated=True, Mode=TwoWay}"
                     Background="#FF2B2B2B"
-                    Foreground="LightGray"
                     BorderBrush="Black">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="SourceUpdated">
@@ -261,7 +257,9 @@
                                               FontSize="12"
                                               SelectedItem="{Binding SelectedStructure, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"                                            
                                               Margin="-1"
-                                              Foreground="LightGray">
+                                              Foreground="LightGray"
+                                              Background="Black"
+                                              >
                                         <ComboBox.ItemTemplate>
                                             <DataTemplate>
                                                 <TextBlock Text="{Binding StructureNameWithCode}" />

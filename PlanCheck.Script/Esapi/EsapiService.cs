@@ -25,28 +25,37 @@ namespace PlanCheck
         }
 
         public Task<Plan[]> GetPlansAsync() =>
-           RunAsync(context => context.Patient.Courses?
-               .SelectMany(x => x.GetPlanSetupsAndSums())
-               .Select(x => new Plan
+           RunAsync(context =>
+           {
+                var plans = context.Patient.Courses?
+                .SelectMany(x => x.GetPlanSetupsAndSums())
+                .Select(x => new Plan
+                {
+                    PlanId = x.Id,
+                    CourseId = x.GetCourse().Id,
+                    PlanType = Extensions.GetPlanType(x),
+                    PlanCreation = Extensions.GetCreationDateTime(x),
+                    PlanStructureSetId = Extensions.GetStructureSetId(x),
+                    PlanImageId = Extensions.GetPlanImageId(x),
+                    PlanImageCreation = Extensions.GetPlanImageCreation(x),
+                    PlanIdWithFractionation = x.Id + Extensions.GetFractionation(x)
+                });
+               if (context.PlanSetup != null)
                {
-                   PlanId = x.Id,
-                   CourseId = x.GetCourse().Id,
-                   PlanType = Extensions.GetPlanType(x),
-                   PlanCreation = Extensions.GetCreationDateTime(x),
-                   PlanStructureSetId = Extensions.GetStructureSetId(x),
-                   PlanImageId = Extensions.GetPlanImageId(x),
-                   PlanImageCreation = Extensions.GetPlanImageCreation(x),
-                   PlanIdWithFractionation = x.Id + Extensions.GetFractionation(x) 
-               })
-               .ToArray());
+                   var p = plans.OrderByDescending(x => x.PlanId == context.PlanSetup.Id).ThenBy(x => x.PlanId).ToList().ToArray();
+                   return p;
+               }
+
+               else
+                   return plans.ToArray();
+           });
 
         public Task<ObservableCollection<StructureViewModel>> GetStructuresAsync(string courseId, string planId) =>
             RunAsync(context =>
             {
                 var planningItem = Extensions.GetPlanningItem(context.Patient, courseId, planId);
-                var ss = planningItem?.StructureSet;
-                var ssvm = StructureSetListViewModel.GetStructureList(ss);
-                return ssvm;
+                var structures = new StructureSetViewModel(planningItem?.StructureSet).Structures;
+                return structures;
             });
 
         public Task<string[]> GetBeamIdsAsync(string courseId, string planId) =>
@@ -80,7 +89,8 @@ namespace PlanCheck
             {
                 var planningItem = Extensions.GetPlanningItem(context.Patient, courseId, planId);
                 var calculator = new ErrorCalculator();
-                var errorGrid = calculator.Calculate(planningItem);
+                var planningItemVM = new PlanningItemViewModel(planningItem);
+                var errorGrid = calculator.Calculate(planningItemVM);
                 return errorGrid;
             });
 
@@ -147,7 +157,7 @@ namespace PlanCheck
                 structure = Extensions.GetStructureFromCode(plan, structureCode);
             var structureVM = new StructureViewModel(structure);
             string metric = dvhObjective;
-            string result = _metricCalc.CalculateMetric(planVM.PlanningItemStructureSet, structureVM, planVM, metric);             
+            string result = _metricCalc.CalculateMetric(planVM.StructureSet.Object, structureVM, planVM, metric);             
             return result;
         }
 

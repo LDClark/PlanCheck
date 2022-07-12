@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -106,7 +106,6 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Calculators\PlanSelectCalculator.cs" />
     <Compile Include="Calculators\PQMColors.cs" />
     <Compile Include="Calculators\PQMCoveredDoseAtVolume.cs" />
     <Compile Include="Calculators\PQMMinMaxMean.cs" />
@@ -149,15 +148,10 @@
     <Compile Include="Helpers\UserMessagedEventArgs.cs" />
     <Compile Include="Helpers\UserMessager.cs" />
     <Compile Include="ViewModels\CollisionCheckViewModel.cs" />
-    <Compile Include="ViewModels\PlanSelectViewModel.cs" />
-    <Compile Include="ViewModels\PlanSelectDetailViewModel.cs" />
-    <Compile Include="ViewModels\StructureSetListViewModel.cs" />
     <Compile Include="ViewModels\ConstraintListViewModel.cs" />
+    <Compile Include="ViewModels\StructureSetViewModel.cs" />
     <Compile Include="ViewModels\StructureViewModel.cs" />
     <Compile Include="ViewModels\ConstraintViewModel.cs" />
-    <Compile Include="Calculators\PlanningItemDetailsCalculator.cs" />
-    <Compile Include="ViewModels\PlanningItemDetailsViewModel.cs" />
-    <Compile Include="ViewModels\PlanningItemListViewModel.cs" />
     <Compile Include="ViewModels\PlanningItemViewModel.cs" />
     <Compile Include="Helpers\DVHExtensions.cs" />
     <Compile Include="ViewModels\ErrorViewModel.cs" />
@@ -172,9 +166,6 @@
     <Compile Include="Views\ProgressDialog.xaml.cs">
       <DependentUpon>ProgressDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\PlanSelectView.xaml.cs">
-      <DependentUpon>PlanSelectView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\UnderscoreConverter.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -183,10 +174,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\ProgressDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\PlanSelectView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

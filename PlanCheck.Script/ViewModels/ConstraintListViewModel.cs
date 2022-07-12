@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -7,17 +7,18 @@ using System.Text;
 
 namespace PlanCheck
 {
-    class ConstraintListViewModel
+    public class ConstraintListViewModel
     {
-        public static ObservableCollection<ConstraintViewModel> GetConstraintList(string constraintDir)
+        public ObservableCollection<ConstraintViewModel> ConstraintList { get; set; }
+
+        public ConstraintListViewModel(string constraintDir)
         {
-            var ConstraintComboBoxList = new ObservableCollection<ConstraintViewModel>();
+            ConstraintList = new ObservableCollection<ConstraintViewModel>();
             foreach (string file in Directory.EnumerateFiles(constraintDir, "*.csv"))
             {
                 var constraintViewModel = new ConstraintViewModel(file);
-                ConstraintComboBoxList.Add(constraintViewModel);
+                ConstraintList.Add(constraintViewModel);
             }
-            return ConstraintComboBoxList;
         }
     }
 }
