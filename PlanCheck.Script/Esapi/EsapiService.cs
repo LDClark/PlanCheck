@@ -157,7 +157,7 @@ namespace PlanCheck
                 structure = Extensions.GetStructureFromCode(plan, structureCode);
             var structureVM = new StructureViewModel(structure);
             string metric = dvhObjective;
-            string result = _metricCalc.CalculateMetric(planVM.StructureSet.Object, structureVM, planVM, metric);             
+            string result = _metricCalc.CalculateMetric(planVM.StructureSet, structureVM, planVM, metric);             
             return result;
         }
 

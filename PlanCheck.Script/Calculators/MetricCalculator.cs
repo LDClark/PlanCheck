@@ -9,7 +9,7 @@ namespace PlanCheck
     // which doesn't expose ESAPI objects in order to isolate the script from ESAPI
     public class MetricCalculator
     {
-        public string CalculateMetric(StructureSet structureSet, StructureViewModel evalStructure, PlanningItemViewModel planningItem, string DVHObjective)
+        public string CalculateMetric(StructureSetViewModel structureSet, StructureViewModel evalStructure, PlanningItemViewModel planningItem, string DVHObjective)
         {
 
             //start with a general regex that pulls out the metric type and the @ (evalunit) part.

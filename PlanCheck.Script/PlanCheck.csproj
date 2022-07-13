@@ -144,7 +144,6 @@
     <Compile Include="Geometry\Triangle.cs" />
     <Compile Include="Helpers\ContourHelper.cs" />
     <Compile Include="Helpers\HelixToolkitException.cs" />
-    <Compile Include="Helpers\INotifyUserMessaged.cs" />
     <Compile Include="Helpers\UserMessagedEventArgs.cs" />
     <Compile Include="Helpers\UserMessager.cs" />
     <Compile Include="ViewModels\CollisionCheckViewModel.cs" />
@@ -166,7 +165,7 @@
     <Compile Include="Views\ProgressDialog.xaml.cs">
       <DependentUpon>ProgressDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\UnderscoreConverter.cs" />
+    <Compile Include="Helpers\UnderscoreConverter.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="Views\MainWindow.xaml">

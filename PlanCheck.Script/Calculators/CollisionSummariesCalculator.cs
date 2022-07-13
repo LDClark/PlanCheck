@@ -10,12 +10,12 @@ namespace PlanCheck
 {
     public class CollisionSummariesCalculator
     {
-        public DiffuseMaterial redMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.Red));
-        public DiffuseMaterial darkblueMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.DarkBlue));
-        public DiffuseMaterial collimatorMaterialStatic = new DiffuseMaterial(new SolidColorBrush(Colors.Green));
-        public DiffuseMaterial collimatorMaterialVMAT = new DiffuseMaterial(new SolidColorBrush(Colors.GreenYellow));
-        public DiffuseMaterial lightblueMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.LightBlue));
-        public DiffuseMaterial magentaMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.Magenta));
+        private DiffuseMaterial redMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.Red));
+        private DiffuseMaterial darkblueMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.DarkBlue));
+        private DiffuseMaterial collimatorMaterialStatic = new DiffuseMaterial(new SolidColorBrush(Colors.Green));
+        private DiffuseMaterial collimatorMaterialVMAT = new DiffuseMaterial(new SolidColorBrush(Colors.GreenYellow));
+        private DiffuseMaterial lightblueMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.LightBlue));
+        private DiffuseMaterial magentaMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.Magenta));
 
         public CollisionCheckViewModel CalculateBeamCollision(PlanSetup planSetup, Beam beam)
         {

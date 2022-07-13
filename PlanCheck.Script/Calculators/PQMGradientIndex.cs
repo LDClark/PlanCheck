@@ -8,13 +8,13 @@ namespace PlanCheck.Calculators
 {
     class PQMGradientIndex
     {
-        public static string GetGradientIndex(StructureSet structureSet, PlanningItemViewModel planningItem, StructureViewModel evalStructure, MatchCollection testMatch, Group evalunit)
+        public static string GetGradientIndex(StructureSetViewModel structureSet, PlanningItemViewModel planningItem, StructureViewModel evalStructure, MatchCollection testMatch, Group evalunit)
         {
             try
             {
                 var structure = structureSet.Structures.FirstOrDefault(x => x.Id == evalStructure.Id);
                 // we have Gradient Index pattern
-                DVHData dvh = planningItem.Object.GetDVHCumulativeData(structure, DoseValuePresentation.Absolute, VolumePresentation.Relative, 0.1);
+                DVHData dvh = planningItem.Object.GetDVHCumulativeData(structure.Object, DoseValuePresentation.Absolute, VolumePresentation.Relative, 0.1);
                 if ((dvh.SamplingCoverage < 0.9) || (dvh.Coverage < 0.9))
                 {
                     return "Unable to calculate - insufficient dose or sampling coverage";
@@ -44,8 +44,8 @@ namespace PlanCheck.Calculators
                 VolumePresentation vpFinal = VolumePresentation.AbsoluteCm3;
                 DoseValuePresentation dvpFinal = (evalunit.Value.CompareTo("%") == 0) ? DoseValuePresentation.Relative : DoseValuePresentation.Absolute;
                 DoseValue dv = new DoseValue(double.Parse(eval.Value) / 100 * prescribedDose.Dose, DoseValue.DoseUnit.cGy);
-                double bodyWithPrescribedDoseVolume = planningItem.Object.GetVolumeAtDose(structure, prescribedDose, vpFinal);
-                double bodyWithEvalDoseVolume = planningItem.Object.GetVolumeAtDose(structure, dv, vpFinal);
+                double bodyWithPrescribedDoseVolume = planningItem.Object.GetVolumeAtDose(structure.Object, prescribedDose, vpFinal);
+                double bodyWithEvalDoseVolume = planningItem.Object.GetVolumeAtDose(structure.Object, dv, vpFinal);
                 var gi = bodyWithEvalDoseVolume / bodyWithPrescribedDoseVolume;
                 return string.Format("{0:0.0}", gi);
             }

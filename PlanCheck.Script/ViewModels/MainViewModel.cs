@@ -46,27 +46,6 @@ namespace PlanCheck
             set => Set(ref _selectedPlan, value);
         }
 
-        private Plan _selectedPlanCompare1;
-        public Plan SelectedPlanCompare1
-        {
-            get => _selectedPlanCompare1;
-            set => Set(ref _selectedPlanCompare1, value);
-        }
-
-        private Plan _selectedPlanCompare2;
-        public Plan SelectedPlanCompare2
-        {
-            get => _selectedPlanCompare2;
-            set => Set(ref _selectedPlanCompare2, value);
-        }
-
-        private Plan _selectedPlanCompare3;
-        public Plan SelectedPlanCompare3
-        {
-            get => _selectedPlanCompare3;
-            set => Set(ref _selectedPlanCompare3, value);
-        }
-
         private ObservableCollection<PQMViewModel> _pqms;
         public ObservableCollection<PQMViewModel> PQMs
         {
@@ -81,8 +60,8 @@ namespace PlanCheck
             set => Set(ref _errorGrid, value);
         }
 
-        private ConstraintListViewModel _constraints;
-        public ConstraintListViewModel Constraints
+        private ObservableCollection<ConstraintViewModel> _constraints;
+        public ObservableCollection<ConstraintViewModel> Constraints
         {
             get => _constraints;
             set => Set(ref _constraints, value);
@@ -167,13 +146,14 @@ namespace PlanCheck
         public ICommand AnalyzePlanCommand => new RelayCommand(AnalyzePlan);
         public ICommand AnalyzeCollisionCommand => new RelayCommand(GetCollisionSummary);
         public ICommand PrintCommand => new RelayCommand(PrintPlan);
+        public ICommand UpdatePQMCommand => new RelayCommand(UpdatePQM);
 
         private async void Start()
         {
             DirectoryInfo constraintDir = new DirectoryInfo(Path.Combine(AssemblyHelper.GetAssemblyDirectory(), "ConstraintTemplates"));
             string firstFileName = constraintDir.GetFiles().FirstOrDefault().FullName;
             string firstConstraintFilePath = Path.Combine(constraintDir.ToString(), firstFileName);
-            Constraints = new ConstraintListViewModel(constraintDir.ToString());
+            Constraints = new ConstraintListViewModel(constraintDir.ToString()).ConstraintList;
             SelectedConstraint = new ConstraintViewModel(firstConstraintFilePath);            
             Plans = await _esapiService.GetPlansAsync();
         }
@@ -289,6 +269,11 @@ namespace PlanCheck
                 {
                     ErrorGrid = await _esapiService.GetErrorsAsync(courseId, planId);
                 });
+        }
+
+        private async void UpdatePQM()
+        {
+
         }
 
         public void GetCameraPosition()

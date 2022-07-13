@@ -11,7 +11,7 @@ namespace PlanCheck.Calculators
 {
     class PQMMinMaxMean
     {
-        public static string GetMinMaxMean(StructureSet structureSet, PlanningItemViewModel planningItem, StructureViewModel evalStructure, MatchCollection testMatch, Group evalunit, Group type)
+        public static string GetMinMaxMean(StructureSetViewModel structureSet, PlanningItemViewModel planningItem, StructureViewModel evalStructure, MatchCollection testMatch, Group evalunit, Group type)
         {
             try
             {
@@ -33,10 +33,10 @@ namespace PlanCheck.Calculators
                             double planSetupRxDose = planSetup.TotalDose.Dose;
                             planSumRxDose += planSetupRxDose;
                         }
-                        dvh = planningItem.Object.GetDVHCumulativeData(structure, DoseValuePresentation.Absolute, VolumePresentation.Relative, 0.1);
+                        dvh = planningItem.Object.GetDVHCumulativeData(structure.Object, DoseValuePresentation.Absolute, VolumePresentation.Relative, 0.1);
                     }
                     else
-                        dvh = planningItem.Object.GetDVHCumulativeData(structure, dvp, VolumePresentation.Relative, 0.1);
+                        dvh = planningItem.Object.GetDVHCumulativeData(structure.Object, dvp, VolumePresentation.Relative, 0.1);
                     if (type.Value.CompareTo("Max") == 0)
                     {
                         //checking dose output unit and adapting to template

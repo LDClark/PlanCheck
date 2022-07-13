@@ -14,6 +14,7 @@ namespace PlanCheck
         public string VolumeValue { get; set; }
         public string VolumeUnit {get;set;}
         public double AssignedHU { get; set; }
+        public Structure Object { get; set; }
 
         public StructureViewModel(Structure structure)
         {
@@ -22,11 +23,12 @@ namespace PlanCheck
                 Id = structure.Id;
                 Name = structure.Name;
                 Code = structure.StructureCodeInfos.FirstOrDefault().Code;
-                NameWithCode = Name + " : " + Code;
+                NameWithCode = Id + " : " + Code;
                 VolumeValue = structure.Volume.ToString("0.0");
                 VolumeUnit = VolumePresentation.AbsoluteCm3.ToString();
                 structure.GetAssignedHU(out double huValue);
                 AssignedHU = huValue;
+                Object = structure;
             }
         }
     }
