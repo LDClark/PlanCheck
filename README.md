@@ -16,8 +16,9 @@ To run:
 2. Set Configuration Manager to x64 for all projects
 3. Remove references to VMS.TPS.Common.Model.API and VMS.TPS.Common.Model.Types, and add the local dlls from the C: drive
 4. Make sure you are running the correct version of EsapiEssentials in PlanCheck and PlanCheck.Runner projects (15.5 uses 1.9, 15.6 uses 2.0)
-5. Right click PlanCheck.Runner project > Set as StartUp Project
-6. In Scripts Admin, add EsapiEssentials to approved scripts list
+5. Right click PlanCheck.Runner project > Set as StartUp Project.
+6. Build all, and then drop esapi dlls (located in bin folder) to Published Scripts folder.
+7. In Eclipse, Tools>Scripts, run the plan check.esapi.dll file.
 
 
 ![alt text](https://github.com/LDClark/PlanCheck/blob/master/TestCase.png)
