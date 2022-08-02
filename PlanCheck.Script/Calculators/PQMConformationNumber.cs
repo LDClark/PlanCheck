@@ -15,8 +15,7 @@ namespace PlanCheck.Calculators
         {
             try
             {
-                var structure = structureSet.Structures.FirstOrDefault(x => x.Id == evalStructure.Id);
-                DVHData dvh = planningItem.Object.GetDVHCumulativeData(structure.Object, DoseValuePresentation.Absolute, VolumePresentation.Relative, 0.1);
+                DVHData dvh = planningItem.Object.GetDVHCumulativeData(evalStructure.Object, DoseValuePresentation.Absolute, VolumePresentation.Relative, 0.1);
                 DoseValue prescribedDose;
                 double planDoseDouble = 0;
                 if ((dvh.SamplingCoverage < 0.9) || (dvh.Coverage < 0.9))
@@ -48,7 +47,7 @@ namespace PlanCheck.Calculators
                 DoseValuePresentation dvpFinal = (evalunit.Value.CompareTo("%") == 0) ? DoseValuePresentation.Relative : DoseValuePresentation.Absolute;
                 DoseValue dv = new DoseValue(double.Parse(eval.Value) / 100 * prescribedDose.Dose, DoseValue.DoseUnit.cGy);
                 double bodyWithPrescribedDoseVolume = planningItem.Object.GetVolumeAtDose(body, prescribedDose, vpFinal);
-                double targetWithPrescribedDoseVolume = planningItem.Object.GetVolumeAtDose(structure.Object, dv, vpFinal);
+                double targetWithPrescribedDoseVolume = planningItem.Object.GetVolumeAtDose(evalStructure.Object, dv, vpFinal);
                 double targetVolume = Convert.ToDouble(evalStructure.VolumeValue);
                 var cn = (targetWithPrescribedDoseVolume / targetVolume) * (targetWithPrescribedDoseVolume / bodyWithPrescribedDoseVolume);
                 return string.Format("{0:0.0}", cn);

@@ -6,7 +6,9 @@
         xmlns:cm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:l="clr-namespace:PlanCheck"
+        xmlns:cmd="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Platform"
         mc:Ignorable="d"
+        Title="PlanCheck"
         Background="Black"
         Foreground="LightGray">
     <Window.Resources>
@@ -236,12 +238,12 @@
             </Grid>
             <DataGrid x:Name="pqmDataGrid"
                       EnableRowVirtualization="False"
-                      IsReadOnly="True"
+                      IsReadOnly="False"
                       Grid.Row="1" 
                       AutoGenerateColumns="False"
                       HorizontalAlignment="Stretch"
                       VerticalAlignment="Stretch"
-                      ItemsSource="{Binding PQMs}"
+                      ItemsSource="{Binding PQMs, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                       RowHeight="23"
                       ColumnWidth="*"
                       Background="Black"
@@ -260,8 +262,8 @@
                                               Background="Black"
                                               >
                                         <i:Interaction.Triggers>
-                                            <i:EventTrigger EventName="SourceUpdated">
-                                                <i:InvokeCommandAction Command="{Binding UpdatePQMCommand}" />
+                                            <i:EventTrigger EventName="SelectionChanged">
+                                                <cmd:EventToCommand Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.UpdatePQMCommand}"/>
                                             </i:EventTrigger>
                                         </i:Interaction.Triggers>
                                         <ComboBox.ItemTemplate>
@@ -269,46 +271,17 @@
                                                 <TextBlock Text="{Binding NameWithCode}" />
                                             </DataTemplate>
                                         </ComboBox.ItemTemplate>
-                                        <ComboBox.Style>
-                                            <Style TargetType="ComboBox">
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding Path=Met}" Value="Goal">
-                                                        <Setter Property="Background" Value="#FF096119"></Setter>
-                                                        <Setter Property="BorderBrush" Value="#FF096119"></Setter>
-                                                    </DataTrigger>
-                                                    <DataTrigger Binding="{Binding Path=Met}" Value="Variation">
-                                                        <Setter Property="Background" Value="#FF665D02"></Setter>
-                                                        <Setter Property="BorderBrush" Value="#FF665D02"></Setter>
-                                                    </DataTrigger>
-                                                    <DataTrigger Binding="{Binding Path=Met}" Value="Not met">
-                                                        <Setter Property="Background" Value="#FF6A2100"></Setter>
-                                                        <Setter Property="BorderBrush" Value="#FF6A2100"></Setter>
-                                                    </DataTrigger>
-                                                    <DataTrigger Binding="{Binding Path=Met}" Value="Not evaluated">
-                                                        <Setter Property="Background" Value="#FF2B2B2B"></Setter>
-                                                        <Setter Property="BorderBrush" Value="#FF2B2B2B"></Setter>
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </ComboBox.Style>
-                                        <ComboBox.Resources>
-                                            <Style TargetType="ComboBoxItem">
-                                                <Setter Property="Background" Value="#FF2B2B2B" />
-                                                <Setter Property="Foreground" Value="LightGray" />
-                                                <Setter Property="BorderBrush" Value="Black" />
-                                            </Style>
-                                        </ComboBox.Resources>
                                     </ComboBox>
                                 </Grid>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTextColumn Header="StructVolume" Binding="{Binding StructVolume, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="2*"/>
+                    <DataGridTextColumn Header="StructVolume" Binding="{Binding StructureVolume, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="2*"/>
                     <DataGridTextColumn Header="DVHObjective" Binding="{Binding DVHObjective, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="3*"/>
                     <DataGridTextColumn Header="Goal" Binding="{Binding Goal, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False" Width="*"/>
                     <DataGridTemplateColumn SortMemberPath="AchievedPercentageOfGoal" Width="5*">
                         <DataGridTemplateColumn.Header>
-                            <TextBlock Text="{Binding DataContext.SelectedPlan.PlanId, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}, Converter={StaticResource UnderscoreConverter}}"/>
+                            <TextBlock Text="Achieved"/>
                         </DataGridTemplateColumn.Header>
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>

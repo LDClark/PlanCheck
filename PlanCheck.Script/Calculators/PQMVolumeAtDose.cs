@@ -12,10 +12,8 @@ namespace PlanCheck.Calculators
         {
             try
             {
-                var structure = structureSet.Structures.FirstOrDefault(x => x.Id == evalStructure.Id);
                 //check for sufficient sampling and dose coverage
-                DVHData dvh = planningItem.Object.GetDVHCumulativeData(structure.Object, DoseValuePresentation.Absolute, VolumePresentation.Relative, 0.1);
-                //MessageBox.Show(evalStructure.Id + "- Eval unit: " + evalunit.Value.ToString() + "Achieved unit: " + dvAchieved.UnitAsString + " - Sampling coverage: " + dvh.SamplingCoverage.ToString() + " Coverage: " + dvh.Coverage.ToString());
+                DVHData dvh = planningItem.Object.GetDVHCumulativeData(evalStructure.Object, DoseValuePresentation.Absolute, VolumePresentation.Relative, 0.1);
                 if ((dvh.SamplingCoverage < 0.9) || (dvh.Coverage < 0.9))
                 {
                     return "Unable to calculate - insufficient dose or sampling coverage";
@@ -40,7 +38,7 @@ namespace PlanCheck.Calculators
                     dv = new DoseValue(planDoseDouble, DoseValue.DoseUnit.cGy);
                 }
 
-                double volumeAchieved = planningItem.Object.GetVolumeAtDose(structure.Object, dv, vpFinal);
+                double volumeAchieved = planningItem.Object.GetVolumeAtDose(evalStructure.Object, dv, vpFinal);
                 return string.Format("{0:0.00} {1}", volumeAchieved, evalunit.Value);   // todo: better formatting based on VolumePresentation
 
             }

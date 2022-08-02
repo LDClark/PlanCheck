@@ -9,7 +9,7 @@ namespace PlanCheck
 {
     public interface IEsapiService
     {
-        Task<Plan[]> GetPlansAsync();
+        Task<PlanningItemViewModel[]> GetPlansAsync();
         Task<ReportPatient> GetReportPatientAsync();
         Task<ObservableCollection<StructureViewModel>> GetStructuresAsync(string courseId, string planId);
         Task<string[]> GetBeamIdsAsync(string courseId, string planId);

@@ -8,7 +8,7 @@ using VMS.TPS.Common.Model.API;
 
 namespace PlanCheck
 {
-    public class Objectives
+    public class ObjectiveViewModel
     {
         public static PQMViewModel[] GetObjectives(ConstraintViewModel constraint)
         {

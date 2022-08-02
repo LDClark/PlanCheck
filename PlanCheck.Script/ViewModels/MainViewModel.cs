@@ -32,15 +32,15 @@ namespace PlanCheck
             _dialogService = dialogService;
         }
 
-        private Plan[] _plans;
-        public Plan[] Plans
+        private PlanningItemViewModel[] _plans;
+        public PlanningItemViewModel[] Plans
         {
             get => _plans;
             set => Set(ref _plans, value);
         }
 
-        private Plan _selectedPlan;
-        public Plan SelectedPlan
+        private PlanningItemViewModel _selectedPlan;
+        public PlanningItemViewModel SelectedPlan
         {
             get => _selectedPlan;
             set => Set(ref _selectedPlan, value);
@@ -161,9 +161,9 @@ namespace PlanCheck
         public async void AnalyzePlan()
         {
             var courseId = SelectedPlan?.CourseId;
-            var planId = SelectedPlan?.PlanId;
+            var planId = SelectedPlan?.Id;
 
-            var type = SelectedPlan?.PlanType;
+            var type = SelectedPlan?.Type;
             if (type == "PlanSum")
                 CCIsEnabled = false;
             if (type == "Plan")
@@ -192,7 +192,7 @@ namespace PlanCheck
             {
                 System.Windows.MessageBox.Show(string.Format("The template file '{0}' chosen does not exist.", SelectedConstraint.ConstraintPath));
             }
-            PQMViewModel[] pqms = Objectives.GetObjectives(SelectedConstraint);
+            PQMViewModel[] pqms = ObjectiveViewModel.GetObjectives(SelectedConstraint);
 
             _dialogService.ShowProgressDialog("Calculating dose metrics...", structures.Count(),
                 async progress =>
@@ -235,9 +235,9 @@ namespace PlanCheck
                                 else
                                     templateSelected = pqm.TemplateId + " : " + templateSelected; // if template code matches, fill in the PQM id
 
-                                string result = await _esapiService.CalculateMetricDoseAsync(courseId, planId, structure.Id, structure.Code, pqm.DVHObjective);
-                                string met = await _esapiService.EvaluateMetricDoseAsync(result, pqm.Goal, pqm.Variation);
-                                var tuple = PQMColors.GetAchievedRatio(structure, pqm.Goal, pqm.DVHObjective, result);
+                                string achieved = await _esapiService.CalculateMetricDoseAsync(courseId, planId, structure.Id, structure.Code, pqm.DVHObjective);
+                                string met = await _esapiService.EvaluateMetricDoseAsync(achieved, pqm.Goal, pqm.Variation);
+                                var tuple = PQMColors.GetAchievedRatio(structure, pqm.Goal, pqm.DVHObjective, achieved);
                                 var ratio = tuple.Item2;
                                 var color = tuple.Item1;
                                 var percentage = ratio * 100;
@@ -247,13 +247,14 @@ namespace PlanCheck
                                     StructureList = structures,
                                     SelectedStructure = structure,
                                     StructureNameWithCode = structure.NameWithCode,
-                                    StructVolume = structure.VolumeValue,
+                                    StructureVolume = structure.VolumeValue,
                                     AchievedPercentageOfGoal = percentage,
                                     AchievedColor = color,
                                     DVHObjective = pqm.DVHObjective,
                                     Goal = pqm.Goal,
                                     Met = met,
-                                    Achieved = result
+                                    Achieved = achieved,
+                                    PlanId = SelectedPlan.Id
                                 });
                                 progress.Increment();
                             }
@@ -273,7 +274,21 @@ namespace PlanCheck
 
         private async void UpdatePQM()
         {
-
+            _dialogService.ShowProgressDialog("Recalculating...", PQMs.Count(),
+            async progress =>
+            {
+                foreach (var pqm in PQMs)
+                {
+                    var achieved = await _esapiService.CalculateMetricDoseAsync(SelectedPlan.CourseId, SelectedPlan.Id, pqm.SelectedStructure.Id, pqm.SelectedStructure.Code, pqm.DVHObjective);
+                    pqm.StructureVolume = pqm.SelectedStructure.VolumeValue;
+                    pqm.Achieved = achieved;
+                    pqm.Met = await _esapiService.EvaluateMetricDoseAsync(pqm.Achieved, pqm.Goal, pqm.Variation);
+                    var tuple = PQMColors.GetAchievedRatio(pqm.SelectedStructure, pqm.Goal, pqm.DVHObjective, achieved);
+                    pqm.AchievedColor = tuple.Item1;
+                    pqm.AchievedPercentageOfGoal = tuple.Item2 * 100;
+                }
+                progress.Increment();
+            });
         }
 
         public void GetCameraPosition()
@@ -287,9 +302,9 @@ namespace PlanCheck
 
         public async void GetCollisionSummary()
         {
-            var planId = SelectedPlan?.PlanId;
+            var planId = SelectedPlan?.Id;
             var courseId = SelectedPlan?.CourseId;
-            var type = SelectedPlan?.PlanType;
+            var type = SelectedPlan?.Type;
             if (type == "Plan")
             {
                 var beamIds = await _esapiService.GetBeamIdsAsync(courseId, planId);
@@ -364,7 +379,7 @@ namespace PlanCheck
                 reportPQMList[i].DVHObjective = pqm.DVHObjective;
                 reportPQMList[i].Goal = pqm.Goal;
                 reportPQMList[i].StructureNameWithCode = pqm.StructureNameWithCode;
-                reportPQMList[i].StructVolume = pqm.StructVolume;
+                reportPQMList[i].StructVolume = pqm.StructureVolume;
                 reportPQMList[i].TemplateId = pqm.TemplateId;
                 reportPQMList[i].Variation = pqm.Variation;
                 reportPQMList[i].Met = pqm.Met;
@@ -377,13 +392,13 @@ namespace PlanCheck
                 ReportPatient = await _esapiService.GetReportPatientAsync(),
                 ReportPlanningItem = new ReportPlanningItem
                 {
-                    Id = SelectedPlan.PlanId,
-                    Type = SelectedPlan.PlanType,
-                    Created = SelectedPlan.PlanCreation
+                    Id = SelectedPlan.Id,
+                    Type = SelectedPlan.Type,
+                    Created = SelectedPlan.CreationDateTime
                 },
                 ReportStructureSet = new ReportStructureSet
                 {
-                    Id = SelectedPlan.PlanStructureSetId,
+                    Id = SelectedPlan.StructureSetId,
                     Image = new ReportImage
                     {
                         Id = SelectedPlan.PlanImageId,

@@ -24,25 +24,25 @@ namespace PlanCheck
             _selectedPlan = context.PlanSetup;
         }
 
-        public Task<Plan[]> GetPlansAsync() =>
+        public Task<PlanningItemViewModel[]> GetPlansAsync() =>
            RunAsync(context =>
            {
                 var plans = context.Patient.Courses?
                 .SelectMany(x => x.GetPlanSetupsAndSums())
-                .Select(x => new Plan
+                .Select(x => new PlanningItemViewModel(x)
                 {
-                    PlanId = x.Id,
+                    Id = x.Id,
                     CourseId = x.GetCourse().Id,
-                    PlanType = Extensions.GetPlanType(x),
-                    PlanCreation = Extensions.GetCreationDateTime(x),
-                    PlanStructureSetId = Extensions.GetStructureSetId(x),
+                    Type = Extensions.GetPlanType(x),
+                    CreationDateTime = Extensions.GetCreationDateTime(x),
+                    StructureSetId = Extensions.GetStructureSetId(x),
                     PlanImageId = Extensions.GetPlanImageId(x),
                     PlanImageCreation = Extensions.GetPlanImageCreation(x),
                     PlanIdWithFractionation = x.Id + Extensions.GetFractionation(x)
                 });
                if (context.PlanSetup != null)
                {
-                   var p = plans.OrderByDescending(x => x.PlanId == context.PlanSetup.Id).ThenBy(x => x.PlanId).ToList().ToArray();
+                   var p = plans.OrderByDescending(x => x.Id == context.PlanSetup.Id).ThenBy(x => x.Id).ToList().ToArray();
                    return p;
                }
 
@@ -139,7 +139,7 @@ namespace PlanCheck
         public Task<PQMViewModel[]> GetObjectivesAsync(ConstraintViewModel constraint) =>
             RunAsync(context =>
             {
-                var objectives = Objectives.GetObjectives(constraint);
+                var objectives = ObjectiveViewModel.GetObjectives(constraint);
                 return objectives.ToArray() ?? new PQMViewModel[0];
             });
 

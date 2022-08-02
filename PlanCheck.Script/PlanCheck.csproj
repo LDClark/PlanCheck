@@ -122,8 +122,7 @@
     <Compile Include="Esapi\EsapiService.cs" />
     <Compile Include="Esapi\Extensions.cs" />
     <Compile Include="Esapi\IEsapiService.cs" />
-    <Compile Include="Esapi\Objectives.cs" />
-    <Compile Include="Esapi\Plan.cs" />
+    <Compile Include="ViewModels\ObjectiveViewModel.cs" />
     <Compile Include="ExtensionMethods\Point3DExtensions.cs" />
     <Compile Include="ExtensionMethods\Vector3DExtensions.cs" />
     <Compile Include="Helpers\AssemblyHelper.cs" />

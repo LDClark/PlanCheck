@@ -18,13 +18,18 @@ namespace PlanCheck
         public PlanningItem Object { get; set; }
         public DateTime CreationDateTime { get; set; }
         public StructureSetViewModel StructureSet { get; set; }
+        public string StructureSetId { get; set; }
         public Image Image { get; set; }
+        public string PlanImageId { get; set; }
+        public DateTime PlanImageCreation { get; set; }
+        public string PlanIdWithFractionation { get; set; }
         public double TotalDose { get; set; }
         public bool IsDoseValid { get; set; }
         public string TargetVolumeId { get; set; }
         public double DoseMax3D { get; set; }
         public VVector DoseMax3DLocation { get; set; }
-        
+        public Beam[] Beams { get; set; }
+
         public PlanningItemViewModel(PlanningItem planningItem)
         {
             if (planningItem is PlanSetup)
