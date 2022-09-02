@@ -159,7 +159,7 @@
     </Compile>
     <Compile Include="Calculators\ErrorCalculator.cs" />
     <Compile Include="Script.cs" />
-    <Compile Include="ViewModels\PQMSummaryViewModel.cs" />
+    <Compile Include="ViewModels\PQMViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Views\ProgressDialog.xaml.cs">
       <DependentUpon>ProgressDialog.xaml</DependentUpon>

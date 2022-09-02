@@ -46,11 +46,14 @@ namespace PlanCheck
                 StructureSet = new StructureSetViewModel(planSetup.StructureSet);
                 Image = planSetup.StructureSet.Image;
                 CreationDateTime = (DateTime) planSetup.CreationDateTime;
+                TargetVolumeId = planSetup.TargetVolumeID;
                 TotalDose = planSetup.TotalDose.Dose;
                 IsDoseValid = planSetup.IsDoseValid;
-                TargetVolumeId = planSetup.TargetVolumeID;
-                DoseMax3D = planSetup.Dose.DoseMax3D.Dose;
-                DoseMax3DLocation = planSetup.Dose.DoseMax3DLocation;
+                if (IsDoseValid)
+                {
+                    DoseMax3D = planSetup.Dose.DoseMax3D.Dose;
+                    DoseMax3DLocation = planSetup.Dose.DoseMax3DLocation;
+                }
             }
             if (planningItem is PlanSum)
             {
@@ -71,8 +74,11 @@ namespace PlanCheck
                     TargetVolumeId = planSetup.TargetVolumeID;
                 }
                 IsDoseValid = planSum.IsDoseValid();
-                DoseMax3D = planSum.Dose.DoseMax3D.Dose;
-                DoseMax3DLocation = planSum.Dose.DoseMax3DLocation;
+                if (IsDoseValid)
+                {
+                    DoseMax3D = planSum.Dose.DoseMax3D.Dose;
+                    DoseMax3DLocation = planSum.Dose.DoseMax3DLocation;
+                }
             }
         }
 
