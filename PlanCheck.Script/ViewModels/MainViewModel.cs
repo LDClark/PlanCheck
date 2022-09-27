@@ -143,7 +143,7 @@ namespace PlanCheck
         }
 
         public ICommand StartCommand => new RelayCommand(Start);
-        public ICommand AnalyzePlanCommand => new RelayCommand(AnalyzePlan);
+        public ICommand AnalyzePlanCommand => new RelayCommand(AnalyzePlanPQMs);
         public ICommand AnalyzeCollisionCommand => new RelayCommand(GetCollisionSummary);
         public ICommand PrintCommand => new RelayCommand(PrintPlan);
         public ICommand UpdatePQMCommand => new RelayCommand(UpdatePQM);
@@ -158,30 +158,21 @@ namespace PlanCheck
             Plans = await _esapiService.GetPlansAsync();
         }
 
-        public async void AnalyzePlan()
+        public async void AnalyzePlanPQMs()
         {
             var courseId = SelectedPlan?.CourseId;
             var planId = SelectedPlan?.Id;
-
+            var structureSetId = SelectedPlan?.StructureSetId;
             var type = SelectedPlan?.Type;
             if (type == "PlanSum")
                 CCIsEnabled = false;
             if (type == "Plan")
                 CCIsEnabled = true;
 
-            if (courseId == null || planId == null)
+            if (courseId == null || planId == null || structureSetId == null)
                 return;
             var structures = new ObservableCollection<StructureViewModel>();
-            try
-            {
-                structures = await _esapiService.GetStructuresAsync(courseId, planId);
-            }
-            catch
-            {
-
-            }    
-            if (structures == null)
-                return;
+            structures = await _esapiService.GetStructuresAsync(courseId, planId);
 
             CollimatorModel = null;
             CouchBodyModel = null;
@@ -272,7 +263,7 @@ namespace PlanCheck
                 });
         }
 
-        private async void UpdatePQM()
+        private void UpdatePQM()
         {
             _dialogService.ShowProgressDialog("Recalculating...", PQMs.Count(),
             async progress =>

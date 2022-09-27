@@ -32,7 +32,7 @@ namespace PlanCheck
                 .Select(x => new PlanningItemViewModel(x)
                 {
                     Id = x.Id,
-                    CourseId = x.GetCourse().Id,
+                    CourseId = x.GetCourseId(),
                     Type = Extensions.GetPlanType(x),
                     CreationDateTime = Extensions.GetCreationDateTime(x),
                     StructureSetId = Extensions.GetStructureSetId(x),
@@ -72,7 +72,7 @@ namespace PlanCheck
                 var planningItem = Extensions.GetPlanningItem(context.Patient, courseId, planId);
                 var plan = (PlanSetup)planningItem;
                 var beam = plan.Beams.FirstOrDefault(x => x.Id == beamId);
-                return CollisionSummariesCalculator.GetCameraPosition(beam);
+                return CollisionCalculator.GetCameraPosition(beam);
             });
 
         public Task<Point3D> GetIsocenterAsync(string courseId, string planId, string beamId) =>
@@ -81,7 +81,7 @@ namespace PlanCheck
                 var planningItem = Extensions.GetPlanningItem(context.Patient, courseId, planId);
                 var plan = (PlanSetup)planningItem;
                 var beam = plan.Beams.FirstOrDefault(x => x.Id == beamId);
-                return CollisionSummariesCalculator.GetIsocenter(beam);
+                return CollisionCalculator.GetIsocenter(beam);
             });
 
         public Task<ObservableCollection<ErrorViewModel>> GetErrorsAsync(string courseId, string planId) =>
@@ -98,7 +98,7 @@ namespace PlanCheck
             RunAsync(context =>
             {
                 var planningItem = Extensions.GetPlanningItem(context.Patient, courseId, planId);
-                var calculator = new CollisionSummariesCalculator();
+                var calculator = new CollisionCalculator();
                 var plan = (PlanSetup)planningItem;
                 var beam = plan.Beams.FirstOrDefault(x => x.Id == beamId);
                 return calculator.CalculateBeamCollision(plan, beam);
@@ -125,7 +125,7 @@ namespace PlanCheck
                 {
 
                 }
-                return CollisionSummariesCalculator.AddCouchBodyMesh(body, couch);
+                return CollisionCalculator.AddCouchBodyMesh(body, couch);
             });
         public Task<Model3DGroup> AddFieldMeshAsync(Model3DGroup modelGroup, string courseId, string planId, string beamId, string status) =>
             RunAsync(context =>
@@ -133,7 +133,7 @@ namespace PlanCheck
                 var planningItem = Extensions.GetPlanningItem(context.Patient, courseId, planId);
                 var plan = (PlanSetup)planningItem;
                 var beam = plan.Beams.FirstOrDefault(x => x.Id == beamId);
-                return CollisionSummariesCalculator.AddFieldMesh(plan, beam, status);
+                return CollisionCalculator.AddFieldMesh(beam, status);
             });
 
         public Task<PQMViewModel[]> GetObjectivesAsync(ConstraintViewModel constraint) =>

@@ -18,12 +18,12 @@ public static class Extensions
         return plans;
     }
 
-    public static Course GetCourse(this PlanningItem plan)
+    public static string GetCourseId(this PlanningItem plan)
     {
         switch (plan)
         {
-            case PlanSetup planSetup: return planSetup.Course;
-            case PlanSum planSum: return planSum.Course;
+            case PlanSetup planSetup: return planSetup.Course.Id;
+            case PlanSum planSum: return planSum.Course.Id;
         }
 
         throw new InvalidOperationException("Unknown PlanningItem type.");
@@ -31,7 +31,7 @@ public static class Extensions
 
     public static string GetStructureSetId(this PlanningItem plan)
     {
-        try
+        if (plan.StructureSet != null)
         {
             switch (plan)
             {
@@ -41,15 +41,12 @@ public static class Extensions
 
             throw new InvalidOperationException("Unknown PlanningItem type.");
         }
-        catch
-        {
-            return "";
-        }
+        else return null;
     }
 
     public static string GetPlanImageId(this PlanningItem plan)
     {
-        try
+        if (plan.StructureSet != null)
         {
             switch (plan)
             {
@@ -59,27 +56,22 @@ public static class Extensions
 
             throw new InvalidOperationException("Unknown PlanningItem type.");
         }
-        catch
-        {
-            return "";
-        }
+        else return null;
     }
+
     public static DateTime GetPlanImageCreation(this PlanningItem plan)
     {
-        try
+        if (plan.StructureSet != null)
         {
             switch (plan)
             {
-                case PlanSetup planSetup: return (DateTime) planSetup.StructureSet.Image.CreationDateTime;
-                case PlanSum planSum: return (DateTime) planSum.StructureSet.Image.CreationDateTime;
+                case PlanSetup planSetup: return (DateTime)planSetup.StructureSet.Image.CreationDateTime;
+                case PlanSum planSum: return (DateTime)planSum.StructureSet.Image.CreationDateTime;
             }
 
             throw new InvalidOperationException("Unknown PlanningItem type.");
         }
-        catch
-        {
-            return DateTime.Now;
-        }
+        else return default;
     }
 
     public static PlanningItem GetPlanningItem(Patient patient, string courseId, string planId)

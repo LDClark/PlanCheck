@@ -126,7 +126,7 @@
     <Compile Include="ExtensionMethods\Point3DExtensions.cs" />
     <Compile Include="ExtensionMethods\Vector3DExtensions.cs" />
     <Compile Include="Helpers\AssemblyHelper.cs" />
-    <Compile Include="Calculators\CollisionSummariesCalculator.cs" />
+    <Compile Include="Calculators\CollisionCalculator.cs" />
     <Compile Include="Geometry\BoundingSphere.cs" />
     <Compile Include="Geometry\CuttingEarsTriangulator.cs" />
     <Compile Include="Geometry\LineSegment.cs" />

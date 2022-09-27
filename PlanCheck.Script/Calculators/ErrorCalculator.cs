@@ -34,31 +34,55 @@ namespace PlanCheck
         public ObservableCollection<ErrorViewModel> GetStructureSetErrors(StructureSetViewModel structureSet)
         {
             var errorGrid = new ObservableCollection<ErrorViewModel>();
-            foreach (var structure in structureSet.Structures)
+
+            if (structureSet != null)
             {
-                try
+                string description = string.Empty;
+                int severity;
+                string status = string.Empty;
+                foreach (var structure in structureSet.Structures)
                 {
                     if (structure.Code == "NormalTissue")
                     {
                         if (structure.AssignedHU != 0)
                         {
-                            var description = string.Format("Structure {0} has an assigned CT value of {1}.", structure.Id, structure.AssignedHU);
-                            var severity = 1;
-                            var status = "3 - OK";
-                            AddNewRow(description,status, severity, errorGrid);
+                            description = string.Format("Structure {0} has an assigned CT value of {1}.", structure.Id, structure.AssignedHU);
+                            severity = 1;
+                            status = "3 - OK";
+                            AddNewRow(description, status, severity, errorGrid);
                         }
                         else
                         {
-                            var description = string.Format("Structure {0} does not have an assigned CT value.", structure.Id);
-                            var severity = 1;
-                            var status = "1 - Warning";
+                            description = string.Format("Structure {0} does not have an assigned CT value.", structure.Id);
+                            severity = 1;
+                            status = "1 - Warning";
                             AddNewRow(description, status, severity, errorGrid);
                         }
                     }
                 }
-                catch
+                foreach (var structure in structureSet.Structures)
                 {
-                }          
+                    if (structure.Id.Contains("CouchSurface") == true)
+                    {
+                        double lowerLimitHU = -650;
+                        double upperLimitHU = -425;
+                        if (structure.AssignedHU <= upperLimitHU || structure.AssignedHU >= lowerLimitHU)
+                        {
+                            description = string.Format("Structure {0} has assigned HU of {1} and is within limit of {2} to {3}.", structure, structure.AssignedHU, upperLimitHU, lowerLimitHU);
+                            severity = 1;
+                            status = "3 - OK";                           
+                            AddNewRow(description, status, severity, errorGrid);
+                        }
+                        else
+                        {
+                            description = string.Format("Structure {0} has assigned HU of {1} and is outside limit of {2} to {3}.", structure, structure.AssignedHU, upperLimitHU, lowerLimitHU);
+                            severity = 1;
+                            status = "1 - Warning";                          
+                            AddNewRow(description, status, severity, errorGrid);
+                        }
+                        break;
+                    }
+                }
             }
             return errorGrid;
         }
@@ -70,23 +94,26 @@ namespace PlanCheck
             string errorStatus;
             int errorSeverity;
 
-            var imageCreationDateTime = planningItem.StructureSet.ImageCreationDateTime;
-
-            if ((planningItem.CreationDateTime - imageCreationDateTime).TotalDays > 21)
+            if (planningItem.StructureSet != null)
             {
-                error = string.Format("CT and structure data ({0}) is {1} days older than plan creation date ({2}) and outside of 21 days.", imageCreationDateTime, (planningItem.CreationDateTime - imageCreationDateTime).TotalDays.ToString("0"), planningItem.CreationDateTime);
-                errorStatus = "1 - Warning";
-                errorSeverity = 1;
-                AddNewRow(error, errorStatus, errorSeverity, errorGrid);
-            }
-            else
-            {
-                error = string.Format("CT and structure data ({0}) is {1} days older than plan creation date ({2}) and within 21 days.", imageCreationDateTime, (planningItem.CreationDateTime - imageCreationDateTime).TotalDays.ToString("0"), planningItem.CreationDateTime);
-                errorStatus = "3 - OK";
-                errorSeverity = 1;
-                AddNewRow(error, errorStatus, errorSeverity, errorGrid);
-            }
+                var imageCreationDateTime = planningItem.StructureSet.ImageCreationDateTime;
 
+                if ((planningItem.CreationDateTime - imageCreationDateTime).TotalDays > 21)
+                {
+                    error = string.Format("CT and structure data ({0}) is {1} days older than plan creation date ({2}) and outside of 21 days.", imageCreationDateTime, (planningItem.CreationDateTime - imageCreationDateTime).TotalDays.ToString("0"), planningItem.CreationDateTime);
+                    errorStatus = "1 - Warning";
+                    errorSeverity = 1;
+                    AddNewRow(error, errorStatus, errorSeverity, errorGrid);
+                }
+                else
+                {
+                    error = string.Format("CT and structure data ({0}) is {1} days older than plan creation date ({2}) and within 21 days.", imageCreationDateTime, (planningItem.CreationDateTime - imageCreationDateTime).TotalDays.ToString("0"), planningItem.CreationDateTime);
+                    errorStatus = "3 - OK";
+                    errorSeverity = 1;
+                    AddNewRow(error, errorStatus, errorSeverity, errorGrid);
+                }
+            }
+            
             if (planningItem.IsDoseValid)
             {
                 if (planningItem.DoseMax3D >= 115)
@@ -125,30 +152,6 @@ namespace PlanCheck
                 errorStatus = "1 - Warning";
                 errorSeverity = 1;
                 AddNewRow(error, errorStatus, errorSeverity, errorGrid);
-            }
-
-            foreach (var structure in planningItem.StructureSet.Structures)
-            {
-                if (structure.Id.Contains("CouchSurface") == true)
-                {
-                    double lowerLimitHU = -650;
-                    double upperLimitHU = -425;
-                    if (structure.AssignedHU <= upperLimitHU || structure.AssignedHU >= lowerLimitHU)
-                    {
-                        error = string.Format("Structure {0} has assigned HU of {1} and is within limit of {2} to {3}.", structure, structure.AssignedHU, upperLimitHU, lowerLimitHU);
-                        errorStatus = "3 - OK";
-                        errorSeverity = 1;
-                        AddNewRow(error, errorStatus, errorSeverity, errorGrid);
-                    }
-                    else
-                    {
-                        error = string.Format("Structure {0} has assigned HU of {1} and is outside limit of {2} to {3}.", structure, structure.AssignedHU, upperLimitHU, lowerLimitHU);
-                        errorStatus = "1 - Warning";
-                        errorSeverity = 1;
-                        AddNewRow(error, errorStatus, errorSeverity, errorGrid);
-                    }
-                    break;
-                }
             }
 
             if (planningItem.TargetVolumeId == "")

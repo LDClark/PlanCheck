@@ -43,8 +43,11 @@ namespace PlanCheck
                 Type = "Plan";
                 IdWithCourseAndType = CourseId + "/" + Id + " (" + Type + ")";
                 Object = planSetup;
-                StructureSet = new StructureSetViewModel(planSetup.StructureSet);
-                Image = planSetup.StructureSet.Image;
+                if (StructureSet != null)
+                {
+                    StructureSet = new StructureSetViewModel(planSetup.StructureSet);
+                    Image = planSetup.StructureSet.Image;
+                }
                 CreationDateTime = (DateTime) planSetup.CreationDateTime;
                 TargetVolumeId = planSetup.TargetVolumeID;
                 TotalDose = planSetup.TotalDose.Dose;
@@ -65,8 +68,11 @@ namespace PlanCheck
                 Type = "PlanSum";
                 IdWithCourseAndType = CourseId + "/" + Id + " (" + Type + ")";
                 Object = planSum;
-                StructureSet = new StructureSetViewModel(planSum.StructureSet);
-                Image = planSum.StructureSet.Image;
+                if (StructureSet != null)
+                {
+                    StructureSet = new StructureSetViewModel(planSum.StructureSet);
+                    Image = planSum.StructureSet.Image;
+                }
                 CreationDateTime = (DateTime)planSum.HistoryDateTime;
                 foreach (var planSetup in planSum.PlanSetups)
                 {
