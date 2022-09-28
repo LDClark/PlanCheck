@@ -6,7 +6,6 @@
         xmlns:cm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:l="clr-namespace:PlanCheck"
-        xmlns:cmd="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Platform"
         mc:Ignorable="d"
         Title="PlanCheck"
         Background="Black"
@@ -25,7 +24,6 @@
                 <PropertyGroupDescription PropertyName="ConstraintPath" />
             </CollectionViewSource.GroupDescriptions>
         </CollectionViewSource>
-        <l:UnderscoreConverter x:Key="UnderscoreConverter" />
     </Window.Resources>
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
@@ -65,7 +63,7 @@
                             </i:Interaction.Triggers>
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding PlanIdWithFractionation, Converter={StaticResource UnderscoreConverter}}"/>
+                                    <TextBlock Text="{Binding PlanIdWithFractionation}"/>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                             <ListBox.GroupStyle>
@@ -73,9 +71,9 @@
                                     <GroupStyle.HeaderTemplate>
                                         <DataTemplate>
                                             <TextBlock
-                                            Text="{Binding Name, StringFormat=Course: \{0\}, Converter={StaticResource UnderscoreConverter}}"
-                                            FontWeight="Bold"
-                                            Foreground="Aqua"/>
+                                                Text="{Binding Name, StringFormat=Course: \{0\}}"
+                                                FontWeight="Bold"
+                                                Foreground="Aqua"/>
                                         </DataTemplate>
                                     </GroupStyle.HeaderTemplate>
                                     <GroupStyle.ContainerStyle>
@@ -243,7 +241,7 @@
                       AutoGenerateColumns="False"
                       HorizontalAlignment="Stretch"
                       VerticalAlignment="Stretch"
-                      ItemsSource="{Binding PQMs}"
+                      ItemsSource="{Binding PQMs,NotifyOnSourceUpdated=True, Mode=TwoWay}"
                       RowHeight="23"
                       ColumnWidth="*"
                       Background="Black"
@@ -263,7 +261,7 @@
                                               >
                                         <i:Interaction.Triggers>
                                             <i:EventTrigger EventName="SelectionChanged">
-                                                <cmd:EventToCommand Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.UpdatePQMCommand}"/>
+                                                <i:InvokeCommandAction Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.UpdatePQMCommand}"/>
                                             </i:EventTrigger>
                                         </i:Interaction.Triggers>
                                         <ComboBox.ItemTemplate>

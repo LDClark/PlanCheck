@@ -154,7 +154,7 @@ namespace PlanCheck
             string firstFileName = constraintDir.GetFiles().FirstOrDefault().FullName;
             string firstConstraintFilePath = Path.Combine(constraintDir.ToString(), firstFileName);
             Constraints = new ConstraintListViewModel(constraintDir.ToString()).ConstraintList;
-            SelectedConstraint = new ConstraintViewModel(firstConstraintFilePath);            
+            SelectedConstraint = new ConstraintViewModel(firstConstraintFilePath);
             Plans = await _esapiService.GetPlansAsync();
         }
 
