@@ -19,7 +19,7 @@ namespace PlanCheck
         /// <summary>
         /// The direction
         /// </summary>
-        private Vector3D direction;
+        private System.Windows.Media.Media3D.Vector3D direction;
 
         /// <summary>
         /// The origin
@@ -42,7 +42,7 @@ namespace PlanCheck
         /// <param name="d">
         /// The sender.
         /// </param>
-        public Ray3D(Point3D o, Vector3D d)
+        public Ray3D(Point3D o, System.Windows.Media.Media3D.Vector3D d)
         {
             this.Origin = o;
             this.Direction = d;
@@ -67,7 +67,7 @@ namespace PlanCheck
         /// Gets or sets the direction.
         /// </summary>
         /// <value>The direction.</value>
-        public Vector3D Direction
+        public System.Windows.Media.Media3D.Vector3D Direction
         {
             get
             {
@@ -109,7 +109,7 @@ namespace PlanCheck
         public Point3D GetNearest(Point3D p3)
         {
             return this.origin
-                   + (Vector3D.DotProduct(p3 - this.origin, this.direction) / this.direction.LengthSquared
+                   + (System.Windows.Media.Media3D.Vector3D.DotProduct(p3 - this.origin, this.direction) / this.direction.LengthSquared
                       * this.direction);
         }
 
@@ -125,7 +125,7 @@ namespace PlanCheck
         /// <returns>
         /// The intersection point.
         /// </returns>
-        public Point3D? PlaneIntersection(Point3D position, Vector3D normal)
+        public Point3D? PlaneIntersection(Point3D position, System.Windows.Media.Media3D.Vector3D normal)
         {
             Point3D intersection;
             if (this.PlaneIntersection(position, normal, out intersection))
@@ -145,17 +145,17 @@ namespace PlanCheck
         /// <returns>
         /// True if a intersection was found.
         /// </returns>
-        public bool PlaneIntersection(Point3D position, Vector3D normal, out Point3D intersection)
+        public bool PlaneIntersection(Point3D position, System.Windows.Media.Media3D.Vector3D normal, out Point3D intersection)
         {
             // http://paulbourke.net/geometry/planeline/
-            double dn = Vector3D.DotProduct(normal, this.Direction);
+            double dn = System.Windows.Media.Media3D.Vector3D.DotProduct(normal, this.Direction);
             if (dn.Equals(0))
             {
                 intersection = default(Point3D);
                 return false;
             }
 
-            double u = Vector3D.DotProduct(normal, position - this.origin) / dn;
+            double u = System.Windows.Media.Media3D.Vector3D.DotProduct(normal, position - this.origin) / dn;
             intersection = this.Origin + (u * this.direction);
             return true;
         }

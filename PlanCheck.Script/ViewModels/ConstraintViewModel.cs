@@ -1,4 +1,6 @@
+using System;
 using System.IO;
+using System.Windows;
 
 namespace PlanCheck
 {
@@ -10,7 +12,7 @@ namespace PlanCheck
         public ConstraintViewModel(string constraintPath)
         {
             ConstraintName = Path.GetFileNameWithoutExtension(constraintPath);
-            ConstraintPath = constraintPath;
+            ConstraintPath = constraintPath;          
         }
     }
 }

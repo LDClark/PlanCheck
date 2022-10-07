@@ -19,7 +19,7 @@ namespace PlanCheck
         /// <summary>
         /// The normal.
         /// </summary>
-        private Vector3D normal;
+        private System.Windows.Media.Media3D.Vector3D normal;
 
         /// <summary>
         /// The position.
@@ -44,7 +44,7 @@ namespace PlanCheck
         /// <param name="n">
         /// The n.
         /// </param>
-        public Plane3D(Point3D p0, Vector3D n)
+        public Plane3D(Point3D p0, System.Windows.Media.Media3D.Vector3D n)
         {
             this.Position = p0;
             this.Normal = n;
@@ -54,7 +54,7 @@ namespace PlanCheck
         /// Gets or sets the normal.
         /// </summary>
         /// <value>The normal.</value>
-        public Vector3D Normal
+        public System.Windows.Media.Media3D.Vector3D Normal
         {
             get
             {
@@ -100,8 +100,8 @@ namespace PlanCheck
         {
             // http://en.wikipedia.org/wiki/Line-plane_intersection
             var l = lb - la;
-            double a = Vector3D.DotProduct(this.position - la, this.normal);
-            double b = Vector3D.DotProduct(l, this.normal);
+            double a = System.Windows.Media.Media3D.Vector3D.DotProduct(this.position - la, this.normal);
+            double b = System.Windows.Media.Media3D.Vector3D.DotProduct(l, this.normal);
             if (a.Equals(0) && b.Equals(0))
             {
                 return null;

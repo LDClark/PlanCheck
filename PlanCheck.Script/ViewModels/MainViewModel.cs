@@ -12,6 +12,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -150,11 +151,8 @@ namespace PlanCheck
 
         private async void Start()
         {
-            DirectoryInfo constraintDir = new DirectoryInfo(Path.Combine(AssemblyHelper.GetAssemblyDirectory(), "ConstraintTemplates"));
-            string firstFileName = constraintDir.GetFiles().FirstOrDefault().FullName;
-            string firstConstraintFilePath = Path.Combine(constraintDir.ToString(), firstFileName);
-            Constraints = new ConstraintListViewModel(constraintDir.ToString()).ConstraintList;
-            SelectedConstraint = new ConstraintViewModel(firstConstraintFilePath);
+            Constraints = new ConstraintListViewModel().ConstraintList;
+            SelectedConstraint = Constraints.First();
             Plans = await _esapiService.GetPlansAsync();
         }
 
@@ -173,86 +171,59 @@ namespace PlanCheck
                 return;
             var structures = new ObservableCollection<StructureViewModel>();
             structures = await _esapiService.GetStructuresAsync(courseId, planId);
-
             CollimatorModel = null;
             CouchBodyModel = null;
             CollisionSummaries = null;
 
-            // make sure the workbook template exists
-            if (!System.IO.File.Exists(SelectedConstraint.ConstraintPath))
-            {
-                System.Windows.MessageBox.Show(string.Format("The template file '{0}' chosen does not exist.", SelectedConstraint.ConstraintPath));
-            }
             PQMViewModel[] pqms = ObjectiveViewModel.GetObjectives(SelectedConstraint);
 
             _dialogService.ShowProgressDialog("Calculating dose metrics...", structures.Count(),
-                async progress =>
-                {
+                async progress => {
                     PQMs = new ObservableCollection<PQMViewModel>();
                     foreach (var structure in structures)
                     {
-                        try
+                        foreach (var pqm in pqms.Where(i => i != null))
                         {
-                            foreach (var pqm in pqms.Where(i => i != null))
+                            string templateSelected = string.Empty;
+                            if (structure.Id.ToUpper().CompareTo(pqm.TemplateId.ToUpper()) == 0) //id matches
                             {
-                                string templateSelected = "";
-                                if (structure.Id.ToUpper().CompareTo(pqm.TemplateId.ToUpper()) == 0) //id matches
-                                {
+                                if (structure.Code != null)
+                                    templateSelected = pqm.TemplateId + " : " + structure.Code; //add in the structure code
+                                else
                                     templateSelected = pqm.TemplateId;
+                                await GetPQM(courseId, planId, structure, pqm, templateSelected, structures);
+                                continue;
+                            }
+                            else
+                            {
+                                foreach (string alias in pqm.TemplateAliases)
+                                {
+                                    if (structure.Id.ToUpper().CompareTo(alias.ToUpper()) == 0) //alias matches
+                                    {
+                                        if (structure.Code != null)
+                                            templateSelected = pqm.TemplateId + "|" + alias + " : " + structure.Code; //add in the structure code and alias
+                                        else
+                                            templateSelected = alias;
+                                        await GetPQM(courseId, planId, structure, pqm, templateSelected, structures);
+                                        continue;
+                                    }
                                 }
-                                else if (structure.Code != null)
+                            }
+                            if (structure.Code != null)
+                            {
+                                if (PQMs.Any(x => x.StructureNameWithCode != structure.NameWithCode)) //check to see if structure has already been found by name
                                 {
                                     foreach (var code in pqm.TemplateCodes)
                                         if (code == structure.Code) //code matches
                                         {
-                                            templateSelected = code;
+                                            templateSelected = pqm.TemplateId + " : " + code; //add in the PQM id
+                                            await GetPQM(courseId, planId, structure, pqm, templateSelected, structures);
+                                            continue;
                                         }
                                 }
-                                else
-                                {
-                                    foreach (string id in pqm.TemplateAliases)
-                                    {
-                                        if (structure.Id.ToUpper().CompareTo(id.ToUpper()) == 0) //id matches alias
-                                        {
-                                            templateSelected = id;
-                                        }
-                                    }
-                                }
-                                if (templateSelected != structure.Code)
-                                {
-                                    if (structure.Id.ToUpper().CompareTo(templateSelected.ToUpper()) != 0) //template code or name not found
-                                        continue;
-                                }
-                                else
-                                    templateSelected = pqm.TemplateId + " : " + templateSelected; // if template code matches, fill in the PQM id
-
-                                string achieved = await _esapiService.CalculateMetricDoseAsync(courseId, planId, structure.Id, structure.Code, pqm.DVHObjective);
-                                string met = await _esapiService.EvaluateMetricDoseAsync(achieved, pqm.Goal, pqm.Variation);
-                                var tuple = PQMColors.GetAchievedRatio(structure, pqm.Goal, pqm.DVHObjective, achieved);
-                                var ratio = tuple.Item2;
-                                var color = tuple.Item1;
-                                var percentage = ratio * 100;
-                                PQMs.Add(new PQMViewModel
-                                {
-                                    TemplateId = templateSelected,
-                                    StructureList = structures,
-                                    SelectedStructure = structure,
-                                    StructureNameWithCode = structure.NameWithCode,
-                                    StructureVolume = structure.VolumeValue,
-                                    AchievedPercentageOfGoal = percentage,
-                                    AchievedColor = color,
-                                    DVHObjective = pqm.DVHObjective,
-                                    Goal = pqm.Goal,
-                                    Met = met,
-                                    Achieved = achieved,
-                                    PlanId = SelectedPlan.Id
-                                });
-                                progress.Increment();
-                            }
+                            }                           
                         }
-                        catch
-                        {
-                        }
+                        progress.Increment();
                     }
                 });
 
@@ -263,9 +234,36 @@ namespace PlanCheck
                 });
         }
 
+        private async Task GetPQM(string courseId, string planId, StructureViewModel structure, PQMViewModel pqm, 
+            string templateSelected, ObservableCollection<StructureViewModel> structures)
+        {
+            string achieved = await _esapiService.CalculateMetricDoseAsync(courseId, planId, structure.Id, structure.Code, pqm.DVHObjective);
+            string met = await _esapiService.EvaluateMetricDoseAsync(achieved, pqm.Goal, pqm.Variation);
+            var tuple = PQMColors.GetAchievedRatio(structure, pqm.Goal, pqm.DVHObjective, achieved);
+            var ratio = tuple.Item2;
+            var color = tuple.Item1;
+            var percentage = ratio * 100;
+            PQMs.Add(new PQMViewModel
+            {
+                TemplateId = templateSelected,
+                StructureList = structures,
+                SelectedStructure = structure,
+                StructureNameWithCode = structure.NameWithCode,
+                StructureVolume = structure.VolumeValue,
+                AchievedPercentageOfGoal = percentage,
+                AchievedColor = color,
+                DVHObjective = pqm.DVHObjective,
+                Goal = pqm.Goal,
+                Met = met,
+                Achieved = achieved,
+                PlanId = planId,
+                CourseId = courseId,
+            });
+        }
+
         private void UpdatePQM()
         {
-            _dialogService.ShowProgressDialog("Recalculating...", PQMs.Count(),
+            _dialogService.ShowProgressDialog("Recalculating PQMs...", PQMs.Count(),
             async progress =>
             {
                 foreach (var pqm in PQMs)
@@ -300,32 +298,6 @@ namespace PlanCheck
             {
                 var beamIds = await _esapiService.GetBeamIdsAsync(courseId, planId);
 
-                _dialogService.ShowProgressDialog("Calculating collisions...", beamIds.Length,
-                async progress =>
-                {
-                    CollisionSummaries = new ObservableCollection<CollisionCheckViewModel>();
-                    foreach (var beamId in beamIds)
-                    {
-                        var collisionSummary = await _esapiService.GetBeamCollisionsAsync(courseId, planId, beamId);
-                        CollisionSummaries.Add(collisionSummary);
-                        progress.Increment();
-                    }
-                });
-
-                _dialogService.ShowProgressDialog("Getting camera position...", 1,
-                async progress =>
-                {
-                    CameraPosition = await _esapiService.GetCameraPositionAsync(courseId, planId, beamIds.FirstOrDefault());
-                    progress.Increment();
-                });
-
-                _dialogService.ShowProgressDialog("Getting isocenter...", 1,
-                async progress =>
-                {
-                    Isoctr = await _esapiService.GetIsocenterAsync(courseId, planId, beamIds.FirstOrDefault());
-                    progress.Increment();
-                });
-
                 _dialogService.ShowProgressDialog("Adding body and couch...", 1,
                 async progress =>
                 {
@@ -335,22 +307,36 @@ namespace PlanCheck
                     progress.Increment();
                 });
 
-                _dialogService.ShowProgressDialog("Adding models...", beamIds.Length,
+                _dialogService.ShowProgressDialog("Getting camera position...", 1,
                     async progress =>
                     {
-                        UpDir = new Vector3D(0, -1, 0);
-                        LookDir = new Vector3D(0, 0, 1);
-                        CollimatorModel = new Model3DGroup();
-                        int i = 0;
-                        foreach (var beamId in beamIds)
-                        {
-                            var status = CollisionSummaries[i].Status;
-                            var fieldModel = await _esapiService.AddFieldMeshAsync(CollimatorModel, courseId, planId, beamId, status);
-                            CollimatorModel.Children.Add(fieldModel);
-                            progress.Increment();
-                            i++;
-                        }
+                        CameraPosition = await _esapiService.GetCameraPositionAsync(courseId, planId, beamIds.FirstOrDefault());
+                        progress.Increment();
                     });
+
+                _dialogService.ShowProgressDialog("Getting isocenter...", 1,
+                async progress =>
+                {
+                    Isoctr = await _esapiService.GetIsocenterAsync(courseId, planId, beamIds.FirstOrDefault());
+                    progress.Increment();
+                });
+
+                _dialogService.ShowProgressDialog("Calculating collisions...", beamIds.Length,
+                async progress =>
+                {
+                    CollisionSummaries = new ObservableCollection<CollisionCheckViewModel>();
+                    UpDir = new Vector3D(0, -1, 0);
+                    LookDir = new Vector3D(0, 0, 1);
+                    CollimatorModel = new Model3DGroup();
+                    foreach (var beamId in beamIds)
+                    {
+                        var collisionSummary = await _esapiService.GetBeamCollisionsAsync(courseId, planId, beamId);
+                        CollisionSummaries.Add(collisionSummary);
+                        var collimatorModel = await _esapiService.AddFieldMeshAsync(CollimatorModel, courseId, planId, beamId, collisionSummary.Status);
+                        CollimatorModel.Children.Add(collimatorModel);
+                        progress.Increment();
+                    }
+                });
             }
         }
 
@@ -361,7 +347,6 @@ namespace PlanCheck
 
             int numPqms = PQMs.Count();
             ReportPQM[] reportPQMList = new ReportPQM[numPqms];
-            var reportPQM = new ReportPQM();
             int i = 0;
             foreach (var pqm in PQMs)
             {

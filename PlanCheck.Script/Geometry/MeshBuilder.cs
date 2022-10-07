@@ -488,7 +488,7 @@ namespace PlanCheck
             normals = new Vector3DCollection(positions.Count);
             for (int i = 0; i < positions.Count; i++)
             {
-                normals.Add(new Vector3D(0, 0, 0));
+                normals.Add(new System.Windows.Media.Media3D.Vector3D(0, 0, 0));
             }
             for (int t = 0; t < triangleIndices.Count; t += 3)
             {
@@ -556,7 +556,7 @@ namespace PlanCheck
         public static void ComputeTangents(Point3DCollection positions, Vector3DCollection normals, PointCollection textureCoordinates, Int32Collection triangleIndices,
             out Vector3DCollection tangents, out Vector3DCollection bitangents)
         {
-            var tan1 = new Vector3D[positions.Count];
+            var tan1 = new System.Windows.Media.Media3D.Vector3D[positions.Count];
             for (int t = 0; t < triangleIndices.Count; t += 3)
             {
                 var i1 = triangleIndices[t];
@@ -579,7 +579,7 @@ namespace PlanCheck
                 var t1 = w2.Y - w1.Y;
                 var t2 = w3.Y - w1.Y;
                 var r = 1.0f / (s1 * t2 - s2 * t1);
-                var udir = new Vector3D((t2 * x1 - t1 * x2) * r, (t2 * y1 - t1 * y2) * r, (t2 * z1 - t1 * z2) * r);
+                var udir = new System.Windows.Media.Media3D.Vector3D((t2 * x1 - t1 * x2) * r, (t2 * y1 - t1 * y2) * r, (t2 * z1 - t1 * z2) * r);
                 tan1[i1] += udir;
                 tan1[i2] += udir;
                 tan1[i3] += udir;
@@ -609,7 +609,7 @@ namespace PlanCheck
         public static void ComputeTangentsQuads(Point3DCollection positions, Vector3DCollection normals, PointCollection textureCoordinates, Int32Collection indices,
             out Vector3DCollection tangents, out Vector3DCollection bitangents)
         {
-            var tan1 = new Vector3D[positions.Count];
+            var tan1 = new System.Windows.Media.Media3D.Vector3D[positions.Count];
             for (int t = 0; t < indices.Count; t += 4)
             {
                 var i1 = indices[t];
@@ -635,7 +635,7 @@ namespace PlanCheck
                 var t1 = w2.Y - w1.Y;
                 var t2 = w4.Y - w1.Y;
                 var r = 1.0f / (s1 * t2 - s2 * t1);
-                var udir = new Vector3D((t2 * x1 - t1 * x2) * r, (t2 * y1 - t1 * y2) * r, (t2 * z1 - t1 * z2) * r);
+                var udir = new System.Windows.Media.Media3D.Vector3D((t2 * x1 - t1 * x2) * r, (t2 * y1 - t1 * y2) * r, (t2 * z1 - t1 * z2) * r);
                 tan1[i1] += udir;
                 tan1[i2] += udir;
                 tan1[i3] += udir;
@@ -842,7 +842,7 @@ namespace PlanCheck
         /// </param>
         public void AddBox(Point3D center, double xlength, double ylength, double zlength, BoxFaces faces)
         {
-            this.AddBox(center, new Vector3D(1, 0, 0), new Vector3D(0, 1, 0), xlength, ylength, zlength, faces);
+            this.AddBox(center, new System.Windows.Media.Media3D.Vector3D(1, 0, 0), new System.Windows.Media.Media3D.Vector3D(0, 1, 0), xlength, ylength, zlength, faces);
         }
         /// <summary>
         /// Adds a box with the specified faces, aligned with the specified axes.
@@ -854,7 +854,7 @@ namespace PlanCheck
         /// <param name="ylength">The length of the box along the Y axis.</param>
         /// <param name="zlength">The length of the box along the Z axis.</param>
         /// <param name="faces">The faces to include.</param>
-        public void AddBox(Point3D center, Vector3D x, Vector3D y, double xlength, double ylength, double zlength, BoxFaces faces = BoxFaces.All)
+        public void AddBox(Point3D center, System.Windows.Media.Media3D.Vector3D x, System.Windows.Media.Media3D.Vector3D y, double xlength, double ylength, double zlength, BoxFaces faces = BoxFaces.All)
         {
             var z = SharedFunctions.CrossProduct(ref x, ref y);
             if ((faces & BoxFaces.Front) == BoxFaces.Front)
@@ -917,7 +917,7 @@ namespace PlanCheck
         /// <remarks>
         /// See http://en.wikipedia.org/wiki/Cone_(geometry).
         /// </remarks>
-        public void AddCone(Point3D origin, Vector3D direction,
+        public void AddCone(Point3D origin, System.Windows.Media.Media3D.Vector3D direction,
             double baseRadius, double topRadius, double height,
             bool baseCap, bool topCap, int thetaDiv)
         {
@@ -977,7 +977,7 @@ namespace PlanCheck
         /// <param name="height">
         /// The height of the face.
         /// </param>
-        public void AddCubeFace(Point3D center, Vector3D normal, Vector3D up, double dist, double width, double height)
+        public void AddCubeFace(Point3D center, System.Windows.Media.Media3D.Vector3D normal, System.Windows.Media.Media3D.Vector3D up, double dist, double width, double height)
         {
             var right = SharedFunctions.CrossProduct(ref normal, ref up);
             var n = normal * (DoubleOrSingle)dist / 2;
@@ -1067,7 +1067,7 @@ namespace PlanCheck
         /// </remarks>
         public void AddCylinder(Point3D p1, Point3D p2, double diameter, int thetaDiv)
         {
-            Vector3D n = p2 - p1;
+            System.Windows.Media.Media3D.Vector3D n = p2 - p1;
             var l = SharedFunctions.Length(ref n);
             n.Normalize();
             this.AddCone(p1, n, diameter / 2, diameter / 2, l, false, false, thetaDiv);
@@ -1098,7 +1098,7 @@ namespace PlanCheck
         /// </remarks>
         public void AddCylinder(Point3D p1, Point3D p2, double radius = 1, int thetaDiv = 32, bool cap1 = true, bool cap2 = true)
         {
-            Vector3D n = p2 - p1;
+            System.Windows.Media.Media3D.Vector3D n = p2 - p1;
             var l = SharedFunctions.Length(ref n);
             n.Normalize();
             this.AddCone(p1, n, radius, radius, l, cap1, cap2, thetaDiv);
@@ -1116,7 +1116,7 @@ namespace PlanCheck
         /// https://en.wikipedia.org/wiki/Pentagon
         /// https://en.wikipedia.org/wiki/Isosceles_triangle
         /// </remarks>
-        public void AddDodecahedron(Point3D center, Vector3D forward, Vector3D up, double sideLength)
+        public void AddDodecahedron(Point3D center, System.Windows.Media.Media3D.Vector3D forward, System.Windows.Media.Media3D.Vector3D up, double sideLength)
         {
             // If points already exist in the MeshBuilder
             var positionsCount = this.positions.Count;
@@ -1303,7 +1303,7 @@ namespace PlanCheck
 
                     if (this.normals != null)
                     {
-                        var n = new Vector3D(x, y, z);
+                        var n = new System.Windows.Media.Media3D.Vector3D(x, y, z);
                         this.normals.Add(n);
                     }
 
@@ -1335,7 +1335,7 @@ namespace PlanCheck
         /// <remarks>
         /// The y-axis is determined by the cross product between the specified x-axis and the p1-origin vector.
         /// </remarks>
-        public void AddExtrudedGeometry(IList<Point> points, Vector3D xaxis, Point3D p0, Point3D p1)
+        public void AddExtrudedGeometry(IList<Point> points, System.Windows.Media.Media3D.Vector3D xaxis, Point3D p0, Point3D p1)
         {
             var p10 = p1 - p0;
             var ydirection = SharedFunctions.CrossProduct(ref xaxis, ref p10);
@@ -1388,12 +1388,12 @@ namespace PlanCheck
                 new Point3D(1,1,1),
                 new Point3D(1,0,1),
             };
-            var normals = new Vector3D[]
+            var normals = new System.Windows.Media.Media3D.Vector3D[]
             {
-                new Vector3D(0,0,1),
-                new Vector3D(0,0,1),
-                new Vector3D(0,0,1),
-                new Vector3D(0,0,1),
+                new System.Windows.Media.Media3D.Vector3D(0,0,1),
+                new System.Windows.Media.Media3D.Vector3D(0,0,1),
+                new System.Windows.Media.Media3D.Vector3D(0,0,1),
+                new System.Windows.Media.Media3D.Vector3D(0,0,1),
             };
             int i0 = this.positions.Count;
             var indices = new int[]
@@ -1438,12 +1438,12 @@ namespace PlanCheck
                 new Point3D(1,0,0), //p3
                 new Point3D(1,1,0), //p2
             };
-            var normals = new Vector3D[]
+            var normals = new System.Windows.Media.Media3D.Vector3D[]
             {
-                -new Vector3D(0,0,1),
-                -new Vector3D(0,0,1),
-                -new Vector3D(0,0,1),
-                -new Vector3D(0,0,1),
+                -new System.Windows.Media.Media3D.Vector3D(0,0,1),
+                -new System.Windows.Media.Media3D.Vector3D(0,0,1),
+                -new System.Windows.Media.Media3D.Vector3D(0,0,1),
+                -new System.Windows.Media.Media3D.Vector3D(0,0,1),
             };
 
             int i0 = this.positions.Count;
@@ -1489,12 +1489,12 @@ namespace PlanCheck
                 new Point3D(1,1,1), //p2   
                 new Point3D(1,1,0), //p3                             
             };
-            var normals = new Vector3D[]
+            var normals = new System.Windows.Media.Media3D.Vector3D[]
             {
-                new Vector3D(1,0,0),
-                new Vector3D(1,0,0),
-                new Vector3D(1,0,0),
-                new Vector3D(1,0,0),
+                new System.Windows.Media.Media3D.Vector3D(1,0,0),
+                new System.Windows.Media.Media3D.Vector3D(1,0,0),
+                new System.Windows.Media.Media3D.Vector3D(1,0,0),
+                new System.Windows.Media.Media3D.Vector3D(1,0,0),
             };
 
             int i0 = this.positions.Count;
@@ -1540,12 +1540,12 @@ namespace PlanCheck
                 new Point3D(0,1,0), //p3 
                 new Point3D(0,1,1), //p2               
             };
-            var normals = new Vector3D[]
+            var normals = new System.Windows.Media.Media3D.Vector3D[]
             {
-                -new Vector3D(1,0,0),
-                -new Vector3D(1,0,0),
-                -new Vector3D(1,0,0),
-                -new Vector3D(1,0,0),
+                -new System.Windows.Media.Media3D.Vector3D(1,0,0),
+                -new System.Windows.Media.Media3D.Vector3D(1,0,0),
+                -new System.Windows.Media.Media3D.Vector3D(1,0,0),
+                -new System.Windows.Media.Media3D.Vector3D(1,0,0),
             };
 
             int i0 = this.positions.Count;
@@ -1591,12 +1591,12 @@ namespace PlanCheck
                 new Point3D(0,1,1), //p1
                 new Point3D(0,1,0), //p0
             };
-            var normals = new Vector3D[]
+            var normals = new System.Windows.Media.Media3D.Vector3D[]
             {
-                new Vector3D(0,1,0),
-                new Vector3D(0,1,0),
-                new Vector3D(0,1,0),
-                new Vector3D(0,1,0),
+                new System.Windows.Media.Media3D.Vector3D(0,1,0),
+                new System.Windows.Media.Media3D.Vector3D(0,1,0),
+                new System.Windows.Media.Media3D.Vector3D(0,1,0),
+                new System.Windows.Media.Media3D.Vector3D(0,1,0),
             };
 
             int i0 = this.positions.Count;
@@ -1642,12 +1642,12 @@ namespace PlanCheck
                 new Point3D(1,0,1), //p2
                 new Point3D(1,0,0), //p3
             };
-            var normals = new Vector3D[]
+            var normals = new System.Windows.Media.Media3D.Vector3D[]
             {
-                -new Vector3D(0,1,0),
-                -new Vector3D(0,1,0),
-                -new Vector3D(0,1,0),
-                -new Vector3D(0,1,0),
+                -new System.Windows.Media.Media3D.Vector3D(0,1,0),
+                -new System.Windows.Media.Media3D.Vector3D(0,1,0),
+                -new System.Windows.Media.Media3D.Vector3D(0,1,0),
+                -new System.Windows.Media.Media3D.Vector3D(0,1,0),
             };
 
             int i0 = this.positions.Count;
@@ -1689,7 +1689,7 @@ namespace PlanCheck
         /// <param name="p0">The start origin of the extruded surface.</param>
         /// <param name="p1">The end origin of the extruded surface.</param>
         /// <remarks>The y-axis is determined by the cross product between the specified x-axis and the p1-origin vector.</remarks>
-        public void AddExtrudedSegments(IList<Point> points, Vector3D axisX, Point3D p0, Point3D p1)
+        public void AddExtrudedSegments(IList<Point> points, System.Windows.Media.Media3D.Vector3D axisX, Point3D p0, Point3D p1)
         {
             if (points.Count % 2 != 0)
             {
@@ -1757,7 +1757,7 @@ namespace PlanCheck
         /// </remarks>
         public void AddLoftedGeometry(
             IList<IList<Point3D>> positionsList,
-            IList<IList<Vector3D>> normalList,
+            IList<IList<System.Windows.Media.Media3D.Vector3D>> normalList,
             IList<IList<Point>> textureCoordinateList)
         {
             int index0 = this.positions.Count;
@@ -1834,7 +1834,7 @@ namespace PlanCheck
         /// <param name="textureCoordinate">
         /// The texture coordinate.
         /// </param>
-        public void AddNode(Point3D position, Vector3D normal, Point textureCoordinate)
+        public void AddNode(Point3D position, System.Windows.Media.Media3D.Vector3D normal, Point textureCoordinate)
         {
             this.positions.Add(position);
 
@@ -1857,7 +1857,7 @@ namespace PlanCheck
         /// <param name="sideLength">Length of the side.</param>
         /// <param name="height">The half height of the octahedron.</param>
         /// <remarks>See <a href="http://en.wikipedia.org/wiki/Octahedron">Octahedron</a>.</remarks>
-        public void AddOctahedron(Point3D center, Vector3D forward, Vector3D up, double sideLength, double height)
+        public void AddOctahedron(Point3D center, System.Windows.Media.Media3D.Vector3D forward, System.Windows.Media.Media3D.Vector3D up, double sideLength, double height)
         {
             var right = SharedFunctions.CrossProduct(ref forward, ref up);
             var n = forward * (DoubleOrSingle)sideLength / 2;
@@ -1940,7 +1940,7 @@ namespace PlanCheck
         /// <param name="thetaDiv">
         /// The number of divisions around the cylinders.
         /// </param>
-        public void AddPipes(IList<Vector3D> points, IList<int> edges, double diameter = 1, int thetaDiv = 32)
+        public void AddPipes(IList<System.Windows.Media.Media3D.Vector3D> points, IList<int> edges, double diameter = 1, int thetaDiv = 32)
         {
             for (int i = 0; i < edges.Count - 1; i += 2)
             {
@@ -1954,7 +1954,7 @@ namespace PlanCheck
         /// <param name="axisX">The x axis.</param>
         /// <param name="axisY">The y axis.</param>
         /// <param name="origin">The origin.</param>
-        public void AddPolygon(IList<Point> points, Vector3D axisX, Vector3D axisY, Point3D origin)
+        public void AddPolygon(IList<Point> points, System.Windows.Media.Media3D.Vector3D axisX, System.Windows.Media.Media3D.Vector3D axisY, Point3D origin)
         {
             var indices = SweepLinePolygonTriangulator.Triangulate(points);
             var index0 = this.positions.Count;
@@ -2069,7 +2069,7 @@ namespace PlanCheck
         /// </remarks>
         public void AddPyramid(Point3D center, double sideLength, double height, bool closeBase = false)
         {
-            this.AddPyramid(center, new Vector3D(1, 0, 0), new Vector3D(0, 0, 1), sideLength, height, closeBase);
+            this.AddPyramid(center, new System.Windows.Media.Media3D.Vector3D(1, 0, 0), new System.Windows.Media.Media3D.Vector3D(0, 0, 1), sideLength, height, closeBase);
         }
         /// <summary>
         /// Adds a pyramid.
@@ -2080,7 +2080,7 @@ namespace PlanCheck
         /// <param name="sideLength">Length of the sides of the pyramid.</param>
         /// <param name="height">The height of the pyramid.</param>
         /// <param name="closeBase">Add triangles to the base of the pyramid or not.</param>
-        public void AddPyramid(Point3D center, Vector3D forward, Vector3D up, double sideLength, double height, bool closeBase = false)
+        public void AddPyramid(Point3D center, System.Windows.Media.Media3D.Vector3D forward, System.Windows.Media.Media3D.Vector3D up, double sideLength, double height, bool closeBase = false)
         {
             var right = SharedFunctions.CrossProduct(ref forward, ref up);
             var n = forward * (DoubleOrSingle)sideLength / 2;
@@ -2237,7 +2237,7 @@ namespace PlanCheck
         /// The texture coordinates.
         /// </param>
         public void AddQuads(
-            IList<Point3D> quadPositions, IList<Vector3D> quadNormals, IList<Point> quadTextureCoordinates)
+            IList<Point3D> quadPositions, IList<System.Windows.Media.Media3D.Vector3D> quadNormals, IList<Point> quadTextureCoordinates)
         {
             if (quadPositions == null)
             {
@@ -2728,9 +2728,9 @@ namespace PlanCheck
 
             var icosahedronVertices = new[]
                 {
-                    new Vector3D(-a, 0, b), new Vector3D(a, 0, b), new Vector3D(-a, 0, -b), new Vector3D(a, 0, -b),
-                    new Vector3D(0, b, a), new Vector3D(0, b, -a), new Vector3D(0, -b, a), new Vector3D(0, -b, -a),
-                    new Vector3D(b, a, 0), new Vector3D(-b, a, 0), new Vector3D(b, -a, 0), new Vector3D(-b, -a, 0)
+                    new System.Windows.Media.Media3D.Vector3D(-a, 0, b), new System.Windows.Media.Media3D.Vector3D(a, 0, b), new System.Windows.Media.Media3D.Vector3D(-a, 0, -b), new System.Windows.Media.Media3D.Vector3D(a, 0, -b),
+                    new System.Windows.Media.Media3D.Vector3D(0, b, a), new System.Windows.Media.Media3D.Vector3D(0, b, -a), new System.Windows.Media.Media3D.Vector3D(0, -b, a), new System.Windows.Media.Media3D.Vector3D(0, -b, -a),
+                    new System.Windows.Media.Media3D.Vector3D(b, a, 0), new System.Windows.Media.Media3D.Vector3D(-b, a, 0), new System.Windows.Media.Media3D.Vector3D(b, -a, 0), new System.Windows.Media.Media3D.Vector3D(-b, -a, 0)
                 };
 
             if (shareVertices)
@@ -2768,7 +2768,7 @@ namespace PlanCheck
         /// <remarks>
         /// See http://en.wikipedia.org/wiki/Surface_of_revolution.
         /// </remarks>
-        public void AddRevolvedGeometry(IList<Point> points, IList<double> textureValues, Point3D origin, Vector3D direction, int thetaDiv)
+        public void AddRevolvedGeometry(IList<Point> points, IList<double> textureValues, Point3D origin, System.Windows.Media.Media3D.Vector3D direction, int thetaDiv)
         {
             direction.Normalize();
 
@@ -2877,7 +2877,7 @@ namespace PlanCheck
             int p1 = this.positions.Count;
             for (int i = p0; i < p1; i++)
             {
-                var pVec = (Vector3D)this.positions[i];
+                var pVec = (System.Windows.Media.Media3D.Vector3D)this.positions[i];
                 this.positions[i] = center + ((DoubleOrSingle)radius * pVec);
             }
         }
@@ -2896,7 +2896,7 @@ namespace PlanCheck
         /// <param name="arcLength">The length of the arc in degrees.</param>
         /// <param name="arcDirection">The start direction of the arc.</param>
         public void AddSurfaceOfRevolution(
-            Point3D origin, Vector3D axis, IList<Point> section, IList<int> sectionIndices, double startAngle, double arcLength, string arcDirection,
+            Point3D origin, System.Windows.Media.Media3D.Vector3D axis, IList<Point> section, IList<int> sectionIndices, double startAngle, double arcLength, string arcDirection,
             int thetaDiv = 360, IList<double> textureValues = null)
         {
             if (this.textureCoordinates != null && textureValues == null)
@@ -3028,7 +3028,7 @@ namespace PlanCheck
         /// See https://en.wikipedia.org/wiki/Tetrahedron and
         /// https://en.wikipedia.org/wiki/Equilateral_triangle.
         /// </remarks>
-        public void AddTetrahedron(Point3D center, Vector3D forward, Vector3D up, double sideLength)
+        public void AddTetrahedron(Point3D center, System.Windows.Media.Media3D.Vector3D forward, System.Windows.Media.Media3D.Vector3D up, double sideLength)
         {
             // Helper Variables
             var right = SharedFunctions.CrossProduct(ref up, ref forward);
@@ -3069,7 +3069,7 @@ namespace PlanCheck
             }
             // If the second Diameter is zero, we can't build out torus
             else if (tubeDiameter == 0.0)
-                throw new PlanCheckException("Torus must have a Diameter bigger than 0");
+                throw new Exception("Torus must have a Diameter bigger than 0");
             // Values result in a Torus
             else
             {
@@ -3139,13 +3139,13 @@ namespace PlanCheck
                             // modify Normal
                             if (selfIntersecting && i == 0 && j == 0)
                             {
-                                normal = new Vector3D(0, 0, -1);
+                                normal = new System.Windows.Media.Media3D.Vector3D(0, 0, -1);
                             }
                             // If self-intersecting Torus and last Point of first Cross-Section
                             // modify Normal
                             else if (selfIntersecting && i == 0 && j == (phiDiv - 1))
                             {
-                                normal = new Vector3D(0, 0, 1);
+                                normal = new System.Windows.Media.Media3D.Vector3D(0, 0, 1);
                             }
                             // Add the Normal
                             this.normals.Add(normal);
@@ -3375,7 +3375,7 @@ namespace PlanCheck
         /// The texture coordinates of the triangle fan.
         /// </param>
         public void AddTriangleFan(
-            IList<Point3D> fanPositions, IList<Vector3D> fanNormals = null, IList<Point> fanTextureCoordinates = null)
+            IList<Point3D> fanPositions, IList<System.Windows.Media.Media3D.Vector3D> fanNormals = null, IList<Point> fanTextureCoordinates = null)
         {
             if (this.positions == null)
             {
@@ -3435,7 +3435,7 @@ namespace PlanCheck
         /// The texture coordinates (corresponding to the points).
         /// </param>
         public void AddTriangles(
-            IList<Point3D> trianglePositions, IList<Vector3D> triangleNormals = null, IList<Point> triangleTextureCoordinates = null)
+            IList<Point3D> trianglePositions, IList<System.Windows.Media.Media3D.Vector3D> triangleNormals = null, IList<Point> triangleTextureCoordinates = null)
         {
             if (trianglePositions == null)
             {
@@ -3511,7 +3511,7 @@ namespace PlanCheck
         /// See http://en.wikipedia.org/wiki/Triangle_strip.
         /// </remarks>
         public void AddTriangleStrip(
-            IList<Point3D> stripPositions, IList<Vector3D> stripNormals = null, IList<Point> stripTextureCoordinates = null)
+            IList<Point3D> stripPositions, IList<System.Windows.Media.Media3D.Vector3D> stripNormals = null, IList<Point> stripTextureCoordinates = null)
         {
             if (stripPositions == null)
             {
@@ -3678,8 +3678,8 @@ namespace PlanCheck
 
             //*******************************
             //*** PROPOSED SOLUTION *********
-            var lastUp = new Vector3D();
-            var lastForward = new Vector3D();
+            var lastUp = new System.Windows.Media.Media3D.Vector3D();
+            var lastForward = new System.Windows.Media.Media3D.Vector3D();
             //*** PROPOSED SOLUTION *********
             //*******************************
 
@@ -3746,7 +3746,7 @@ namespace PlanCheck
 
             if (frontCap || backCap && path.Count > 1)
             {
-                var normals = new Vector3D[section.Count];
+                var normals = new System.Windows.Media.Media3D.Vector3D[section.Count];
                 var fanTextures = new Point[section.Count];
                 var count = path.Count;
                 if (backCap)
@@ -3794,7 +3794,7 @@ namespace PlanCheck
         /// </param>
         public void AddTube(
             IList<Point3D> path, IList<double> angles, IList<double> values, IList<double> diameters,
-            IList<Point> section, Vector3D sectionXAxis, bool isTubeClosed, bool isSectionClosed, bool frontCap = false, bool backCap = false)
+            IList<Point> section, System.Windows.Media.Media3D.Vector3D sectionXAxis, bool isTubeClosed, bool isSectionClosed, bool frontCap = false, bool backCap = false)
         {
             if (values != null && values.Count == 0)
             {
@@ -3876,7 +3876,7 @@ namespace PlanCheck
             this.AddRectangularMeshTriangleIndices(index0, pathLength, sectionLength, isSectionClosed, isTubeClosed);
             if (frontCap || backCap && path.Count > 1)
             {
-                var normals = new Vector3D[section.Count];
+                var normals = new System.Windows.Media.Media3D.Vector3D[section.Count];
                 var fanTextures = new Point[section.Count];
                 var count = path.Count;
                 if (backCap)
@@ -3959,7 +3959,7 @@ namespace PlanCheck
         /// </param>
         public void Append(
             IList<Point3D> positionsToAppend, IList<int> triangleIndicesToAppend,
-            IList<Vector3D> normalsToAppend = null, IList<Point> textureCoordinatesToAppend = null)
+            IList<System.Windows.Media.Media3D.Vector3D> normalsToAppend = null, IList<Point> textureCoordinatesToAppend = null)
         {
             if (positionsToAppend == null)
             {
@@ -4174,11 +4174,11 @@ namespace PlanCheck
         /// <returns>
         /// The normal.
         /// </returns>
-        private Vector3D FindCornerNormal(Point3D p, double eps)
+        private System.Windows.Media.Media3D.Vector3D FindCornerNormal(Point3D p, double eps)
         {
-            var sum = new Vector3D();
+            var sum = new System.Windows.Media.Media3D.Vector3D();
             int count = 0;
-            var addedNormals = new HashSet<Vector3D>();
+            var addedNormals = new HashSet<System.Windows.Media.Media3D.Vector3D>();
             for (int i = 0; i < this.triangleIndices.Count; i += 3)
             {
                 int i0 = i;
@@ -4232,7 +4232,7 @@ namespace PlanCheck
 
             if (count == 0)
             {
-                return new Vector3D();
+                return new System.Windows.Media.Media3D.Vector3D();
             }
 
             return sum * (1f / count);
@@ -4317,7 +4317,7 @@ namespace PlanCheck
             {
                 for (int i = 0; i < this.Normals.Count; i++)
                 {
-                    var v = new Vector3D(
+                    var v = new System.Windows.Media.Media3D.Vector3D(
                         this.Normals[i].X * (DoubleOrSingle)scaleX, this.Normals[i].Y * (DoubleOrSingle)scaleY, this.Normals[i].Z * (DoubleOrSingle)scaleZ);
                     v.Normalize();
                     this.Normals[i] = v;

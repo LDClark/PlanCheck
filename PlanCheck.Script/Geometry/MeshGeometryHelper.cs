@@ -78,7 +78,7 @@ namespace PlanCheck
             var normals = new Vector3DCollection(positions.Count);
             for (int i = 0; i < positions.Count; i++)
             {
-                normals.Add(new Vector3D());
+                normals.Add(new System.Windows.Media.Media3D.Vector3D());
             }
 
             for (int i = 0; i < triangleIndices.Count; i += 3)
@@ -89,9 +89,9 @@ namespace PlanCheck
                 var p0 = positions[index0];
                 var p1 = positions[index1];
                 var p2 = positions[index2];
-                Vector3D u = p1 - p0;
-                Vector3D v = p2 - p0;
-                Vector3D w = SharedFunctions.CrossProduct(ref u, ref v);
+                System.Windows.Media.Media3D.Vector3D u = p1 - p0;
+                System.Windows.Media.Media3D.Vector3D v = p2 - p0;
+                System.Windows.Media.Media3D.Vector3D w = SharedFunctions.CrossProduct(ref u, ref v);
                 w.Normalize();
                 normals[index0] += w;
                 normals[index1] += w;
@@ -212,7 +212,7 @@ namespace PlanCheck
             var edgeIndices = new Int32Collection();
 
             // the keys of the dictionary are created from the triangle indices of the edge
-            var edgeNormals = new Dictionary<ulong, Vector3D>();
+            var edgeNormals = new Dictionary<ulong, System.Windows.Media.Media3D.Vector3D>();
 
             for (int i = 0; i < mesh.TriangleIndices.Count / 3; i++)
             {
@@ -231,7 +231,7 @@ namespace PlanCheck
                     int minIndex = Math.Min(index0, index1);
                     int maxIndex = Math.Max(index0, index1);
                     ulong key = CreateKey((uint)minIndex, (uint)maxIndex);
-                    Vector3D value;
+                    System.Windows.Media.Media3D.Vector3D value;
                     if (edgeNormals.TryGetValue(key, out value))
                     {
                         var n2 = value;
@@ -431,7 +431,7 @@ namespace PlanCheck
         /// <returns>
         /// The <see cref="MeshGeometry3D"/>.
         /// </returns>
-        public static MeshGeometry3D Cut(this MeshGeometry3D mesh, Point3D plane, Vector3D normal)
+        public static MeshGeometry3D Cut(this MeshGeometry3D mesh, Point3D plane, System.Windows.Media.Media3D.Vector3D normal)
         {
             var hasTextureCoordinates = mesh.TextureCoordinates != null && mesh.TextureCoordinates.Count > 0;
             var hasNormals = mesh.Normals != null && mesh.Normals.Count > 0;
@@ -465,7 +465,7 @@ namespace PlanCheck
                 var index2 = mesh.TriangleIndices[i + 2];
 
                 Point3D[] positions;
-                Vector3D[] normals;
+                System.Windows.Media.Media3D.Vector3D[] normals;
                 Point[] textureCoordinates;
                 int[] triangleIndices;
 
@@ -510,14 +510,14 @@ namespace PlanCheck
         /// <returns>
         /// The segments of the contour.
         /// </returns>
-        public static IList<Point3D> GetContourSegments(this MeshGeometry3D mesh, Point3D plane, Vector3D normal)
+        public static IList<Point3D> GetContourSegments(this MeshGeometry3D mesh, Point3D plane, System.Windows.Media.Media3D.Vector3D normal)
         {
             var segments = new List<Point3D>();
             var contourHelper = new ContourHelper(plane, normal, mesh);
             for (int i = 0; i < mesh.TriangleIndices.Count; i += 3)
             {
                 Point3D[] positions;
-                Vector3D[] normals;
+                System.Windows.Media.Media3D.Vector3D[] normals;
                 Point[] textureCoordinates;
                 int[] triangleIndices;
 
@@ -721,7 +721,7 @@ namespace PlanCheck
         /// <param name="trianglesOut"></param>
         /// <param name="textureOut"></param>
         /// <param name="normalOut"></param>
-        public static void RemoveIsolatedVertices(IList<Point3D> vertices, IList<int> triangles, IList<Point> texture, IList<Vector3D> normals,
+        public static void RemoveIsolatedVertices(IList<Point3D> vertices, IList<int> triangles, IList<Point> texture, IList<System.Windows.Media.Media3D.Vector3D> normals,
             out Point3DCollection verticesOut, out Int32Collection trianglesOut, out PointCollection textureOut, out Vector3DCollection normalOut)
         {
             verticesOut = null;

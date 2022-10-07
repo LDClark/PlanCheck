@@ -35,22 +35,22 @@ namespace PlanCheck
         /// <param name="second"></param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Vector3D CrossProduct(ref Vector3D first, ref Vector3D second)
+        public static System.Windows.Media.Media3D.Vector3D CrossProduct(ref System.Windows.Media.Media3D.Vector3D first, ref System.Windows.Media.Media3D.Vector3D second)
         {
 #if SHARPDX
             return Vector3.Cross(first, second);
 #else
-            return Vector3D.CrossProduct(first, second);
+            return System.Windows.Media.Media3D.Vector3D.CrossProduct(first, second);
 #endif
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Vector3D CrossProduct(Vector3D first, Vector3D second)
+        public static System.Windows.Media.Media3D.Vector3D CrossProduct(System.Windows.Media.Media3D.Vector3D first, System.Windows.Media.Media3D.Vector3D second)
         {
 #if SHARPDX
             return Vector3.Cross(first, second);
 #else
-            return Vector3D.CrossProduct(first, second);
+            return System.Windows.Media.Media3D.Vector3D.CrossProduct(first, second);
 #endif
         }
 
@@ -61,7 +61,7 @@ namespace PlanCheck
         /// <param name="second"></param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static DoubleOrSingle DotProduct(ref Vector3D first, ref Vector3D second)
+        public static DoubleOrSingle DotProduct(ref System.Windows.Media.Media3D.Vector3D first, ref System.Windows.Media.Media3D.Vector3D second)
         {
             return first.X * second.X + first.Y * second.Y + first.Z * second.Z;
         }
@@ -83,7 +83,7 @@ namespace PlanCheck
         /// <param name="vector"></param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static DoubleOrSingle LengthSquared(ref Vector3D vector)
+        public static DoubleOrSingle LengthSquared(ref System.Windows.Media.Media3D.Vector3D vector)
         {
             return vector.X * vector.X + vector.Y * vector.Y + vector.Z * vector.Z;
         }
@@ -103,7 +103,7 @@ namespace PlanCheck
         /// <param name="vector"></param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static DoubleOrSingle Length(ref Vector3D vector)
+        public static DoubleOrSingle Length(ref System.Windows.Media.Media3D.Vector3D vector)
         {
             return (DoubleOrSingle)Math.Sqrt(LengthSquared(ref vector));
         }
@@ -115,7 +115,7 @@ namespace PlanCheck
         /// <param name="vector"></param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static System.Windows.Media.Media3D.Point3D ToPoint3D(ref Vector3D vector)
+        public static System.Windows.Media.Media3D.Point3D ToPoint3D(ref System.Windows.Media.Media3D.Vector3D vector)
         {
             return new System.Windows.Media.Media3D.Point3D(vector.X, vector.Y, vector.Z);
         }
@@ -125,7 +125,7 @@ namespace PlanCheck
         /// <param name="vector"></param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static System.Windows.Media.Media3D.Vector3D ToVector3D(ref Vector3D vector)
+        public static System.Windows.Media.Media3D.Vector3D ToVector3D(ref System.Windows.Media.Media3D.Vector3D vector)
         {
             return new System.Windows.Media.Media3D.Vector3D(vector.X, vector.Y, vector.Z);
         }

@@ -55,7 +55,7 @@
                             VerticalAlignment="Stretch"
                             Margin="0,5,0,0"    
                             Background="#FF2B2B2B"
-                            Foreground="Gray" >
+                            Foreground="LightGray" >
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="SourceUpdated">
                                     <i:InvokeCommandAction Command="{Binding AnalyzePlanCommand}" />

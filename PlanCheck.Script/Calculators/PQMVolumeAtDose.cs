@@ -8,7 +8,7 @@ namespace PlanCheck.Calculators
 {
     class PQMVolumeAtDose
     {
-        public static string GetVolumeAtDose(StructureSetViewModel structureSet, PlanningItemViewModel planningItem, StructureViewModel evalStructure, MatchCollection testMatch, Group evalunit)
+        public static string GetVolumeAtDose(PlanningItemViewModel planningItem, StructureViewModel evalStructure, MatchCollection testMatch, Group evalunit)
         {
             try
             {

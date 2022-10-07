@@ -16,12 +16,9 @@ namespace PlanCheck
     {
         private readonly MetricCalculator _metricCalc;
 
-        private PlanningItem _selectedPlan;
-
         public EsapiService(PluginScriptContext context) : base(context)
         {
             _metricCalc = new MetricCalculator();
-            _selectedPlan = context.PlanSetup;
         }
 
         public Task<PlanningItemViewModel[]> GetPlansAsync() =>
@@ -157,14 +154,14 @@ namespace PlanCheck
                 structure = Extensions.GetStructureFromCode(plan, structureCode);
             var structureVM = new StructureViewModel(structure);
             string metric = dvhObjective;
-            string result = _metricCalc.CalculateMetric(planVM.StructureSet, structureVM, planVM, metric);             
+ 
+            string result = _metricCalc.CalculateMetric(structureVM, planVM, metric);             
             return result;
         }
 
         public string EvaluateMetricDose(string result, string goal, string variation)
         {
-            var met = "";
-            met = _metricCalc.EvaluateMetric(result, goal, variation);
+            var met = _metricCalc.EvaluateMetric(result, goal, variation);
             return met;
         }
 

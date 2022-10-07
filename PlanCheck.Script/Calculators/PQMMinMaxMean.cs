@@ -11,7 +11,7 @@ namespace PlanCheck.Calculators
 {
     class PQMMinMaxMean
     {
-        public static string GetMinMaxMean(StructureSetViewModel structureSet, PlanningItemViewModel planningItem, StructureViewModel evalStructure, MatchCollection testMatch, Group evalunit, Group type)
+        public static string GetMinMaxMean(PlanningItemViewModel planningItem, StructureViewModel evalStructure, MatchCollection testMatch, Group evalunit, Group type)
         {
             try
             {

@@ -83,7 +83,7 @@ namespace PlanCheck
         /// <summary>
         /// The original mesh normal vectors.
         /// </summary>
-        private readonly Vector3D[] meshNormals;
+        private readonly System.Windows.Media.Media3D.Vector3D[] meshNormals;
 
         /// <summary>
         /// The original mesh texture coordinates.
@@ -98,7 +98,7 @@ namespace PlanCheck
         /// <summary>
         /// The normal vectors.
         /// </summary>
-        private readonly Vector3D[] normals;
+        private readonly System.Windows.Media.Media3D.Vector3D[] normals;
 
         /// <summary>
         /// The texture coordinates.
@@ -116,11 +116,11 @@ namespace PlanCheck
         /// <param name="planeOrigin">The plane origin.</param>
         /// <param name="planeNormal">The plane normal.</param>
         /// <param name="originalMesh">The original mesh.</param>
-        public ContourHelper(Point3D planeOrigin, Vector3D planeNormal, MeshGeometry3D originalMesh)
+        public ContourHelper(Point3D planeOrigin, System.Windows.Media.Media3D.Vector3D planeNormal, MeshGeometry3D originalMesh)
         {
             var hasNormals = originalMesh.Normals != null && originalMesh.Normals.Count > 0;
             var hasTextureCoordinates = originalMesh.TextureCoordinates != null && originalMesh.TextureCoordinates.Count > 0;
-            this.normals = hasNormals ? new Vector3D[3] : null;
+            this.normals = hasNormals ? new System.Windows.Media.Media3D.Vector3D[3] : null;
             this.textures = hasTextureCoordinates ? new Point[3] : null;
             this.positionCount = originalMesh.Positions.Count;
 
@@ -198,7 +198,7 @@ namespace PlanCheck
             int index1,
             int index2,
             out Point3D[] newPositions,
-            out Vector3D[] newNormals,
+            out System.Windows.Media.Media3D.Vector3D[] newNormals,
             out Point[] newTextureCoordinates,
             out int[] triangleIndices)
         {
@@ -228,13 +228,13 @@ namespace PlanCheck
                     break;
                 case ContourFacetResult.All:
                     newPositions = new Point3D[0];
-                    newNormals = new Vector3D[0];
+                    newNormals = new System.Windows.Media.Media3D.Vector3D[0];
                     newTextureCoordinates = new Point[0];
                     triangleIndices = new[] { index0, index1, index2 };
                     return;
                 default:
                     newPositions = new Point3D[0];
-                    newNormals = new Vector3D[0];
+                    newNormals = new System.Windows.Media.Media3D.Vector3D[0];
                     newTextureCoordinates = new Point[0];
                     triangleIndices = new int[0];
                     return;
@@ -257,7 +257,7 @@ namespace PlanCheck
             }
             else
             {
-                newNormals = new Vector3D[0];
+                newNormals = new System.Windows.Media.Media3D.Vector3D[0];
             }
 
             if (this.textures != null)
@@ -386,13 +386,13 @@ namespace PlanCheck
         /// <param name="index1">The second index.</param>
         /// <returns>The interpolated vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private Vector3D CreateNewNormal(int index0, int index1)
+        private System.Windows.Media.Media3D.Vector3D CreateNewNormal(int index0, int index1)
         {
             var firstPoint = this.normals[index0];
             var secondPoint = this.normals[index1];
             var firstSide = this.sides[index0];
             var secondSide = this.sides[index1];
-            return new Vector3D(
+            return new System.Windows.Media.Media3D.Vector3D(
                 CalculatePoint(firstPoint.X, secondPoint.X, firstSide, secondSide),
                 CalculatePoint(firstPoint.Y, secondPoint.Y, firstSide, secondSide),
                 CalculatePoint(firstPoint.Z, secondPoint.Z, firstSide, secondSide));

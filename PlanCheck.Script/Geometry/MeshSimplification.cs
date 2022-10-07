@@ -124,7 +124,7 @@ namespace PlanCheck
             public readonly double[] err = new double[4];
             public bool deleted = false;
             public bool dirty = false;
-            public Vector3D normal = new Vector3D();
+            public System.Windows.Media.Media3D.Vector3D normal = new System.Windows.Media.Media3D.Vector3D();
 
             public Triangle Clone()
             {
@@ -142,20 +142,20 @@ namespace PlanCheck
 
         private sealed class Vertex
         {
-            public Vector3D p;
+            public System.Windows.Media.Media3D.Vector3D p;
             public int tStart = 0;
             public int tCount = 0;
             public SymmetricMatrix q = new SymmetricMatrix();
             public bool border = false;
             public Vertex()
             {
-                p = new Vector3D();
+                p = new System.Windows.Media.Media3D.Vector3D();
             }
             public Vertex(Point3D v)
             {
-                p = new Vector3D(v.X, v.Y, v.Z);
+                p = new System.Windows.Media.Media3D.Vector3D(v.X, v.Y, v.Z);
             }
-            public Vertex(ref Vector3D v)
+            public Vertex(ref System.Windows.Media.Media3D.Vector3D v)
             {
                 p = v;
             }
@@ -284,7 +284,7 @@ namespace PlanCheck
                                 continue;
                             }
                             //Compute vertex to collapse to
-                            Vector3D p;
+                            System.Windows.Media.Media3D.Vector3D p;
                             CalculateError(i0, i1, out p);
                             deleted0.Clear();
                             deleted1.Clear();
@@ -356,7 +356,7 @@ namespace PlanCheck
             return new MeshGeometry3D() { Positions = pos, TriangleIndices = tris };
         }
 
-        private bool Flipped(ref Vector3D p, int i0, int i1, ref Vertex v0, ref Vertex v1, IList<bool> deleted)
+        private bool Flipped(ref System.Windows.Media.Media3D.Vector3D p, int i0, int i1, ref Vertex v0, ref Vertex v1, IList<bool> deleted)
         {
             for (int i = 0; i < v0.tCount; ++i)
             {
@@ -371,9 +371,9 @@ namespace PlanCheck
                     continue;
                 }
 
-                Vector3D d1 = vertices[id1].p - p;
+                System.Windows.Media.Media3D.Vector3D d1 = vertices[id1].p - p;
                 d1.Normalize();
-                Vector3D d2 = vertices[id2].p - p;
+                System.Windows.Media.Media3D.Vector3D d2 = vertices[id2].p - p;
                 d2.Normalize();
                 if (SharedFunctions.DotProduct(ref d1, ref d2) > 0.999)
                 {
@@ -392,7 +392,7 @@ namespace PlanCheck
 
         private void UpdateTriangles(int i0, ref Vertex v, IList<bool> deleted, ref int deletedTriangles)
         {
-            Vector3D p;
+            System.Windows.Media.Media3D.Vector3D p;
             for (int i = 0; i < v.tCount; ++i)
             {
                 var r = refs[v.tStart + i];
@@ -415,9 +415,9 @@ namespace PlanCheck
             }
         }
 
-        private double CalculateError(int id_v1, int id_v2, out Vector3D p_result)
+        private double CalculateError(int id_v1, int id_v2, out System.Windows.Media.Media3D.Vector3D p_result)
         {
-            p_result = new Vector3D();
+            p_result = new System.Windows.Media.Media3D.Vector3D();
             // compute interpolated vertex
             var q = vertices[id_v1].q + vertices[id_v2].q;
             bool border = vertices[id_v1].border & vertices[id_v2].border;
@@ -491,7 +491,7 @@ namespace PlanCheck
                         vertices[tri.v[j]].q += new SymmetricMatrix(n.X, n.Y, n.Z, -SharedFunctions.DotProduct(ref n, ref p0));
                     }
                 }
-                Vector3D p;
+                System.Windows.Media.Media3D.Vector3D p;
                 foreach (var tri in triangles)
                 {
                     for (int i = 0; i < 3; ++i)

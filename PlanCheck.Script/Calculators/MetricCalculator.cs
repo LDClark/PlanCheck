@@ -9,7 +9,7 @@ namespace PlanCheck
     // which doesn't expose ESAPI objects in order to isolate the script from ESAPI
     public class MetricCalculator
     {
-        public string CalculateMetric(StructureSetViewModel structureSet, StructureViewModel evalStructure, PlanningItemViewModel planningItem, string DVHObjective)
+        public string CalculateMetric(StructureViewModel evalStructure, PlanningItemViewModel planningItem, string DVHObjective)
         {
 
             //start with a general regex that pulls out the metric type and the @ (evalunit) part.
@@ -67,44 +67,44 @@ namespace PlanCheck
                                     else
                                     {
                                         // we have Gradient Index pattern
-                                        return PQMGradientIndex.GetGradientIndex(structureSet, planningItem, evalStructure, testMatch, evalunit);
+                                        return PQMGradientIndex.GetGradientIndex(planningItem, evalStructure, testMatch, evalunit);
                                     }
                                 }
                                 else
                                 {
                                     // we have Conformation Number pattern
-                                    return PQMConformationNumber.GetConformationNumber(structureSet, planningItem, evalStructure, testMatch, evalunit);
+                                    return PQMConformationNumber.GetConformationNumber(planningItem, evalStructure, testMatch, evalunit);
                                 }
 
                             }
                             else
                             {
                                 // we have Covered Dose at Volume pattern
-                                return PQMCoveredDoseAtVolume.GetCoveredDoseAtVolume(structureSet, planningItem, evalStructure, testMatch, evalunit);
+                                return PQMCoveredDoseAtVolume.GetCoveredDoseAtVolume(planningItem, evalStructure, testMatch, evalunit);
                             }
                         }
                         else
                         {
                             // we have Covered Volume at Dose pattern
-                            return PQMCoveredVolumeAtDose.GetCoveredVolumeAtDose(structureSet, planningItem, evalStructure, testMatch, evalunit);
+                            return PQMCoveredVolumeAtDose.GetCoveredVolumeAtDose(planningItem, evalStructure, testMatch, evalunit);
                         }
                     }
                     else
                     {
                         // we have Dose at Volume pattern
-                        return PQMDoseAtVolume.GetDoseAtVolume(structureSet, planningItem, evalStructure, testMatch, evalunit);
+                        return PQMDoseAtVolume.GetDoseAtVolume(planningItem, evalStructure, testMatch, evalunit);
                     }
                 }
                 else
                 {
                     // we have Volume at Dose pattern
-                    return PQMVolumeAtDose.GetVolumeAtDose(structureSet, planningItem, evalStructure, testMatch, evalunit);
+                    return PQMVolumeAtDose.GetVolumeAtDose(planningItem, evalStructure, testMatch, evalunit);
                 }
             }
             else
             {
                 // we have Min, Max, Mean, or Volume
-                return PQMMinMaxMean.GetMinMaxMean(structureSet, planningItem, evalStructure, testMatch, evalunit, type);
+                return PQMMinMaxMean.GetMinMaxMean(planningItem, evalStructure, testMatch, evalunit, type);
             }
         }
 

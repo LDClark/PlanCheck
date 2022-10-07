@@ -8,7 +8,7 @@ namespace PlanCheck.Calculators
 {
     class PQMGradientIndex
     {
-        public static string GetGradientIndex(StructureSetViewModel structureSet, PlanningItemViewModel planningItem, StructureViewModel evalStructure, MatchCollection testMatch, Group evalunit)
+        public static string GetGradientIndex(PlanningItemViewModel planningItem, StructureViewModel evalStructure, MatchCollection testMatch, Group evalunit)
         {
             try
             {

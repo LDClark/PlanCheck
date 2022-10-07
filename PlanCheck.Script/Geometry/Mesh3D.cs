@@ -221,7 +221,7 @@ namespace PlanCheck
         /// <returns>
         /// The face normal.
         /// </returns>
-        public Vector3D GetFaceNormal(int faceIndex)
+        public System.Windows.Media.Media3D.Vector3D GetFaceNormal(int faceIndex)
         {
             int m = this.Faces[faceIndex].Length;
             double x = 0;
@@ -232,13 +232,13 @@ namespace PlanCheck
                 var v0 = this.Vertices[this.Faces[faceIndex][i]];
                 var v1 = this.Vertices[this.Faces[faceIndex][(i + 1) % m]];
                 var v2 = this.Vertices[this.Faces[faceIndex][(i + 2) % m]];
-                var n = Vector3D.CrossProduct(v1 - v0, v2 - v0);
+                var n = System.Windows.Media.Media3D.Vector3D.CrossProduct(v1 - v0, v2 - v0);
                 x += n.X;
                 y += n.Y;
                 z += n.Z;
             }
 
-            return new Vector3D(x, y, z);
+            return new System.Windows.Media.Media3D.Vector3D(x, y, z);
         }
 
         /// <summary>

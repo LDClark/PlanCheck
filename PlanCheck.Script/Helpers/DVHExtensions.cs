@@ -9,7 +9,6 @@ public static class DvhExtensions
     {
         if (pitem is PlanSetup)
         {
-            //return ((PlanSetup)pitem).GetDoseAtVolume(structure, volume, volumePresentation, requestedDosePresentation);
             DVHData dvh = pitem.GetDVHCumulativeData(structure, requestedDosePresentation, volumePresentation, 0.001);
             return DvhExtensions.DoseAtVolume(dvh, volume);
         }

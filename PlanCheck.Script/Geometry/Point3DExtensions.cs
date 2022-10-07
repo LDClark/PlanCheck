@@ -51,7 +51,7 @@ namespace PlanCheck
         }
 
         /// <summary>
-        /// Convert a <see cref="Point3D"/> to a <see cref="Vector3D"/>.
+        /// Convert a <see cref="Point3D"/> to a <see cref="System.Windows.Media.Media3D.Vector3D"/>.
         /// </summary>
         /// <param name="n">
         /// The input point.
@@ -59,9 +59,9 @@ namespace PlanCheck
         /// <returns>
         /// A vector.
         /// </returns>
-        public static Vector3D ToVector3D(this Point3D n)
+        public static System.Windows.Media.Media3D.Vector3D ToVector3D(this Point3D n)
         {
-            return new Vector3D(n.X, n.Y, n.Z);
+            return new System.Windows.Media.Media3D.Vector3D(n.X, n.Y, n.Z);
         }
 
         /// <summary>

@@ -95,13 +95,13 @@ namespace PlanCheck
 #if SHARPDX
             var right = Vector3D.Cross(
 #else
-            var right = Vector3D.CrossProduct(
+            var right = System.Windows.Media.Media3D.Vector3D.CrossProduct(
 #endif
-                up, Math.Abs(up.X) > Math.Abs(up.Z) ? new Vector3D(0, 0, 1) : new Vector3D(1, 0, 0));
+                up, Math.Abs(up.X) > Math.Abs(up.Z) ? new System.Windows.Media.Media3D.Vector3D(0, 0, 1) : new System.Windows.Media.Media3D.Vector3D(1, 0, 0));
 #if SHARPDX
             var backward = Vector3D.Cross(
 #else
-            var backward = Vector3D.CrossProduct(
+            var backward = System.Windows.Media.Media3D.Vector3D.CrossProduct(
 #endif
                 right, up);
             var m = new Matrix3D(backward.X, right.X, up.X, 0, backward.Y, right.Y, up.Y, 0, backward.Z, right.Z, up.Z, 0, 0, 0, 0, 1);
@@ -137,14 +137,14 @@ namespace PlanCheck
         /// <returns>
         /// The normal.
         /// </returns>
-        public Vector3D GetNormal()
+        public System.Windows.Media.Media3D.Vector3D GetNormal()
         {
             if (this.Points.Count < 3)
             {
                 throw new InvalidOperationException("At least three points required in the polygon to find a normal.");
             }
 
-            Vector3D v1 = this.Points[1] - this.Points[0];
+            System.Windows.Media.Media3D.Vector3D v1 = this.Points[1] - this.Points[0];
             for (int i = 2; i < this.Points.Count; i++)
             {
 #if SHARPDX
@@ -152,7 +152,7 @@ namespace PlanCheck
 
                 if (n.LengthSquared() > 1e-10)
 #else
-                var n = Vector3D.CrossProduct(v1, this.Points[i] - this.Points[0]);
+                var n = System.Windows.Media.Media3D.Vector3D.CrossProduct(v1, this.Points[i] - this.Points[0]);
 
                 if (n.LengthSquared > 1e-10)
 #endif
@@ -165,7 +165,7 @@ namespace PlanCheck
 #if SHARPDX
             Vector3D result = Vector3D.Cross(v1, this.Points[2] - this.Points[0]);
 #else
-            Vector3D result = Vector3D.CrossProduct(v1, this.Points[2] - this.Points[0]);
+            System.Windows.Media.Media3D.Vector3D result = System.Windows.Media.Media3D.Vector3D.CrossProduct(v1, this.Points[2] - this.Points[0]);
 #endif
             result.Normalize();
             return result;
@@ -179,14 +179,14 @@ namespace PlanCheck
         /// </returns>
         public bool IsPlanar()
         {
-            Vector3D v1 = this.Points[1] - this.Points[0];
-            var normal = new Vector3D();
+            System.Windows.Media.Media3D.Vector3D v1 = this.Points[1] - this.Points[0];
+            var normal = new System.Windows.Media.Media3D.Vector3D();
             for (int i = 2; i < this.Points.Count; i++)
             {
 #if SHARPDX
                 var n = Vector3D.Cross(v1, this.Points[i] - this.Points[0]);
 #else
-                var n = Vector3D.CrossProduct(v1, this.Points[i] - this.Points[0]);
+                var n = System.Windows.Media.Media3D.Vector3D.CrossProduct(v1, this.Points[i] - this.Points[0]);
 #endif
                 n.Normalize();
                 if (i == 2)
@@ -196,7 +196,7 @@ namespace PlanCheck
 #if SHARPDX
                 else if (Math.Abs(Vector3D.Dot(n, normal) - 1) > 1e-8)
 #else
-                else if (Math.Abs(Vector3D.DotProduct(n, normal) - 1) > 1e-8)
+                else if (Math.Abs(System.Windows.Media.Media3D.Vector3D.DotProduct(n, normal) - 1) > 1e-8)
 #endif
                 {
                     return false;

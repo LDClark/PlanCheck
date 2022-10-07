@@ -11,7 +11,7 @@ namespace PlanCheck.Calculators
 {
     class PQMConformationNumber
     {
-        public static string GetConformationNumber(StructureSetViewModel structureSet, PlanningItemViewModel planningItem, StructureViewModel evalStructure, MatchCollection testMatch, Group evalunit)
+        public static string GetConformationNumber(PlanningItemViewModel planningItem, StructureViewModel evalStructure, MatchCollection testMatch, Group evalunit)
         {
             try
             {
@@ -41,7 +41,7 @@ namespace PlanCheck.Calculators
                 Group unit = testMatch[0].Groups["unit"];
                 DoseValue.DoseUnit du = (unit.Value.CompareTo("%") == 0) ? DoseValue.DoseUnit.Percent :
                     (unit.Value.CompareTo("cGy") == 0) ? DoseValue.DoseUnit.cGy : DoseValue.DoseUnit.Unknown;
-                var body = structureSet.Structures.Where(x => x.Id.Contains("BODY")).First().Object;
+                var body = planningItem.StructureSet.Structures.Where(x => x.Id.Contains("BODY")).First().Object;
                 //VolumePresentation vpFinal = (evalunit.Value.CompareTo("%") == 0) ? VolumePresentation.Relative : VolumePresentation.AbsoluteCm3;
                 VolumePresentation vpFinal = VolumePresentation.AbsoluteCm3;
                 DoseValuePresentation dvpFinal = (evalunit.Value.CompareTo("%") == 0) ? DoseValuePresentation.Relative : DoseValuePresentation.Absolute;

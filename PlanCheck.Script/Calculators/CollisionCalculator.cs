@@ -17,18 +17,21 @@ namespace PlanCheck
         static readonly DiffuseMaterial magentaMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.Magenta));
         static readonly DiffuseMaterial greenMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.Green));
         static readonly DiffuseMaterial darkOrangeMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.DarkOrange));
+        static readonly DiffuseMaterial yellowMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.Yellow));
 
-        //linac gantry parameters in mm
-        static readonly double distToCollFace = 415.0;  //iso to collimator
-        static readonly double collimatorDiameter1 = 470.0;  //gantry face diameter (metal plate)
-        static readonly double collimatorDiameter2 = 750.0; //gantry diameter (plastic hub)
-        static readonly double collimatorFaceThickness = 27.5;  //metal plate thickness
-        static readonly double collimatorTopThickness = 200.0; //gantry plastic hub thickness
-        static readonly double distToCollFaceElectron = 50.0;  //5cm from iso to electron cone block
+        //linac gantry parameters in cm
+        static readonly double distToCollFace = 41.5;  //iso to collimator
+        static readonly double distToCollFaceElectron = 5.0;  //distance from iso to electron cone tray
+        static readonly double distToCollFaceSRS = 25.5;  //distance from iso to srs cone
+
+        static readonly double collimatorDiameter1 = 47.0;  //gantry face diameter (metal plate)
+        static readonly double collimatorDiameter2 = 75.0; //gantry diameter (plastic hub)
+        static readonly double collimatorDiameterSRS = 7.0;  //diameter of srs cone
+
+        static readonly double collimatorFaceThickness = 2.75;  //metal plate thickness
+        static readonly double collimatorTopThickness = 20.0; //gantry plastic hub thickness
         static readonly double collimatorThicknessElectron = 30.0;  //thickness of electron cone
-        static readonly double distToCollFaceSRS = 255.0;  //distance from iso to srs cone
-        static readonly double collimatorDiameterSRS = 70.0;  //diameter of srs cone
-        static readonly double collimatorThicknessSRS = 100.0;  //length of srs cone
+        static readonly double collimatorThicknessSRS = 10.0;  //thickness of srs cone
 
         //warnings in cm
         static readonly double collisionDistance = 3.0;
@@ -99,33 +102,28 @@ namespace PlanCheck
 
         public static Model3DGroup AddFieldMesh(Beam beam, string status)
         {
-            var collimatorMaterialStatic = greenMaterial;
-            var collimatorMaterialVMAT = greenYellowMaterial;
-            if (status == "Collision")
-            {
-                collimatorMaterialStatic = redMaterial;
-                collimatorMaterialVMAT = redMaterial;
-            }
-            if (status == "Warning")
-            {
-                collimatorMaterialStatic = darkOrangeMaterial;
-                collimatorMaterialVMAT = darkOrangeMaterial;
-            }
-
             var collimatorMaterial = greenMaterial;
+            var backMaterial = darkBlueMaterial;
             var modelGroup = new Model3DGroup();
             var isoctr = GetIsocenter(beam);
             var iso3DMesh = CalculateIsoMesh(isoctr);
             if (beam.MLCPlanType.ToString() == "VMAT" || beam.Technique.Id.Contains("ARC"))
+                collimatorMaterial = greenYellowMaterial;
+            if (beam.EnergyModeDisplayName.Contains("E"))
             {
-                collimatorMaterial = collimatorMaterialVMAT;
+                collimatorMaterial = yellowMaterial;
+                backMaterial = yellowMaterial;
+            }                
+            if (status == "Collision")
+            {
+                collimatorMaterial = redMaterial;
             }
-            if (beam.Technique.ToString().Contains("STATIC"))
+            if (status == "Warning")
             {
-                collimatorMaterial = collimatorMaterialStatic;
+                collimatorMaterial = darkOrangeMaterial;
             }
             MeshGeometry3D collimatorMesh = GetCollimatorMesh(beam, isoctr);
-            modelGroup.Children.Add(new GeometryModel3D { Geometry = collimatorMesh, Material = collimatorMaterial, BackMaterial = darkBlueMaterial });
+            modelGroup.Children.Add(new GeometryModel3D { Geometry = collimatorMesh, Material = collimatorMaterial, BackMaterial = backMaterial });
             modelGroup.Children.Add(new GeometryModel3D { Geometry = iso3DMesh, Material = redMaterial, BackMaterial = redMaterial });
             modelGroup.Freeze();
             return modelGroup;
@@ -184,8 +182,9 @@ namespace PlanCheck
                         (beam.GantryDirection.ToString() == "CounterClockwise" && cp.Index == (beam.ControlPoints.First().Index + arcAngleResolution)) ||
                         (cp.Index == beam.ControlPoints.Last().Index))
                     {
-                        AddCylinderToMesh(meshBuilder, gantryAngle, tableAngle, thetaDiv, distToCollFace, collimatorFaceThickness, iso, collimatorDiameter1);
-                        AddCylinderToMesh(meshBuilder, gantryAngle, tableAngle, thetaDiv, distToCollFace, collimatorTopThickness, iso, collimatorDiameter2);
+                        AddCylinderToMesh(meshBuilder, gantryAngle, tableAngle, iso, thetaDiv, distToCollFace, collimatorFaceThickness, collimatorDiameter1);
+                        AddCylinderToMesh(meshBuilder, gantryAngle, tableAngle, iso, thetaDiv, distToCollFace, collimatorTopThickness, collimatorDiameter2);
+                        
                     }
                         
                     if (i > arcAngleResolution)
@@ -198,19 +197,19 @@ namespace PlanCheck
                     gantryAngle = beam.ControlPoints.First().GantryAngle <= 180.0 ? (Math.PI / 180.0) * (beam.ControlPoints.First().GantryAngle - 180.0) : (Math.PI / 180.0) * (beam.ControlPoints.First().GantryAngle - 180.0);
                 else
                     gantryAngle = beam.ControlPoints.First().GantryAngle <= 180.0 ? (Math.PI / 180.0) * beam.ControlPoints.First().GantryAngle : (Math.PI / 180.0) * (beam.ControlPoints.First().GantryAngle - 360.0);
-                AddCylinderToMesh(meshBuilder, gantryAngle, tableAngle, thetaDiv, distToCollFace, collimatorFaceThickness, iso, collimatorDiameter1);
-                AddCylinderToMesh(meshBuilder, gantryAngle, tableAngle, thetaDiv, distToCollFace, collimatorTopThickness, iso, collimatorDiameter2);
+                AddCylinderToMesh(meshBuilder, gantryAngle, tableAngle, iso, thetaDiv, distToCollFace, collimatorFaceThickness, collimatorDiameter1);
+                AddCylinderToMesh(meshBuilder, gantryAngle, tableAngle, iso, thetaDiv, distToCollFace, collimatorTopThickness, collimatorDiameter2);
             }
             if (beam.EnergyModeDisplayName.Contains("E"))
             {
                 double fieldSize = Double.Parse(Regex.Match(beam.Applicator.Id, @"\d+").Value);
-                double collimaterDiameterElectron = fieldSize * 10.0 + 30.0; //convert to mm and add 30 mm safety margin
+                double collimatorDiameterElectron = fieldSize + 9.0; //add 9 cm safety margin
 
                 if (beam.Plan.TreatmentOrientation.ToString() == "HeadFirstProne")
                     gantryAngle = beam.ControlPoints.First().GantryAngle <= 180.0 ? (Math.PI / 180.0) * (beam.ControlPoints.First().GantryAngle - 180.0) : (Math.PI / 180.0) * (beam.ControlPoints.First().GantryAngle - 180.0);
                 else
                     gantryAngle = beam.ControlPoints.First().GantryAngle <= 180.0 ? (Math.PI / 180.0) * beam.ControlPoints.First().GantryAngle : (Math.PI / 180.0) * (beam.ControlPoints.First().GantryAngle - 360.0);
-                AddCylinderToMesh(meshBuilder, gantryAngle, tableAngle, thetaDiv, distToCollFaceElectron, collimatorThicknessElectron, iso, collimaterDiameterElectron);
+                AddCylinderToMesh(meshBuilder, gantryAngle, tableAngle, iso, thetaDiv, distToCollFaceElectron, collimatorThicknessElectron, collimatorDiameterElectron);
             }
             if (beam.EnergyModeDisplayName.Contains("SRS"))
             {
@@ -231,24 +230,29 @@ namespace PlanCheck
                     if ((cp.Index == beam.ControlPoints.First().Index) ||
                         (cp.Index == beam.ControlPoints.Last().Index))
                     {
-                        AddCylinderToMesh(meshBuilder, gantryAngle, tableAngle, thetaDiv, distToCollFaceSRS, collimatorThicknessSRS, iso, collimatorDiameterSRS);
+                        AddCylinderToMesh(meshBuilder, gantryAngle, tableAngle, iso, thetaDiv, distToCollFaceSRS, collimatorThicknessSRS, collimatorDiameterSRS);
                     }
                     if (beam.GantryDirection.ToString() == "Clockwise" && cp.Index == beam.ControlPoints.First().Index)
-                        for (double x = gantryAngle; x < gantryAngleLast; x = x + thetaDiv * (Math.PI / 180))
-                            AddCylinderToMesh(meshBuilder, x, tableAngle, thetaDiv, distToCollFaceSRS, collimatorThicknessSRS, iso, collimatorDiameterSRS);
+                        for (double g = gantryAngle; g < gantryAngleLast; g = g + thetaDiv * (Math.PI / 180))
+                            AddCylinderToMesh(meshBuilder, g, tableAngle, iso, thetaDiv, distToCollFaceSRS, collimatorThicknessSRS, collimatorDiameterSRS);
                         
                     if (beam.GantryDirection.ToString() == "CounterClockwise" && cp.Index == beam.ControlPoints.First().Index)
-                        for (double x = gantryAngle; x > gantryAngleLast; x = x - thetaDiv * (Math.PI / 180))
-                            AddCylinderToMesh(meshBuilder, x, tableAngle, thetaDiv, distToCollFaceSRS, collimatorThicknessSRS, iso, collimatorDiameterSRS);
+                        for (double g = gantryAngle; g > gantryAngleLast; g = g - thetaDiv * (Math.PI / 180))
+                            AddCylinderToMesh(meshBuilder, g, tableAngle, iso, thetaDiv, distToCollFaceSRS, collimatorThicknessSRS, collimatorDiameterSRS);
                 }
             }
             return meshBuilder.ToMesh(true);
         }
 
-        public static MeshBuilder AddCylinderToMesh(MeshBuilder meshBuilder, double gantryAngle, double tableAngle, int thetaDiv, double distanceFromIso, double cylinderThickness, Point3D iso, double diameter)
+        public static MeshBuilder AddCylinderToMesh(MeshBuilder meshBuilder, double gantryAngle, double tableAngle, Point3D iso, int thetaDiv, double distanceFromIso, double cylinderThickness, double diameter)
         {
             Point3D circleCenter1 = new Point3D();
             Point3D circleCenter2 = new Point3D();
+
+            //convert from cm to mm
+            distanceFromIso = distanceFromIso * 10;
+            cylinderThickness = cylinderThickness * 10;
+            diameter = diameter * 10;
 
             circleCenter1.X = iso.X + distanceFromIso * Math.Cos(tableAngle) * Math.Sin(gantryAngle);
             circleCenter1.Y = iso.Y - distanceFromIso * Math.Cos(gantryAngle);
