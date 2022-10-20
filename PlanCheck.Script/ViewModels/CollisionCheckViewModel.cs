@@ -6,8 +6,8 @@ namespace PlanCheck
     {
         public bool View { get; set; }
         public string FieldID { get; set; }
-        public string GantryToTableDistance { get; set; }
-        public string GantryToBodyDistance { get; set; }
+        public string GantryToTable { get; set; }
+        public string GantryToBody { get; set; }
         public string Status { get; set; }
     }
 }

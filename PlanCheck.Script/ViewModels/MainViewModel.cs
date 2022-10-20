@@ -192,6 +192,7 @@ namespace PlanCheck
                                 else
                                     templateSelected = pqm.TemplateId;
                                 await GetPQM(courseId, planId, structure, pqm, templateSelected, structures);
+                                progress.Increment();
                                 continue;
                             }
                             else
@@ -205,6 +206,7 @@ namespace PlanCheck
                                         else
                                             templateSelected = alias;
                                         await GetPQM(courseId, planId, structure, pqm, templateSelected, structures);
+                                        progress.Increment();
                                         continue;
                                     }
                                 }
@@ -218,12 +220,12 @@ namespace PlanCheck
                                         {
                                             templateSelected = pqm.TemplateId + " : " + code; //add in the PQM id
                                             await GetPQM(courseId, planId, structure, pqm, templateSelected, structures);
+                                            progress.Increment();
                                             continue;
                                         }
                                 }
                             }                           
-                        }
-                        progress.Increment();
+                        }                      
                     }
                 });
 
@@ -268,11 +270,11 @@ namespace PlanCheck
             {
                 foreach (var pqm in PQMs)
                 {
-                    var achieved = await _esapiService.CalculateMetricDoseAsync(SelectedPlan.CourseId, SelectedPlan.Id, pqm.SelectedStructure.Id, pqm.SelectedStructure.Code, pqm.DVHObjective);
+                    pqm.Achieved = await _esapiService.CalculateMetricDoseAsync(SelectedPlan.CourseId, SelectedPlan.Id, pqm.SelectedStructure.Id, 
+                        pqm.SelectedStructure.Code, pqm.DVHObjective);
                     pqm.StructureVolume = pqm.SelectedStructure.VolumeValue;
-                    pqm.Achieved = achieved;
                     pqm.Met = await _esapiService.EvaluateMetricDoseAsync(pqm.Achieved, pqm.Goal, pqm.Variation);
-                    var tuple = PQMColors.GetAchievedRatio(pqm.SelectedStructure, pqm.Goal, pqm.DVHObjective, achieved);
+                    var tuple = PQMColors.GetAchievedRatio(pqm.SelectedStructure, pqm.Goal, pqm.DVHObjective, pqm.Achieved);
                     pqm.AchievedColor = tuple.Item1;
                     pqm.AchievedPercentageOfGoal = tuple.Item2 * 100;
                 }

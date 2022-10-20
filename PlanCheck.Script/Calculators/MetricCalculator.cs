@@ -18,7 +18,7 @@ namespace PlanCheck
             string d_at_v_pattern = @"^D(?<evalpt>\d+\p{P}\d+|\d+)(?<unit>(%|cc))$"; // matches D95%, D2cc
             string dc_at_v_pattern = @"^DC(?<evalpt>\d+)(?<unit>(%|cc))$"; // matches DC95%, DC700cc
             string v_at_d_pattern = @"^V(?<evalpt>\d+\p{P}\d+|\d+)(?<unit>(%|Gy|cGy))$"; // matches V98%, V40Gy
-            string cv_at_d_pattern = @"^CV(?<evalpt>\d+)(?<unit>(%|Gy|cGy))$"; // matches CV98%, CV40Gy
+            string cv_at_d_pattern = @"^CV(?<evalpt>\d+(\.\d+)?)(?<unit>(%|Gy|cGy))$"; // matches CV98%, CV40Gy
                                                                                // Max[Gy] D95%[%] V98%[%] CV98%[%] D2cc[Gy] V40Gy[%]
             string cn_pattern = @"^CN(?<evalpt>\d+\p{P}\d+|\d+)(?<unit>(%|Gy|cGy))$"; //matches CN50%   
             string gi_pattern = @"^GI(?<evalpt>\d+\p{P}\d+|\d+)(?<unit>(%|Gy|cGy))$"; //matches GI50%   
@@ -62,7 +62,7 @@ namespace PlanCheck
                                     if (testMatch.Count != 1)
                                     {
 
-                                        return string.Format("DVH Objective expression \"{0}\" is not a recognized expression type.", DVHObjective);
+                                        return string.Format("\"{0}\" is not a recognized expression type.", DVHObjective);
                                     }
                                     else
                                     {

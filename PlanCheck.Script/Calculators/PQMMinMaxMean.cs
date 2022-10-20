@@ -44,6 +44,11 @@ namespace PlanCheck.Calculators
                         {
                             return new DoseValue(dvh.MaxDose.Dose / 100, DoseValue.DoseUnit.Gy).ToString();
                         }
+                        //cGy to cGy
+                        else if ((evalunit.Value.CompareTo("cGy") == 0) && (dvh.MaxDose.Unit.CompareTo(DoseValue.DoseUnit.Gy) == 0))
+                        {
+                            return new DoseValue(dvh.MaxDose.Dose * 100, DoseValue.DoseUnit.cGy).ToString();
+                        }
                         //Gy to Gy or % to %
                         else
                         {

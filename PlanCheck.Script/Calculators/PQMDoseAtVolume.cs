@@ -27,8 +27,10 @@ namespace PlanCheck.Calculators
                 //checking dose output unit and adapting to template
                 if (dvAchieved.UnitAsString.CompareTo(evalunit.Value.ToString()) != 0)
                 {
-                    if ((evalunit.Value.CompareTo("cGy") == 0) && (dvAchieved.Unit.CompareTo(DoseValue.DoseUnit.cGy) == 0))
-                        dvAchieved = new DoseValue(dvAchieved.Dose / 100, DoseValue.DoseUnit.cGy);
+                    if ((evalunit.Value.CompareTo("cGy") == 0) && (dvAchieved.Unit.CompareTo(DoseValue.DoseUnit.Gy) == 0))
+                        dvAchieved = new DoseValue(dvAchieved.Dose * 100, DoseValue.DoseUnit.cGy);
+                    else if ((evalunit.Value.CompareTo("Gy") == 0) && (dvAchieved.Unit.CompareTo(DoseValue.DoseUnit.cGy) == 0))
+                        dvAchieved = new DoseValue(dvAchieved.Dose / 100, DoseValue.DoseUnit.Gy);
                     else
                         return "Unable to calculate";
                 }

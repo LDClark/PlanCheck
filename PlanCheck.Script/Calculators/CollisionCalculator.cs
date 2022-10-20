@@ -93,8 +93,8 @@ namespace PlanCheck
             {
                 View = true,
                 FieldID = beam.Id,
-                GantryToBodyDistance = shortestDistanceBody + " cm",
-                GantryToTableDistance = shortestDistanceTable + " cm",
+                GantryToBody = shortestDistanceBody + " cm",
+                GantryToTable = shortestDistanceTable + " cm",
                 Status = status
             };
             return collisionSummary;
@@ -173,9 +173,9 @@ namespace PlanCheck
                 foreach (ControlPoint cp in beam.ControlPoints)
                 {
                     if (beam.Plan.TreatmentOrientation.ToString() == "HeadFirstProne")
-                        gantryAngle = cp.GantryAngle <= 180.0f ? (Math.PI / 180.0f) * (cp.GantryAngle - 180.0f) : (Math.PI / 180.0f) * (cp.GantryAngle - 180.0f);
+                        gantryAngle = ConvertProneGantryAngleToRadians(cp.GantryAngle);
                     else
-                        gantryAngle = cp.GantryAngle <= 180.0f ? (Math.PI / 180.0f) * cp.GantryAngle : (Math.PI / 180.0f) * (cp.GantryAngle - 360.0f);
+                        gantryAngle = ConvertSupineGantryAngleToRadians(cp.GantryAngle); ;
                     i++;
                     if ((cp.Index == beam.ControlPoints.First().Index) ||
                         (beam.GantryDirection.ToString() == "Clockwise" && cp.Index == (beam.ControlPoints.First().Index + arcAngleResolution)) ||
@@ -183,10 +183,9 @@ namespace PlanCheck
                         (cp.Index == beam.ControlPoints.Last().Index))
                     {
                         AddCylinderToMesh(meshBuilder, gantryAngle, tableAngle, iso, thetaDiv, distToCollFace, collimatorFaceThickness, collimatorDiameter1);
-                        AddCylinderToMesh(meshBuilder, gantryAngle, tableAngle, iso, thetaDiv, distToCollFace, collimatorTopThickness, collimatorDiameter2);
-                        
+                        AddCylinderToMesh(meshBuilder, gantryAngle, tableAngle, iso, thetaDiv, distToCollFace, collimatorTopThickness, collimatorDiameter2);                      
                     }
-                        
+                       
                     if (i > arcAngleResolution)
                         arcAngleResolution = arcAngleResolution + 20;
                 }
@@ -194,9 +193,9 @@ namespace PlanCheck
             if (beam.Technique.ToString().Contains("STATIC"))
             {
                 if (beam.Plan.TreatmentOrientation.ToString() == "HeadFirstProne")
-                    gantryAngle = beam.ControlPoints.First().GantryAngle <= 180.0 ? (Math.PI / 180.0) * (beam.ControlPoints.First().GantryAngle - 180.0) : (Math.PI / 180.0) * (beam.ControlPoints.First().GantryAngle - 180.0);
+                    gantryAngle = ConvertProneGantryAngleToRadians(beam.ControlPoints.First().GantryAngle);
                 else
-                    gantryAngle = beam.ControlPoints.First().GantryAngle <= 180.0 ? (Math.PI / 180.0) * beam.ControlPoints.First().GantryAngle : (Math.PI / 180.0) * (beam.ControlPoints.First().GantryAngle - 360.0);
+                    gantryAngle = ConvertSupineGantryAngleToRadians(beam.ControlPoints.First().GantryAngle);
                 AddCylinderToMesh(meshBuilder, gantryAngle, tableAngle, iso, thetaDiv, distToCollFace, collimatorFaceThickness, collimatorDiameter1);
                 AddCylinderToMesh(meshBuilder, gantryAngle, tableAngle, iso, thetaDiv, distToCollFace, collimatorTopThickness, collimatorDiameter2);
             }
@@ -206,9 +205,9 @@ namespace PlanCheck
                 double collimatorDiameterElectron = fieldSize + 9.0; //add 9 cm safety margin
 
                 if (beam.Plan.TreatmentOrientation.ToString() == "HeadFirstProne")
-                    gantryAngle = beam.ControlPoints.First().GantryAngle <= 180.0 ? (Math.PI / 180.0) * (beam.ControlPoints.First().GantryAngle - 180.0) : (Math.PI / 180.0) * (beam.ControlPoints.First().GantryAngle - 180.0);
+                    gantryAngle = ConvertProneGantryAngleToRadians(beam.ControlPoints.First().GantryAngle);
                 else
-                    gantryAngle = beam.ControlPoints.First().GantryAngle <= 180.0 ? (Math.PI / 180.0) * beam.ControlPoints.First().GantryAngle : (Math.PI / 180.0) * (beam.ControlPoints.First().GantryAngle - 360.0);
+                    gantryAngle = ConvertSupineGantryAngleToRadians(beam.ControlPoints.First().GantryAngle);
                 AddCylinderToMesh(meshBuilder, gantryAngle, tableAngle, iso, thetaDiv, distToCollFaceElectron, collimatorThicknessElectron, collimatorDiameterElectron);
             }
             if (beam.EnergyModeDisplayName.Contains("SRS"))
@@ -216,17 +215,17 @@ namespace PlanCheck
                 thetaDiv = 10;
                 double gantryAngleLast;
 
-                if (beam.Plan.TreatmentOrientation.ToString() == "HeadFirstProne")              
-                    gantryAngleLast = beam.ControlPoints.Last().GantryAngle <= 180.0 ? (Math.PI / 180.0) * (beam.ControlPoints.Last().GantryAngle - 180.0) : (Math.PI / 180.0) * (beam.ControlPoints.Last().GantryAngle - 180.0);
+                if (beam.Plan.TreatmentOrientation.ToString() == "HeadFirstProne")
+                    gantryAngleLast = ConvertProneGantryAngleToRadians(beam.ControlPoints.Last().GantryAngle);
                 else
-                    gantryAngleLast = beam.ControlPoints.Last().GantryAngle <= 180.0 ? (Math.PI / 180.0) * beam.ControlPoints.Last().GantryAngle : (Math.PI / 180.0) * (beam.ControlPoints.Last().GantryAngle - 360.0);
+                    gantryAngleLast = ConvertSupineGantryAngleToRadians(beam.ControlPoints.Last().GantryAngle);
 
                 foreach (ControlPoint cp in beam.ControlPoints)
                 {
                     if (beam.Plan.TreatmentOrientation.ToString() == "HeadFirstProne")
-                        gantryAngle = cp.GantryAngle <= 180.0 ? (Math.PI / 180.0) * (cp.GantryAngle - 180.0) : (Math.PI / 180.0) * (cp.GantryAngle - 180.0);
+                        gantryAngle = ConvertProneGantryAngleToRadians(cp.GantryAngle);
                     else
-                        gantryAngle = cp.GantryAngle <= 180.0 ? (Math.PI / 180.0) * cp.GantryAngle : (Math.PI / 180.0) * (cp.GantryAngle - 360.0);                  
+                        gantryAngle = ConvertSupineGantryAngleToRadians(cp.GantryAngle);
                     if ((cp.Index == beam.ControlPoints.First().Index) ||
                         (cp.Index == beam.ControlPoints.Last().Index))
                     {
@@ -242,6 +241,16 @@ namespace PlanCheck
                 }
             }
             return meshBuilder.ToMesh(true);
+        }
+
+        public static double ConvertProneGantryAngleToRadians(double angle)
+        {
+            return angle <= 180.0 ? (Math.PI / 180.0) * (angle - 180.0) : (Math.PI / 180.0) * (angle - 180.0);
+        }
+
+        public static double ConvertSupineGantryAngleToRadians(double angle)
+        {
+            return angle <= 180.0 ? (Math.PI / 180.0) * angle : (Math.PI / 180.0) * (angle - 360.0);
         }
 
         public static MeshBuilder AddCylinderToMesh(MeshBuilder meshBuilder, double gantryAngle, double tableAngle, Point3D iso, int thetaDiv, double distanceFromIso, double cylinderThickness, double diameter)

@@ -21,9 +21,15 @@ namespace PlanCheck.Calculators
                 Group eval = testMatch[0].Groups["evalpt"];
                 Group unit = testMatch[0].Groups["unit"];
                 DoseValue.DoseUnit du = (unit.Value.CompareTo("%") == 0) ? DoseValue.DoseUnit.Percent :
-                        (unit.Value.CompareTo("cGy") == 0) ? DoseValue.DoseUnit.cGy : DoseValue.DoseUnit.Unknown;
+                        (unit.Value.CompareTo("cGy") == 0) ? DoseValue.DoseUnit.cGy : DoseValue.DoseUnit.Gy;
                 VolumePresentation vp = (unit.Value.CompareTo("%") == 0) ? VolumePresentation.Relative : VolumePresentation.AbsoluteCm3;
                 DoseValue dv = new DoseValue(double.Parse(eval.Value), du);
+
+                if ((unit.Value.CompareTo("cGy") == 0) && (dvh.MaxDose.Unit.CompareTo(DoseValue.DoseUnit.Gy) == 0))
+                    dv = new DoseValue(double.Parse(eval.Value) / 100, DoseValue.DoseUnit.Gy);
+                if ((unit.Value.CompareTo("Gy") == 0) && (dvh.MaxDose.Unit.CompareTo(DoseValue.DoseUnit.cGy) == 0))
+                    dv = new DoseValue(double.Parse(eval.Value) * 100, DoseValue.DoseUnit.cGy);
+
                 double volume = double.Parse(eval.Value);
                 VolumePresentation vpFinal = (evalunit.Value.CompareTo("%") == 0) ? VolumePresentation.Relative : VolumePresentation.AbsoluteCm3;
                 DoseValuePresentation dvpFinal = (evalunit.Value.CompareTo("%") == 0) ? DoseValuePresentation.Relative : DoseValuePresentation.Absolute;
