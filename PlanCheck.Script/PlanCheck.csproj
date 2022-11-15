@@ -229,52 +229,28 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\DoseInValid.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources\DoseValid.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources\PlanApproved.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources\PlanRejected.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources\PlanUnapproved.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources\PlanVerification.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources\TreatApproved.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\DoseInValid.png" />
+    <EmbeddedResource Include="Resources\DoseValid.png" />
+    <EmbeddedResource Include="Resources\PlanApproved.png" />
+    <EmbeddedResource Include="Resources\PlanRejected.png" />
+    <EmbeddedResource Include="Resources\PlanUnapproved.png" />
+    <EmbeddedResource Include="Resources\PlanVerification.png" />
+    <EmbeddedResource Include="Resources\TreatApproved.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\female-symbol.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\female-symbol.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\male-symbol.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\male-symbol.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\other-symbol.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\other-symbol.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Plan.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Plan.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\PlanSum.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\PlanSum.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
