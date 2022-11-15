@@ -16,12 +16,15 @@ namespace PlanCheck.Calculators
             try
             {
                 DVHData dvh = planningItem.Object.GetDVHCumulativeData(evalStructure.Object, DoseValuePresentation.Absolute, VolumePresentation.Relative, 0.1);
-                DoseValue prescribedDose;
-                double planDoseDouble = 0;
+
+                //check for sufficient sampling and dose coverage
                 if ((dvh.SamplingCoverage < 0.9) || (dvh.Coverage < 0.9))
                 {
                     return "Unable to calculate - insufficient dose or sampling coverage";
                 }
+
+                DoseValue prescribedDose;
+                double planDoseDouble = 0;
                 if (planningItem.Object is PlanSum)
                 {
                     PlanSum planSum = (PlanSum)planningItem.Object;
@@ -41,8 +44,7 @@ namespace PlanCheck.Calculators
                 Group unit = testMatch[0].Groups["unit"];
                 DoseValue.DoseUnit du = (unit.Value.CompareTo("%") == 0) ? DoseValue.DoseUnit.Percent :
                     (unit.Value.CompareTo("cGy") == 0) ? DoseValue.DoseUnit.cGy : DoseValue.DoseUnit.Unknown;
-                var body = planningItem.StructureSet.Structures.Where(x => x.Id.Contains("BODY")).First().Object;
-                //VolumePresentation vpFinal = (evalunit.Value.CompareTo("%") == 0) ? VolumePresentation.Relative : VolumePresentation.AbsoluteCm3;
+                var body = planningItem.Object.StructureSet.Structures.Where(x => x.Id.Contains("BODY")).First();
                 VolumePresentation vpFinal = VolumePresentation.AbsoluteCm3;
                 DoseValuePresentation dvpFinal = (evalunit.Value.CompareTo("%") == 0) ? DoseValuePresentation.Relative : DoseValuePresentation.Absolute;
                 DoseValue dv = new DoseValue(double.Parse(eval.Value) / 100 * prescribedDose.Dose, DoseValue.DoseUnit.cGy);
@@ -55,6 +57,10 @@ namespace PlanCheck.Calculators
             catch (NullReferenceException)
             {
                 return "Unable to calculate - DVH is not valid";
+            }
+            catch (ApplicationException)
+            {
+                return "Unable to calculate - constraint is not valid";
             }
         }
     }

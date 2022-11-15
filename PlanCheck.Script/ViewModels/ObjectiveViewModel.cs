@@ -78,50 +78,5 @@ namespace PlanCheck
         {
             return Whitespace.Replace(input, replacement);
         }
-
-        public Structure FindStructureFromAlias(StructureSet ss, string ID, string[] aliases, string[] codes)
-        {
-            // search through the list of alias ids until we find an alias that matches an existing structure.
-            Structure oar = null;
-            string actualStructId = "";
-            oar = (from s in ss.Structures
-                   where s.Id.ToUpper().CompareTo(ID.ToUpper()) == 0
-                   select s).FirstOrDefault();
-            if (oar == null)
-            {
-                foreach (string alias in aliases)
-                {
-                    oar = (from s in ss.Structures
-                           where s.Id.ToUpper().CompareTo(alias.ToUpper()) == 0
-                           select s).FirstOrDefault();
-                    if (oar != null && oar.IsEmpty != true)
-                    {
-                        actualStructId = oar.Id;
-                        //return oar;
-                        break;
-                    }
-                    else
-                    {
-                        foreach (string code in codes)  //try to find structure by code
-                        {
-                            oar = (from s in ss.Structures
-                                   where s.StructureCodeInfos.FirstOrDefault().Code != null && s.StructureCodeInfos.FirstOrDefault().Code.ToString().CompareTo(code) == 0
-                                   select s).LastOrDefault();
-                            if (oar != null)
-                            {
-                                actualStructId = oar.Id;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-
-            if ((oar != null) && (oar.IsEmpty))
-            {
-                oar = null;
-            }
-            return oar;
-        }
     }
 }

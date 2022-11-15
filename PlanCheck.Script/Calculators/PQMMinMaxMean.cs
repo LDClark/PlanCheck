@@ -96,6 +96,10 @@ namespace PlanCheck.Calculators
             {
                 return "Unable to calculate - DVH is not valid";
             }
+            catch (ApplicationException)
+            {
+                return "Unable to calculate - constraint is not valid";
+            }
         }
     }
 }

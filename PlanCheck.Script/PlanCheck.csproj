@@ -122,6 +122,27 @@
     <Compile Include="Esapi\EsapiService.cs" />
     <Compile Include="Esapi\Extensions.cs" />
     <Compile Include="Esapi\IEsapiService.cs" />
+    <Compile Include="Reporting\Internal\CustomStyles.cs" />
+    <Compile Include="Reporting\Internal\HeaderAndFooter.cs" />
+    <Compile Include="Reporting\Internal\PatientInfo.cs" />
+    <Compile Include="Reporting\Internal\PlanningItemSymbol.cs" />
+    <Compile Include="Reporting\Internal\PQMsContent.cs" />
+    <Compile Include="Reporting\Internal\SexSymbol.cs" />
+    <Compile Include="Reporting\Internal\Size.cs" />
+    <Compile Include="Reporting\ReportPdf.cs" />
+    <Compile Include="Reporting\ReportPlanningItem.cs" />
+    <Compile Include="Reporting\Beam.cs" />
+    <Compile Include="Reporting\Doctor.cs" />
+    <Compile Include="Reporting\IReport.cs" />
+    <Compile Include="Reporting\Plan.cs" />
+    <Compile Include="Reporting\ReportData.cs" />
+    <Compile Include="Reporting\ReportImage.cs" />
+    <Compile Include="Reporting\ReportPatient.cs" />
+    <Compile Include="Reporting\ReportPQM.cs" />
+    <Compile Include="Reporting\ReportPQMs.cs" />
+    <Compile Include="Reporting\ReportSex.cs" />
+    <Compile Include="Reporting\ReportStructure.cs" />
+    <Compile Include="Reporting\ReportStructureSet.cs" />
     <Compile Include="ViewModels\ObjectiveViewModel.cs" />
     <Compile Include="Geometry\Point3DExtensions.cs" />
     <Compile Include="Geometry\Vector3DExtensions.cs" />
@@ -194,51 +215,66 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PlanCheck.Reporting.MigraDoc\PlanCheck.Reporting.MigraDoc.csproj">
-      <Project>{c455fec6-526d-4cc8-bf35-2b23137ef215}</Project>
-      <Name>PlanCheck.Reporting.MigraDoc</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\PlanCheck.Reporting\PlanCheck.Reporting.csproj">
-      <Project>{9bb0ce8d-91c4-4e54-9afa-eb8d9797e8ea}</Project>
-      <Name>PlanCheck.Reporting</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="EsapiEssentials">
       <Version>2.0.0</Version>
     </PackageReference>
     <PackageReference Include="EsapiEssentials.PluginRunner">
       <Version>2.0.0</Version>
     </PackageReference>
+    <PackageReference Include="PDFsharp-MigraDoc-WPF">
+      <Version>1.50.5147</Version>
+    </PackageReference>
     <PackageReference Include="YamlDotNet">
       <Version>8.1.2</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Views\Resources\DoseInValid.png">
+    <EmbeddedResource Include="Resources\DoseInValid.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Views\Resources\DoseValid.png">
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\DoseValid.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Views\Resources\PlanApproved.png">
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\PlanApproved.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Views\Resources\PlanRejected.png">
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\PlanRejected.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Views\Resources\PlanSum.png">
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\PlanUnapproved.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Views\Resources\PlanUnapproved.png">
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\PlanVerification.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Views\Resources\PlanVerification.png">
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\TreatApproved.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Views\Resources\TreatApproved.png">
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\female-symbol.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\male-symbol.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\other-symbol.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Plan.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\PlanSum.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

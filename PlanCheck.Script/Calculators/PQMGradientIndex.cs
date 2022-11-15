@@ -12,8 +12,8 @@ namespace PlanCheck.Calculators
         {
             try
             {
-                // we have Gradient Index pattern
                 DVHData dvh = planningItem.Object.GetDVHCumulativeData(evalStructure.Object, DoseValuePresentation.Absolute, VolumePresentation.Relative, 0.1);
+
                 if ((dvh.SamplingCoverage < 0.9) || (dvh.Coverage < 0.9))
                 {
                     return "Unable to calculate - insufficient dose or sampling coverage";
@@ -39,7 +39,6 @@ namespace PlanCheck.Calculators
                     planDoseDouble = planSetup.TotalDose.Dose;
                 }
                 prescribedDose = new DoseValue(planDoseDouble, DoseValue.DoseUnit.cGy);
-                //var body = structureSet.Structures.Where(x => x.Id.Contains("BODY")).First();
                 VolumePresentation vpFinal = VolumePresentation.AbsoluteCm3;
                 DoseValuePresentation dvpFinal = (evalunit.Value.CompareTo("%") == 0) ? DoseValuePresentation.Relative : DoseValuePresentation.Absolute;
                 DoseValue dv = new DoseValue(double.Parse(eval.Value) / 100 * prescribedDose.Dose, DoseValue.DoseUnit.cGy);
@@ -51,6 +50,10 @@ namespace PlanCheck.Calculators
             catch (NullReferenceException)
             {
                 return "Unable to calculate - DVH is not valid";
+            }
+            catch (ApplicationException)
+            {
+                return "Unable to calculate - constraint is not valid";
             }
         }
     }

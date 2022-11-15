@@ -110,7 +110,7 @@ public static class Extensions
         switch (plan)
         {
             case PlanSetup planSetup: return "  -  " + planSetup.DosePerFraction.ValueAsString + " " + planSetup.DosePerFraction.UnitAsString + " x " + planSetup.NumberOfFractions + " to " + planSetup.TotalDose.ValueAsString + " " + planSetup.TotalDose.UnitAsString;
-            case PlanSum planSum: return "";
+            case PlanSum planSum: return "  -  PlanSum";
         }
         throw new InvalidOperationException("Unknown PlanningItem type.");
     }

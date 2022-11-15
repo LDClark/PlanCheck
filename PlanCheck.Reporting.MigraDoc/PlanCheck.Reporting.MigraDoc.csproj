@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -80,12 +80,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Internal\CustomStyles.cs" />
     <Compile Include="Internal\PQMsContent.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\PlanCheck.Reporting\PlanCheck.Reporting.csproj">
-      <Project>{9BB0CE8D-91C4-4E54-9AFA-EB8D9797E8EA}</Project>
-      <Name>PlanCheck.Reporting</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\female-symbol.png" />
