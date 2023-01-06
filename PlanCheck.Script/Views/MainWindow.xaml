@@ -132,7 +132,8 @@
                             <ModelVisual3D>
                                 <ModelVisual3D>
                                     <ModelVisual3D.Content>
-                                        <AmbientLight Color="White" />
+                                        <PointLight Color="White"
+                                                    Position="{Binding CameraPosition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                     </ModelVisual3D.Content>
                                 </ModelVisual3D>
                             </ModelVisual3D>

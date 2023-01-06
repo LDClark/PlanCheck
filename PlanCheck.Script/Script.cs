@@ -8,18 +8,25 @@ namespace VMS.TPS
     {
         public override void Run(PluginScriptContext context)
         {
-            var esapiService = new EsapiService(context);
-
-            using (var ui = new UiRunner())
+            if (context.Patient != null)
             {
-                ui.Run(() =>
+                var esapiService = new EsapiService(context);
+
+                using (var ui = new UiRunner())
                 {
-                    var window = new MainWindow();
-                    var dialogService = new DialogService(window);
-                    var viewModel = new MainViewModel(esapiService, dialogService);
-                    window.DataContext = viewModel;
-                    window.ShowDialog();
-                });
+                    ui.Run(() =>
+                    {
+                        var window = new MainWindow();
+                        var dialogService = new DialogService(window);
+                        var viewModel = new MainViewModel(esapiService, dialogService);
+                        window.DataContext = viewModel;
+                        window.ShowDialog();
+                    });
+                }
+            }
+            else
+            {
+                MessageBox.Show("Please open a patient.", "PlanCheck");
             }
         }
     }
