@@ -1,10 +1,19 @@
-using System.Windows.Media.Media3D;
+using GalaSoft.MvvmLight;
 
 namespace PlanCheck
 {
-    public class CollisionCheckViewModel
+    public class CollisionCheckViewModel : ViewModelBase
     {
-        public bool View { get; set; }
+        private bool _view;
+        public bool View
+        {
+            get { return _view; }
+            set
+            {
+                _view = value;
+                RaisePropertyChanged("View");
+            }
+        }
         public string FieldID { get; set; }
         public string GantryToTable { get; set; }
         public string GantryToBody { get; set; }

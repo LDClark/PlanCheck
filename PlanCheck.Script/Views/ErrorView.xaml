@@ -1,0 +1,61 @@
+﻿<UserControl x:Class="PlanCheck.Views.ErrorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:PlanCheck.Views"
+             mc:Ignorable="d" 
+             Background="Black"
+             Foreground="LightGray"
+             d:DesignHeight="100" 
+             d:DesignWidth="800" 
+             >
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <TextBlock 
+            Grid.Row="0" 
+            Text="Plan Checks (PC)" />
+        <DataGrid x:Name="errorDataGrid"
+                    AutoGenerateColumns="False"
+                    Grid.Row="1" 
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    ItemsSource="{Binding ErrorGrid}"
+                    IsReadOnly="True"
+                    ColumnWidth="*" 
+                    Background="Black"
+                    Foreground="LightGray"  
+                    RowHeight="23">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Description" Binding="{Binding Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="600"/>
+                <DataGridTextColumn Header="Status" Binding="{Binding Status, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="*"/>
+                <DataGridTextColumn Header="Severity" Binding="{Binding Severity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="*"/>
+            </DataGrid.Columns>
+            <DataGrid.RowStyle>
+                <Style TargetType="DataGridRow">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Status}" Value="1 - Warning">
+                            <Setter Property="Background" Value="#FF6A2100"></Setter>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Status}" Value="2 - Variation">
+                            <Setter Property="Background" Value="#FF665D02"></Setter>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Status}" Value="3 - OK">
+                            <Setter Property="Background" Value="#FF096119"></Setter>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.RowStyle>
+            <DataGrid.Resources>
+                <Style BasedOn="{StaticResource {x:Type DataGridColumnHeader}}" TargetType="{x:Type DataGridColumnHeader}">
+                    <Setter Property="Background" Value="#FF2B2B2B" />
+                    <Setter Property="Foreground" Value="LightGray" />
+                    <Setter Property="BorderThickness" Value="2,2,2,2"/>
+                </Style>
+            </DataGrid.Resources>
+        </DataGrid>
+    </Grid>
+</UserControl>

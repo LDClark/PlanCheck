@@ -1,0 +1,75 @@
+﻿<UserControl x:Class="PlanCheck.Views.PlanContextView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:local="clr-namespace:PlanCheck.Views"
+        mc:Ignorable="d"
+        Background="Black"
+        Foreground="LightGray"            
+        d:DesignHeight="400" 
+        d:DesignWidth="300" 
+        >
+    <UserControl.Resources>
+        <CollectionViewSource x:Key="Plans" Source="{Binding Plans}">
+            <CollectionViewSource.GroupDescriptions>
+                <PropertyGroupDescription PropertyName="CourseId" />
+            </CollectionViewSource.GroupDescriptions>
+        </CollectionViewSource>
+    </UserControl.Resources>
+        <Grid >
+        <DockPanel
+            LastChildFill="True">
+            <TextBlock
+                DockPanel.Dock="Top"
+                Text="Plans:"
+                Margin="0,5,0,0"/>
+            <ListBox
+                DockPanel.Dock="Top"
+                ItemsSource="{Binding Source={StaticResource Plans}}"
+                SelectedItem="{Binding SelectedPlan, NotifyOnSourceUpdated=True}"
+                VerticalAlignment="Stretch"
+                Margin="0,5,0,0"    
+                Background="#FF2B2B2B"
+                Foreground="LightGray" >
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="SourceUpdated">
+                        <i:InvokeCommandAction Command="{Binding AnalyzePlanCommand}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding PlanIdWithFractionation}"/>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+                <ListBox.GroupStyle>
+                    <GroupStyle>
+                        <GroupStyle.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Text="{Binding Name, StringFormat=Course: \{0\}}"
+                                    FontWeight="Bold"
+                                    Foreground="Aqua"/>
+                            </DataTemplate>
+                        </GroupStyle.HeaderTemplate>
+                        <GroupStyle.ContainerStyle>
+                            <Style TargetType="GroupItem">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="GroupItem">
+                                            <StackPanel>
+                                                <ContentPresenter Margin="5,5,0,0" />
+                                                <ItemsPresenter Margin="5,3,5,0"/>
+                                            </StackPanel>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </GroupStyle.ContainerStyle>
+                    </GroupStyle>
+                </ListBox.GroupStyle>
+            </ListBox>
+        </DockPanel>
+    </Grid>
+</UserControl>
