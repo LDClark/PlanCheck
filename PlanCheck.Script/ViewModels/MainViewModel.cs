@@ -177,6 +177,53 @@ namespace PlanCheck
             CollimatorModel = null;
             CouchBodyModel = null;
             CollisionSummaries = null;
+            
+            if (type == "Plan")
+            {
+                var beamIds = await _esapiService.GetBeamIdsAsync(courseId, planId);
+
+                _dialogService.ShowProgressDialog("Adding body and couch...",
+                async progress =>
+                {
+                    CouchBodyModel = new Model3DGroup();
+                    var couchBodyModel = await _esapiService.AddCouchBodyAsync(courseId, planId);
+                    CouchBodyModel.Children.Add(couchBodyModel);
+                });
+
+                _dialogService.ShowProgressDialog("Getting camera position...",
+                async progress =>
+                {
+                    CameraPosition = await _esapiService.GetCameraPositionAsync(courseId, planId, beamIds.FirstOrDefault());
+                });
+
+                _dialogService.ShowProgressDialog("Getting isocenter...",
+                async progress =>
+                {
+                    Isoctr = await _esapiService.GetIsocenterAsync(courseId, planId, beamIds.FirstOrDefault());
+                });
+
+                _dialogService.ShowProgressDialog("Adding collimator...", beamIds.Length,
+                async progress =>
+                {
+                    CollisionSummaries = new ObservableCollection<CollisionCheckViewModel>();
+                    UpDir = new Vector3D(0, -1, 0);
+                    LookDir = new Vector3D(0, 0, 1);
+                    CollimatorModel = new Model3DGroup();
+                    foreach (var beamId in beamIds)
+                    {
+                        var collisionSummary = new CollisionCheckViewModel
+                        {
+                            View = true,
+                            FieldID = beamId,
+                            Status = "Not calculated"
+                        }
+;                       CollisionSummaries.Add(collisionSummary);
+                        var collimatorModel = await _esapiService.AddFieldMeshAsync(CollimatorModel, courseId, planId, beamId, collisionSummary.Status);
+                        CollimatorModel.Children.Add(collimatorModel);
+                        progress.Increment();
+                    }
+                });
+            }
 
             PQMViewModel[] pqms = ObjectiveViewModel.GetObjectives(SelectedConstraint);
 
@@ -204,8 +251,9 @@ namespace PlanCheck
                                 {
                                     if (structure.Id.ToUpper().CompareTo(alias.ToUpper()) == 0) //alias matches
                                     {
+                                        //add in the structure code and alias
                                         if (structure.Code != null)
-                                            templateSelected = pqm.TemplateId + "|" + alias + " : " + structure.Code; //add in the structure code and alias
+                                            templateSelected = pqm.TemplateId + "|" + alias + " : " + structure.Code; 
                                         else
                                             templateSelected = alias;
                                         await GetPQM(courseId, planId, structure, pqm, templateSelected, structures);
@@ -216,7 +264,8 @@ namespace PlanCheck
                             }
                             if (structure.Code != null)
                             {
-                                if (PQMs.Any(x => x.StructureNameWithCode != structure.NameWithCode)) //check to see if structure has already been found by name
+                                //check to see if structure has already been found by name
+                                if (PQMs.Any(x => x.StructureNameWithCode != structure.NameWithCode)) 
                                 {
                                     foreach (var code in pqm.TemplateCodes)
                                         if (code == structure.Code) //code matches
@@ -232,52 +281,6 @@ namespace PlanCheck
                     }
                 });
 
-            if (type == "Plan")
-            {
-                var beamIds = await _esapiService.GetBeamIdsAsync(courseId, planId);
-
-                _dialogService.ShowProgressDialog("Adding body and couch...",
-                async progress =>
-                {
-                    CouchBodyModel = new Model3DGroup();
-                    var couchBodyModel = await _esapiService.AddCouchBodyAsync(courseId, planId);
-                    CouchBodyModel.Children.Add(couchBodyModel);
-                });
-
-                _dialogService.ShowProgressDialog("Getting camera position...",
-                async progress =>
-                {
-                    CameraPosition = await _esapiService.GetCameraPositionAsync(courseId, planId, beamIds.FirstOrDefault());
-                });
-
-                _dialogService.ShowProgressDialog("Getting isocenter...",
-                async progress =>
-                {
-                    Isoctr = await _esapiService.GetIsocenterAsync(courseId, planId, beamIds.FirstOrDefault());
-                });
-
-                _dialogService.ShowProgressDialog("Adding collimator model...", beamIds.Length,
-                async progress =>
-                {
-                    CollisionSummaries = new ObservableCollection<CollisionCheckViewModel>();
-                    UpDir = new Vector3D(0, -1, 0);
-                    LookDir = new Vector3D(0, 0, 1);
-                    CollimatorModel = new Model3DGroup();
-                    foreach (var beamId in beamIds)
-                    {
-                        var collisionSummary = new CollisionCheckViewModel
-                        {
-                            View = true,
-                            FieldID = beamId,
-                            Status = "Not calculated"
-                        }
-;                       CollisionSummaries.Add(collisionSummary);
-                        var collimatorModel = await _esapiService.AddFieldMeshAsync(CollimatorModel, courseId, planId, beamId, collisionSummary.Status);
-                        CollimatorModel.Children.Add(collimatorModel);
-                        progress.Increment();
-                    }
-                });
-            }
 
             _dialogService.ShowProgressDialog("Finding errors...",
                 async progress =>

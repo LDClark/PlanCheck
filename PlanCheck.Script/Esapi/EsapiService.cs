@@ -106,24 +106,47 @@ namespace PlanCheck
             {
                 var planningItem = Extensions.GetPlanningItem(context.Patient, courseId, planId);
                 var structureSet = planningItem.StructureSet;
-                var body = structureSet.Structures.Where(x => x.Id.Contains("BODY")).First();
                 Structure couch = null;
-                try
+                Structure body = null;
+
+                foreach (Structure structure in structureSet.Structures)
+                {
+                    if (structure.StructureCode != null)
+                    {
+                        if (structure.StructureCode.Code.ToUpper().Contains("BODY"))
+                        {
+                            body = structure;
+                            break;
+                        }                                                      
+                    }
+                }
+
+                if (body == null)
                 {
                     foreach (Structure structure in structureSet.Structures)
                     {
-                        if (structure.StructureCodeInfos.FirstOrDefault().Code == "Support")
+                        if (structure.DicomType.ToUpper().Contains("EXTERNAL"))
                         {
-                            couch = structure;
-                        }
+                            body = structure;
+                            break;
+                        }                               
                     }
                 }
-                catch
-                {
 
+                foreach (Structure structure in structureSet.Structures)
+                {
+                    if (structure.StructureCode != null)
+                    {
+                        if (structure.StructureCode.Code.ToUpper().Contains("SUPPORT"))
+                        {
+                            couch = structure;
+                            break;
+                        }                       
+                    }
                 }
                 return CollisionCalculator.AddCouchBodyMesh(body, couch);
             });
+
         public Task<Model3DGroup> AddFieldMeshAsync(Model3DGroup modelGroup, string courseId, string planId, string beamId, string status) =>
             RunAsync(context =>
             {

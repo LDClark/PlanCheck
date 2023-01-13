@@ -17,7 +17,8 @@ namespace PlanCheck
             DirectoryInfo constraintDir = new DirectoryInfo(Path.Combine(AssemblyHelper.GetAssemblyDirectory(), "ConstraintTemplates"));
             if (!Directory.Exists(constraintDir.FullName))
             {
-                if (MessageBox.Show(string.Format("The template folder 'ConstraintTemplates' does not exist.  Create the directory and a default constraint?", constraintDir.FullName), 
+                if (MessageBox.Show(string.Format("The template folder 'ConstraintTemplates' does not exist.  " +
+                    "Create the directory and a default constraint?", constraintDir.FullName), 
                     "Folder not found", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                 {
                     var file = Path.Combine(constraintDir.FullName, "Default.csv");

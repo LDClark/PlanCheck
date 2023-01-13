@@ -68,14 +68,16 @@ namespace PlanCheck
                         double upperLimitHU = -425;
                         if (structure.AssignedHU <= upperLimitHU || structure.AssignedHU >= lowerLimitHU)
                         {
-                            description = string.Format("Structure {0} has assigned HU of {1} and is within limit of {2} to {3}.", structure, structure.AssignedHU, upperLimitHU, lowerLimitHU);
+                            description = string.Format("Structure {0} has assigned HU of {1} and is within limit of {2} to {3}.", 
+                                structure, structure.AssignedHU, upperLimitHU, lowerLimitHU);
                             severity = 1;
                             status = "3 - OK";                           
                             AddNewRow(description, status, severity, errorGrid);
                         }
                         else
                         {
-                            description = string.Format("Structure {0} has assigned HU of {1} and is outside limit of {2} to {3}.", structure, structure.AssignedHU, upperLimitHU, lowerLimitHU);
+                            description = string.Format("Structure {0} has assigned HU of {1} and is outside limit of {2} to {3}.", 
+                                structure, structure.AssignedHU, upperLimitHU, lowerLimitHU);
                             severity = 1;
                             status = "1 - Warning";                          
                             AddNewRow(description, status, severity, errorGrid);
@@ -100,14 +102,16 @@ namespace PlanCheck
 
                 if ((planningItem.CreationDateTime - imageCreationDateTime).TotalDays > 21)
                 {
-                    error = string.Format("CT and structure data ({0}) is {1} days older than plan creation date ({2}) and outside of 21 days.", imageCreationDateTime, (planningItem.CreationDateTime - imageCreationDateTime).TotalDays.ToString("0"), planningItem.CreationDateTime);
+                    error = string.Format("CT and structure data ({0}) is {1} days older than plan creation date ({2}) and outside of 21 days.", 
+                        imageCreationDateTime, (planningItem.CreationDateTime - imageCreationDateTime).TotalDays.ToString("0"), planningItem.CreationDateTime);
                     errorStatus = "1 - Warning";
                     errorSeverity = 1;
                     AddNewRow(error, errorStatus, errorSeverity, errorGrid);
                 }
                 else
                 {
-                    error = string.Format("CT and structure data ({0}) is {1} days older than plan creation date ({2}) and within 21 days.", imageCreationDateTime, (planningItem.CreationDateTime - imageCreationDateTime).TotalDays.ToString("0"), planningItem.CreationDateTime);
+                    error = string.Format("CT and structure data ({0}) is {1} days older than plan creation date ({2}) and within 21 days.", 
+                        imageCreationDateTime, (planningItem.CreationDateTime - imageCreationDateTime).TotalDays.ToString("0"), planningItem.CreationDateTime);
                     errorStatus = "3 - OK";
                     errorSeverity = 1;
                     AddNewRow(error, errorStatus, errorSeverity, errorGrid);

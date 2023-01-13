@@ -171,12 +171,10 @@ namespace PlanCheck
                             //MessageBox.Show("Evaluating variation");
                             if (String.IsNullOrEmpty(variation))
                             {
-                                //MessageBox.Show(String.Format("Empty variation condition Achieved: {0} Variation: {1}", objective.Achieved.ToString(), objective.Variation.ToString()));
                                 met = "Not met";
                             }
                             else
                             {
-                                //MessageBox.Show(String.Format("Non Empty variation condition Achieved: {0} Variation: {1}", objective.Achieved.ToString(), objective.Variation.ToString()));
                                 if ((evalvalue - Double.Parse(variation)) <= 0)
                                 {
                                     met = "Variation";

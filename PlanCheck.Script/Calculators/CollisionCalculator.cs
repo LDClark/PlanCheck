@@ -18,6 +18,7 @@ namespace PlanCheck
         static readonly DiffuseMaterial greenMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.Green));
         static readonly DiffuseMaterial darkOrangeMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.DarkOrange));
         static readonly DiffuseMaterial yellowMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.Yellow));
+        static readonly DiffuseMaterial darkGreenMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.DarkGreen));
 
         //linac gantry parameters in cm
         static readonly double distToCollFace = 41.5;  //iso to collimator
@@ -102,8 +103,8 @@ namespace PlanCheck
 
         public static Model3DGroup AddFieldMesh(Beam beam, string status)
         {
-            var collimatorMaterial = greenMaterial;
-            var backMaterial = darkBlueMaterial;
+            var collimatorMaterial = darkGreenMaterial;
+            var backMaterial = greenYellowMaterial;
             var modelGroup = new Model3DGroup();
             var isoctr = GetIsocenter(beam);
             var iso3DMesh = CalculateIsoMesh(isoctr);
@@ -134,8 +135,9 @@ namespace PlanCheck
             var modelGroup = new Model3DGroup();
 
             if (couch != null)
-                modelGroup.Children.Add(new GeometryModel3D { Geometry = couch.MeshGeometry, Material = magentaMaterial, BackMaterial = darkBlueMaterial });
-            modelGroup.Children.Add(new GeometryModel3D { Geometry = body.MeshGeometry, Material = lightBlueMaterial, BackMaterial = darkBlueMaterial });
+                modelGroup.Children.Add(new GeometryModel3D { Geometry = couch.MeshGeometry, Material = magentaMaterial, BackMaterial = yellowMaterial });
+            if (body != null)
+                modelGroup.Children.Add(new GeometryModel3D { Geometry = body.MeshGeometry, Material = lightBlueMaterial, BackMaterial = yellowMaterial });
             modelGroup.Freeze();
             return modelGroup;
         }
@@ -163,7 +165,8 @@ namespace PlanCheck
         {
             var meshBuilder = new MeshBuilder(false, false);
             int thetaDiv = 20;
-            double tableAngle = beam.ControlPoints.First().PatientSupportAngle <= 180.0f ? (Math.PI / 180.0f) * beam.ControlPoints.First().PatientSupportAngle : (Math.PI / 180.0f) * (beam.ControlPoints.First().PatientSupportAngle - 360.0f);
+            double tableAngle = beam.ControlPoints.First().PatientSupportAngle <= 180.0f ? (Math.PI / 180.0f) * 
+                beam.ControlPoints.First().PatientSupportAngle : (Math.PI / 180.0f) * (beam.ControlPoints.First().PatientSupportAngle - 360.0f);
             double gantryAngle;
 
             if (beam.MLCPlanType.ToString() == "VMAT" || beam.Technique.Id.Contains("ARC"))
@@ -253,7 +256,8 @@ namespace PlanCheck
             return angle <= 180.0 ? (Math.PI / 180.0) * angle : (Math.PI / 180.0) * (angle - 360.0);
         }
 
-        public static MeshBuilder AddCylinderToMesh(MeshBuilder meshBuilder, double gantryAngle, double tableAngle, Point3D iso, int thetaDiv, double distanceFromIso, double cylinderThickness, double diameter)
+        public static MeshBuilder AddCylinderToMesh(MeshBuilder meshBuilder, double gantryAngle, double tableAngle, 
+            Point3D iso, int thetaDiv, double distanceFromIso, double cylinderThickness, double diameter)
         {
             Point3D circleCenter1 = new Point3D();
             Point3D circleCenter2 = new Point3D();
@@ -284,7 +288,8 @@ namespace PlanCheck
             {
                 foreach (Point3D point2 in meshPositions2)
                 {
-                    double distance = (Math.Sqrt((Math.Pow((point2.X - point1.X), 2)) + (Math.Pow((point2.Y - point1.Y), 2)) + (Math.Pow((point2.Z - point1.Z), 2)))) / 10;
+                    double distance = (Math.Sqrt((Math.Pow((point2.X - point1.X), 2)) + (Math.Pow((point2.Y - point1.Y), 2))
+                        + (Math.Pow((point2.Z - point1.Z), 2)))) / 10;
                     if (distance < shortestDistance)
                     {
                         shortestDistance = distance;

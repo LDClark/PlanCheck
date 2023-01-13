@@ -88,7 +88,8 @@ namespace PlanCheck
             }
         }
 
-        static public ObservableCollection<PlanningItemViewModel> GetPlanningItemList(IEnumerable<PlanSetup> planSetupsInScope, IEnumerable<PlanSum> planSumsInScope)
+        static public ObservableCollection<PlanningItemViewModel> GetPlanningItemList(IEnumerable<PlanSetup> planSetupsInScope, 
+            IEnumerable<PlanSum> planSumsInScope)
         {
             var PlanningItemComboBoxList = new ObservableCollection<PlanningItemViewModel>();
             foreach (PlanSetup planSetup in planSetupsInScope)
